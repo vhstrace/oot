@@ -1332,7 +1332,7 @@ scene, like `gameplay_keep`, the scene's keep object and Link's object.
 The object space is at least 1000 KB. There are 19 object slots
 (`ObjectContext.slots[19]`). Normally up to 3 are persistent, and the
 largest room object list in the ntsc-1.0 scenes has 15 objects (Lake
-Hylia, Market, Death Mountain Crater, Water Temple, Bottom of the Well),
+Hylia, Market, Death Mountain Trail, Water Temple, Bottom of the Well),
 so with the cucco the most used is 19. Only `Scene_CommandObjectList`
 adds objects after scene start. In scenes that already list `OBJECT_NIW`
 (Kakariko, Lon Lon Ranch), a second copy loads in the room part, and
