@@ -379,3 +379,49 @@ frame is still seen, since that frame then runs with the button down.
 - Music keeps playing while time is stopped.
 - Some worn N64 sticks rest past 10 and keep time moving; raise the 10 if
   so.
+
+## Every chest opens with the short kick
+
+**Source diff:** `cheats/patches/chests-open-with-no-delay.diff`
+**Changes:** built on the Mac. Changes the `ovl_player_actor` overlay.
+**Recorded:** 2026-11-11 00:06:20
+
+**Mechanism:** This is the OoT version of the ALTTP cheat "No delay for
+opening treasure chests". When Link opens a chest,
+`Player_ActionHandler_2` (`ovl_player_actor/z_player.c`) picks one of
+two ways:
+
+```c
+if ((giEntry->itemId != ITEM_NONE) && (giEntry->gi >= 0) &&
+    (Item_CheckObtainability(giEntry->itemId) == ITEM_NONE)) {
+    Player_AnimPlayOnceAdjusted(play, this, this->ageProperties->unk_98);
+    ...
+    chest->unk_1F4 = 1;
+    Camera_RequestSetting(Play_GetCamera(play, CAM_ID_MAIN), CAM_SET_SLOW_CHEST_CS);
+} else {
+    Player_AnimPlayOnce(play, this, &gPlayerAnim_link_normal_box_kick);
+    chest->unk_1F4 = -1;
+}
+```
+
+The first is the long cutscene for new major items (`link_demo_Tbox_open`,
+slow camera, the light beam `Demo_Tre_Lgt` and the chest fanfare, started
+by `EnBox_WaitOpen` when `unk_1F4 > 0`). The second is the quick kick
+used for small items. The patch adds `0 &&` to the condition, so every
+chest uses the quick kick.
+
+**Evidence:** `GET_ITEM` (top of `z_player.c`) makes `gi` negative for
+`CHEST_ANIM_SHORT`. `EnBox_WaitOpen` (`ovl_En_Box/z_en_box.c`) spawns
+`ACTOR_DEMO_TRE_LGT` and plays `NA_BGM_OPEN_TRE_BOX` only when
+`unk_1F4 > 0`; with `-1` it plays the short lid animation. The item
+is still given, with its normal get-item text, by
+`Player_Action_8084E6D4`. `git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Big items lose their chest light and fanfare. The get-item pose,
+  jingle and text box are not changed, so some wait is still there.
+- Link holds the item up with the small-item pose (`get_itemB`).

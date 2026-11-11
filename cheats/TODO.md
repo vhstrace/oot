@@ -37,7 +37,7 @@ sword beams fire at any health, and the two fireball long codes.
   `input[0]` in `Play_Update`, or change the buttons.
 - [x] Time moves only while any button or the analog stick is being pressed.
   Use `FrameAdvance_Update`.
-- [ ] No delay for opening treasure chests. Shorten the chest-open wait
+- [x] No delay for opening treasure chests. Shorten the chest-open wait
   in `ovl_En_Box` and the player's chest-open action.
 - [ ] Link picks up pots, bushes and rocks with almost no delay. Speed up
   the player's lift action.
