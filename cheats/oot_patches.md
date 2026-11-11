@@ -869,7 +869,7 @@ the turned model. `git apply --check` passes, and it builds.
 - Every `EnHorse` is turned around, also when no one rides it: Epona in
   Lon Lon Ranch, Ingo's horse in the race, and horses in cutscenes that
   use this actor.
-- The horse's hit spheres are set from the drawn skin, so they turn
-  around with the model. The horse's head is now behind it for things
-  like jumping fences.
+- The horse's hit spheres (`colliderJntSph`) and the hoof dust are set
+  from the drawn skin in `EnHorse_PostDraw`, so they turn around with the
+  model. Jumps and wall checks still use the direction of travel.
 - The control stick still steers by the direction of travel, as before.
