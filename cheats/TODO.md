@@ -73,7 +73,7 @@ sword beams fire at any health, and the two fireball long codes.
   the player's shield/guard collision.
 - [x] Thrown objects hit enemies anywhere. Make the collider of thrown
   pots, rocks and bombs much bigger.
-- [ ] Arrows fly through enemies (Sword beams fly through enemies).
+- [x] Arrows fly through enemies (Sword beams fly through enemies).
   `ovl_En_Arrow`: don't kill the arrow when it hits an actor.
 - [ ] Arrows fly twice as fast (Sword beams fly twice as fast).
   `ovl_En_Arrow`.

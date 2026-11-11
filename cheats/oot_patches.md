@@ -873,3 +873,40 @@ the turned model. `git apply --check` passes, and it builds.
   from the drawn skin in `EnHorse_PostDraw`, so they turn around with the
   model. Jumps and wall checks still use the direction of travel.
 - The control stick still steers by the direction of travel, as before.
+
+## Arrows fly through enemies
+
+**Source diff:** `patches/arrows-fly-through-enemies.diff`
+**Changes:** built on the Mac. Changes the `ovl_En_Arrow` overlay.
+**Recorded:** 2026-11-11 00:32:24
+
+**Mechanism:** in `EnArrow_Fly` (`z_en_arrow.c`), `atTouched` is set when
+the arrow's collider hit an actor (`this->collider.base.atFlags & AT_HIT`).
+Then the arrow stops: it sticks in the actor, carries it (for actors that
+can ride an arrow), or bounces off (`func_809B3CEC`). The patch adds a
+check before that: for arrows (`params < ARROW_SEED`), it clears `AT_HIT`
+and sets `atTouched` to false. So the arrow keeps flying. The hit still
+counts for the actor that was hit, since the collision system already gave
+it the damage. This is the OoT version of the ALTTP "Sword beams fly
+through enemies" cheat.
+
+**Evidence:** the actor's damage is set in `CollisionCheck_ApplyDamage`
+before the arrow's update reads `AT_HIT`, so clearing the flag only
+changes what the arrow does. The arrow's collider stays on, so it can hit
+more enemies on its way. Walls (`this->touchedPoly`) still stop it.
+`git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- An arrow can hit the same enemy on more than one frame while it passes
+  through. Most enemies are safe for a short time after a hit, so this
+  may not matter.
+- Fire, ice and light arrows burst into their effect when the arrow
+  hits something (`hitFlags`). They no longer burst on enemies, only on
+  walls and the floor, or when the arrow's time runs out.
+- Enemy arrows (negative `params`) also fly through what they hit,
+  including Link.
+- Slingshot seeds and Deku Nuts are not changed.
