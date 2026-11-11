@@ -1,0 +1,13 @@
+diff --git a/src/overlays/gamestates/ovl_file_choose/z_file_choose.c b/src/overlays/gamestates/ovl_file_choose/z_file_choose.c
+index cb98b7de7..0cf908689 100644
+--- a/src/overlays/gamestates/ovl_file_choose/z_file_choose.c
++++ b/src/overlays/gamestates/ovl_file_choose/z_file_choose.c
+@@ -1869,7 +1869,7 @@ void FileSelect_FadeOut(GameState* thisx) {
+ void FileSelect_LoadGame(GameState* thisx) {
+     FileSelectState* this = (FileSelectState*)thisx;
+ 
+-#if DEBUG_FEATURES
++#if 1
+     if (this->buttonIndex == FS_BTN_SELECT_FILE_1) {
+         SFX_PLAY_CENTERED(NA_SE_SY_FSEL_DECIDE_L);
+         gSaveContext.fileNum = this->buttonIndex;

@@ -521,3 +521,32 @@ it, and copies the file name over the debug name "LINK".
 - No intro cutscene, so Navi's first meeting is skipped. Story flags for
   later events are not set, so the story still runs from the start.
 - Files already saved are not changed.
+
+## Loading File 1 opens the map select
+
+**Source diff:** `patches/file-1-opens-map-select.diff`
+**Changes:** built on the Mac. Changes the `ovl_file_choose` overlay.
+**Recorded:** 2026-11-11 00:13:00
+
+**Mechanism:** `FileSelect_LoadGame` in `z_file_choose.c` has a block
+that only the debug ROM builds (`#if DEBUG_FEATURES`). When the player
+loads File 1, it opens the save and then goes to `MapSelect_Init`
+instead of `Play_Init`. The patch changes `#if DEBUG_FEATURES` to
+`#if 1`, so the retail build has the block too.
+
+**Evidence:** `ovl_select` (the map select) and `z_select_static` are
+already in the retail ROM (`ovl_select.plf` is in the map), so only this
+one gate is missing. `git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- File 1 must exist. Make a file in slot 1 first, then load it.
+- The map select uses File 1's save, not the debug save, since
+  `gSaveContext.fileNum` is 0 and not `0xFF`.
+- Files 2 and 3 load the game as before.
+- The other controller 2 debug features (L+R+Z to the map select and so on)
+  stay off. They are `#if DEBUG_FEATURES` code in `graph.c` and other
+  files.

@@ -50,7 +50,7 @@ sword beams fire at any health, and the two fireball long codes.
   (`ovl_opening/z_opening.c`); the call for file 1 in `Sram_InitSave` is
   behind `DEBUG_FEATURES`. Call it from `Sram_InitSave` instead of
   `Sram_InitNewSave`.
-- [ ] Turn on the map select (Turn on the controller 2 debug features).
+- [x] Turn on the map select (Turn on the controller 2 debug features).
   `ovl_select` is in the retail ROM. Boot into it, or open it from the
   title screen.
 - [ ] Start a new game with a better sword and shield (Link's uncle gives
