@@ -1483,3 +1483,48 @@ and it builds.
 - Three times the enemies use more memory and CPU. Rooms with many enemies
   may slow down, and if memory runs out some enemies don't spawn.
 - Bosses (`ACTORCAT_BOSS`) are not copied.
+
+## Castle courtyard guards move at double speed
+
+**Source diff:** `patches/castle-guards-move-at-double-speed.diff`
+**Changes:** built on the Mac. Changes the `ovl_En_Heishi1` overlay.
+**Recorded:** 2026-11-11 00:49:58
+
+**Mechanism:** `ovl_En_Heishi1` is the patrolling guard in the Hyrule
+Castle courtyard (`hairal_niwa`, day and night). Each guard copies one
+row of `sAnimParamsInit` into `animSpeed`, `moveSpeedTarget`,
+`moveSpeedMax`, `bodyTurnSpeedTarget`, `bodyTurnSpeedMax` and the
+head-turn values. `EnHeishi1_Walk` walks along the path with
+`Math_ApproachF(..., this->moveSpeed)`. When a guard sees Link,
+`EnHeishi1_MoveToLink` walks to him with `Math_ApproachF(&this->moveSpeed,
+6.0f, 1.0f, 0.4f)`, turning at up to `3000.0f`.
+
+The patch doubles the walk animation speed, the move speed and its step,
+and the body turn speed and its step, in all four `sAnimParamsInit` rows
+(`1.0f, ..., 3.0f, 0.5f, 1000.0f, 200.0f` to `2.0f, ..., 6.0f, 1.0f,
+2000.0f, 400.0f`, and `3.0f, ..., 6.0f, 0.8f, 2000.0f, 400.0f` to
+`6.0f, ..., 12.0f, 1.6f, 4000.0f, 800.0f`). It does the same in
+`EnHeishi1_SetupMoveToLink` (animation `3.0f` to `6.0f`) and
+`EnHeishi1_MoveToLink` (`6.0f, 0.4f` to `12.0f, 0.8f`, and `3000.0f,
+300.0f` to `6000.0f, 600.0f`). The head-turn values are not changed, so
+the guards look around at the usual speed. This is the OoT version of the
+ALTTP cheats "Soldiers chase Link at double speed" and "Soldiers move
+faster".
+
+**Evidence:** The field order is from `z_en_heishi1.h` (the second value,
+`-10.0f` or `-3.0f`, is the animation morph and is not changed).
+`Math_ApproachF` doesn't overshoot, so the guards still reach each
+waypoint; the waypoint check is within 20 units. `ACTOR_EN_HEISHI1` is
+only in the `hairal_niwa` and `hairal_niwa_n` actor lists. `git apply
+--check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- OoT guards don't fight. When one sees Link, the game shows a message and
+  throws him out, so the faster guards mainly make the courtyard
+  sneaking harder.
+- Other guards (`ovl_En_Heishi2`, `3` and `4`, at the castle gate,
+  the market and Kakariko) stand still or talk, and are not changed.

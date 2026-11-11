@@ -110,7 +110,7 @@ sword beams fire at any health, and the two fireball long codes.
 - [x] Enemies spawn several copies and come back after you kill them
   (Overworld enemies spawn several copies ...). Don't set the
   room-clear/kill flags, and spawn each enemy more than once.
-- [ ] Hyrule Castle guards chase Link at double speed (Soldiers chase
+- [x] Hyrule Castle guards chase Link at double speed (Soldiers chase
   Link at double speed / Soldiers move faster). `ovl_En_Heishi*`.
 - [ ] Octoroks spit something other than rocks.
   `ovl_En_Okuta`: spawn another actor instead of the rock.
