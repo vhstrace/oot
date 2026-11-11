@@ -141,5 +141,5 @@ sword beams fire at any health, and the two fireball long codes.
   number when a sequence sets one (`src/audio/`).
 - [x] Music and sound effects play 2 whole tones higher. Add 4 semitones
   in the note pitch calculation (`src/audio/`).
-- [ ] Every sound effect comes from the wrong sound list. Shift the sound
+- [x] Every sound effect comes from the wrong sound list. Shift the sound
   bank part of each sfx id in `Audio_PlaySfxGeneral`.

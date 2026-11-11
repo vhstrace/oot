@@ -1956,3 +1956,56 @@ step. `git apply --check` passes, and it builds.
   sample rate is held at 4 times, so it is less than 4 semitones higher.
 - Samples play faster, so sound effects and voices are a little shorter.
   Note lengths in the music don't change, so the tempo stays the same.
+
+## Every sound effect comes from the wrong sound list
+
+**Source diff:** `cheats/patches/sfx-come-from-wrong-list.diff`
+**Changes:** built on the Mac. Changes `code` (the audio part,
+`src/audio/game/sfx.c`).
+**Recorded:** 2026-11-11 01:05:42
+
+**Mechanism:** A sound effect id (`include/sfx.h`) is the bank in bits
+12-15, flags in bits 9-11 and the index in the bank in bits 0-8
+(`SFX_BANK`, `SFX_INDEX`). The bank picks which list of sounds in
+sequence 0 plays it: player, item, environment, enemy, system, ocarina
+or voice. `Audio_PlaySfxGeneral` (`src/audio/game/sfx.c`) queues the id
+as it is.
+
+The patch adds `Audio_WrongSfxListId`, which moves an id to the next
+bank (player to item, item to environment, environment to enemy, enemy
+to system, system to voice, voice to player) and keeps the flags. The
+index is taken modulo the new bank's size (`NA_SE_*_END -
+(NA_SE_*_BASE + 1)`), so it always names a real sound. The ocarina
+bank stays as it is. `Audio_PlaySfxGeneral` calls it on every id, so
+each sound effect plays the sound at the same place in another list.
+This is the OoT version of the ALTTP cheat "Every sound effect comes
+from the wrong sound list".
+
+`Audio_StopSfxByPosAndId`, `Audio_StopSfxByTokenAndId`,
+`Audio_StopSfxById` and `Audio_IsSfxPlaying` call it too, so game
+code that stops a looping sound, or waits for one to end, finds it under
+its new id.
+
+**Evidence:** `SFX_BANK`, `SFX_INDEX`, the `BANK_*` enum and the
+`NA_SE_*_BASE`/`_END` values are in `include/sfx.h`. Every sound
+effect call (`Sfx_PlaySfxCentered`, `Actor_PlaySfx`, `func_800F4*`
+and so on) ends in `Audio_PlaySfxGeneral`. Nothing else in
+`src/audio/game/` or `src/code/` compares an id against
+`gSfxBanks`. `git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Ocarina sounds (`BANK_OCARINA`, such as Link's ocarina notes) are
+  left as they are, since the ocarina's notes are set through its own
+  channel and would be silent in another bank. Nothing is moved into the
+  ocarina bank.
+- Some sounds in the new list are long loops (for example environment
+  sounds). A short sound that becomes a loop plays until the game stops
+  the old id, or until the bank entry is pushed out by other sounds.
+- Bank sizes differ, so many ids in a large bank (enemy has the most)
+  land on the same few sounds of a small bank.
+- System sounds (menu cursor, text) become voice sounds, so the pause
+  menu and text boxes make Link's voice sounds.

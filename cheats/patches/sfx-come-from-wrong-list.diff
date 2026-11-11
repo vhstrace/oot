@@ -1,0 +1,74 @@
+diff --git a/src/audio/game/sfx.c b/src/audio/game/sfx.c
+index ec44bd9dd..cfbbc7722 100644
+--- a/src/audio/game/sfx.c
++++ b/src/audio/game/sfx.c
+@@ -73,7 +73,28 @@ void Audio_ClearBGMMute(u8 channelIndex) {
+     }
+ }
+ 
+-void Audio_PlaySfxGeneral(u16 sfxId, Vec3f* pos, u8 token, f32* freqScale, f32* vol, s8* reverbAdd) {
++// Number of sfx in each bank, and the bank each one is moved to (ocarina stays).
++static u16 sSfxBankCounts[7] = {
++    NA_SE_PL_END - (NA_SE_PL_BASE + 1), NA_SE_IT_END - (NA_SE_IT_BASE + 1), NA_SE_EV_END - (NA_SE_EV_BASE + 1),
++    NA_SE_EN_END - (NA_SE_EN_BASE + 1), NA_SE_SY_END - (NA_SE_SY_BASE + 1), NA_SE_OC_END - (NA_SE_OC_BASE + 1),
++    NA_SE_VO_END - (NA_SE_VO_BASE + 1),
++};
++static u8 sNextSfxBank[7] = {
++    BANK_ITEM, BANK_ENV, BANK_ENEMY, BANK_SYSTEM, BANK_VOICE, BANK_OCARINA, BANK_PLAYER,
++};
++
++u32 Audio_WrongSfxListId(u32 sfxId) {
++    u32 bankId;
++
++    if ((sfxId == NA_SE_NONE) || (SFX_BANK(sfxId) >= 7)) {
++        return sfxId;
++    }
++    bankId = sNextSfxBank[SFX_BANK(sfxId)];
++    return (bankId << 12) | (sfxId & 0xE00) | (SFX_INDEX(sfxId) % sSfxBankCounts[bankId]);
++}
++
++void Audio_PlaySfxGeneral(u16 origSfxId, Vec3f* pos, u8 token, f32* freqScale, f32* vol, s8* reverbAdd) {
++    u16 sfxId = Audio_WrongSfxListId(origSfxId);
+     UNUSED_NDEBUG u8 i;
+     SfxRequest* req;
+ 
+@@ -580,7 +601,8 @@ void Audio_StopSfxByPos(Vec3f* pos) {
+     Audio_RemoveMatchingSfxRequests(2, &cmp);
+ }
+ 
+-void Audio_StopSfxByPosAndId(Vec3f* pos, u16 sfxId) {
++void Audio_StopSfxByPosAndId(Vec3f* pos, u16 origSfxId) {
++    u16 sfxId = Audio_WrongSfxListId(origSfxId);
+     SfxBankEntry* entry;
+     u8 entryIndex = gSfxBanks[SFX_BANK(sfxId)][0].next;
+     u8 prevEntryIndex = 0;
+@@ -608,7 +630,8 @@ void Audio_StopSfxByPosAndId(Vec3f* pos, u16 sfxId) {
+     Audio_RemoveMatchingSfxRequests(3, &cmp);
+ }
+ 
+-void Audio_StopSfxByTokenAndId(u8 token, u16 sfxId) {
++void Audio_StopSfxByTokenAndId(u8 token, u16 origSfxId) {
++    u16 sfxId = Audio_WrongSfxListId(origSfxId);
+     SfxBankEntry* entry;
+     u8 entryIndex = gSfxBanks[SFX_BANK(sfxId)][0].next;
+     u8 prevEntryIndex = 0;
+@@ -635,7 +658,8 @@ void Audio_StopSfxByTokenAndId(u8 token, u16 sfxId) {
+     Audio_RemoveMatchingSfxRequests(4, &cmp);
+ }
+ 
+-void Audio_StopSfxById(u32 sfxId) {
++void Audio_StopSfxById(u32 origSfxId) {
++    u32 sfxId = Audio_WrongSfxListId(origSfxId);
+     SfxBankEntry* entry;
+     u8 entryIndex = gSfxBanks[SFX_BANK(sfxId)][0].next;
+     u8 prevEntryIndex = 0;
+@@ -699,7 +723,8 @@ void func_800F8F88(void) {
+     }
+ }
+ 
+-u8 Audio_IsSfxPlaying(u32 sfxId) {
++u8 Audio_IsSfxPlaying(u32 origSfxId) {
++    u32 sfxId = Audio_WrongSfxListId(origSfxId);
+     SfxBankEntry* entry;
+     u8 entryIndex = gSfxBanks[SFX_BANK(sfxId)][0].next;
+ 
