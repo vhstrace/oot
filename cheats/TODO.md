@@ -107,7 +107,7 @@ sword beams fire at any health, and the two fireball long codes.
   common enemy chase code, or in `Actor_WorldYawTowardActor`.
 - [x] Enemies pass through Link. Turn off enemy-to-player collision
   (OC) in `z_collision_check.c`.
-- [ ] Enemies spawn several copies and come back after you kill them
+- [x] Enemies spawn several copies and come back after you kill them
   (Overworld enemies spawn several copies ...). Don't set the
   room-clear/kill flags, and spawn each enemy more than once.
 - [ ] Hyrule Castle guards chase Link at double speed (Soldiers chase

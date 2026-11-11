@@ -1,0 +1,36 @@
+diff --git a/src/code/z_actor.c b/src/code/z_actor.c
+index 243dc7fbb..c3e831620 100644
+--- a/src/code/z_actor.c
++++ b/src/code/z_actor.c
+@@ -3254,8 +3254,7 @@ Actor* Actor_Spawn(ActorContext* actorCtx, PlayState* play, s16 actorId, f32 pos
+ 
+     objectSlot = Object_GetSlot(&play->objectCtx, profile->objectId);
+ 
+-    if ((objectSlot < 0) ||
+-        ((profile->category == ACTORCAT_ENEMY) && Flags_GetClear(play, play->roomCtx.curRoom.num))) {
++    if (objectSlot < 0) {
+         PRINTF(ACTOR_COLOR_ERROR T("データバンク無し！！<データバンク＝%d>(profilep->bank=%d)\n",
+                                    "No data bank!! <data bank=%d> (profilep->bank=%d)\n") ACTOR_RST,
+                objectSlot, profile->objectId);
+@@ -3367,8 +3366,19 @@ void Actor_SpawnTransitionActors(PlayState* play, ActorContext* actorCtx) {
+ }
+ 
+ Actor* Actor_SpawnEntry(ActorContext* actorCtx, ActorEntry* actorEntry, PlayState* play) {
+-    return Actor_Spawn(actorCtx, play, actorEntry->id, actorEntry->pos.x, actorEntry->pos.y, actorEntry->pos.z,
+-                       actorEntry->rot.x, actorEntry->rot.y, actorEntry->rot.z, actorEntry->params);
++    Actor* actor = Actor_Spawn(actorCtx, play, actorEntry->id, actorEntry->pos.x, actorEntry->pos.y,
++                               actorEntry->pos.z, actorEntry->rot.x, actorEntry->rot.y, actorEntry->rot.z,
++                               actorEntry->params);
++    s32 i;
++
++    if ((actor != NULL) && (actor->category == ACTORCAT_ENEMY) && (actorEntry->id != ACTOR_EN_SW)) {
++        for (i = 0; i < 2; i++) {
++            Actor_Spawn(actorCtx, play, actorEntry->id, actorEntry->pos.x, actorEntry->pos.y, actorEntry->pos.z,
++                        actorEntry->rot.x, actorEntry->rot.y, actorEntry->rot.z, actorEntry->params);
++        }
++    }
++
++    return actor;
+ }
+ 
+ Actor* Actor_Delete(ActorContext* actorCtx, Actor* actor, PlayState* play) {

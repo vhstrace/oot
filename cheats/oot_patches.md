@@ -1431,3 +1431,54 @@ other actors. `git apply --check` passes, and it builds.
   (`ovl_En_Floormas`). Armos (`ovl_En_Am`) use an OC touch to wake up
   and to stop when they bump into Link, so they may act differently.
 - Bosses (`ACTORCAT_BOSS`) still push Link.
+
+## Enemies spawn three at a time and come back after you clear a room
+
+**Source diff:** `patches/enemies-spawn-copies-and-come-back.diff`
+**Changes:** built on the Mac. Changes `code` (`z_actor.c`).
+**Recorded:** 2026-11-11 00:48:18
+
+**Mechanism:** When a room loads, `Actor_SpawnEntry`
+(`src/code/z_actor.c`) spawns each actor in the room's actor list with
+`Actor_Spawn`. The patch checks the new actor, and if it is in
+`ACTORCAT_ENEMY`, it spawns two more of the same actor with the same
+position, rotation and params. So each enemy in a room's list comes as
+three.
+
+`Actor_Spawn` also refuses to spawn any enemy in a room whose clear flag
+is set: `((profile->category == ACTORCAT_ENEMY) &&
+Flags_GetClear(play, play->roomCtx.curRoom.num))`. The patch removes this
+part, so enemies come back in those rooms too. This is the OoT version of
+the ALTTP cheat "Overworld enemies spawn several copies and come back after
+you kill them".
+
+**Evidence:** In OoT most enemies already come back when Link leaves a
+room and comes back. Only rooms with the clear flag set
+(`Flags_SetClear`) keep their enemies away. That flag is set after some
+fights, for example Big Octo (`ovl_En_Bigokuta`), the Deku Scrub puzzle
+(`ovl_En_Hintnuts`), the ice shutter rooms (`ovl_Bg_Ice_Shutter`) and
+boss rooms. The flag itself is still set, so doors and other things that
+read it stay open. Gold Skulltulas (`ACTOR_EN_SW`) are not copied, since
+each copy would carry the same token flag. `git apply --check` passes,
+and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The three copies start at the same spot. Most push each other apart
+  (OC), but enemies with no OC (Skulltulas on walls, for example) may stay
+  on top of each other and look like one.
+- Mini-bosses and scripted enemies come as three too (Stalfos, Lizalfos,
+  Iron Knuckles, Dark Link, Poe Sisters, Dead Hand and so on). Their
+  cutscenes, music and room-clear checks were made for one, so some fights
+  may act strangely or not end.
+- Enemies that the game spawns later (Stalchildren in Hyrule Field,
+  enemies that come out of the ground) are not copied. Only room actor
+  lists are.
+- Big Octo and other enemies held back by the clear flag come back. Some
+  of them may also check their own flags.
+- Three times the enemies use more memory and CPU. Rooms with many enemies
+  may slow down, and if memory runs out some enemies don't spawn.
+- Bosses (`ACTORCAT_BOSS`) are not copied.
