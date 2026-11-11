@@ -689,3 +689,35 @@ value for its glow and rumble. `git apply --check` passes, and it builds.
   still starts at 0.5, as before.
 - With the Great Spin magic upgrade, every charged spin uses magic for the
   big spin, as a full charge does.
+
+## Hold B to keep swinging the sword
+
+**Source diff:** `patches/hold-b-to-keep-swinging.diff`
+**Changes:** built on the Mac. Changes the `ovl_player_actor` overlay.
+**Recorded:** 2026-11-11 00:17:40
+
+**Mechanism:** `func_8083BB20` in `z_player.c` decides if Link starts a
+sword swing. For the player it returns true only when `sUseHeldItem` is
+set, which happens on a new press of the button. `Player_ActionHandler_7`
+calls it to start a swing, and `Player_Action_808502D0` calls
+`Player_ActionHandler_7` when a swing ends, to chain the next one. The
+patch changes `if (sUseHeldItem ||` to
+`if (sUseHeldItem || sHeldItemButtonIsHeldDown ||`.
+`sHeldItemButtonIsHeldDown` is true each frame the button for the held
+item is down (set in `Player_ProcessItemButtons`). So with B held, a new
+swing starts as soon as the last one ends.
+
+**Evidence:** `sHeldItemButtonIsHeldDown` is cleared each frame and set
+again only while the button of the item in Link's hand is held.
+`func_8083BB20` also needs a melee weapon in hand and no shield up.
+`git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Each swing still plays to its end. Only the wait for a new press is gone.
+- Holding B now swings again in place of charging, so the charged spin
+  attack can't start. The quick spin (roll the stick, then B) still works.
+- Holding a C button with a Deku Stick in hand also swings again and again.

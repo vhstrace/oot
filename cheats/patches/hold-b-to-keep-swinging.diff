@@ -1,0 +1,13 @@
+diff --git a/src/overlays/actors/ovl_player_actor/z_player.c b/src/overlays/actors/ovl_player_actor/z_player.c
+index b8c908ad2..f40636cfe 100644
+--- a/src/overlays/actors/ovl_player_actor/z_player.c
++++ b/src/overlays/actors/ovl_player_actor/z_player.c
+@@ -6329,7 +6329,7 @@ void func_8083BA90(PlayState* play, Player* this, s32 arg2, f32 xzSpeed, f32 yVe
+ 
+ s32 func_8083BB20(Player* this) {
+     if (!(this->stateFlags1 & PLAYER_STATE1_SHIELDING) && (Player_GetMeleeWeaponHeld(this) != 0)) {
+-        if (sUseHeldItem ||
++        if (sUseHeldItem || sHeldItemButtonIsHeldDown ||
+             ((this->actor.category != ACTORCAT_PLAYER) && CHECK_BTN_ALL(sControlInput->press.button, BTN_B))) {
+             return 1;
+         }
