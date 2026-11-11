@@ -626,3 +626,37 @@ passes, and it builds.
   might be stuck in a state meant for one.
 - Only the exit from Link's house changes. Going into the house works as
   before.
+
+## Every enemy dies in one hit
+
+**Source diff:** `patches/every-enemy-dies-in-one-hit.diff`
+**Changes:** built on the Mac. Changes `code` (`z_collision_check.c`).
+**Recorded:** 2026-11-11 00:15:55
+
+**Mechanism:** `CollisionCheck_ApplyDamage` works out the damage of each
+hit (from the actor's damage table, or attack minus defense) and adds it
+with `col->actor->colChkInfo.damage += damage;`. The actor then takes it
+off its health, most often with `Actor_ApplyDamage`. The patch adds a
+check after the add: if the hit actor is `ACTORCAT_ENEMY` and the damage
+is not 0 but less than its health, the damage becomes its health. So any
+hit that does damage at all takes the enemy's health to 0.
+
+**Evidence:** `Actor_ApplyDamage` sets health to 0 when
+`health <= damage`. Setting the damage to exactly the health (and not
+`0xFF`) also works for actors that do `health -= damage` by themselves,
+since the u8 can't wrap. `git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Only actors in the enemy category. Bosses (`ACTORCAT_BOSS`) take normal
+  damage.
+- Hits with 0 damage stay at 0. Deku Nuts, the boomerang and other attacks
+  that only stun still only stun, and enemies that are immune to an attack
+  stay immune.
+- Some enemies keep their own health count or need a special attack to
+  finish them (for example, enemies that must be stunned first). They may
+  not die at once.
+- Enemy-on-enemy hits (rare) are also deadly.

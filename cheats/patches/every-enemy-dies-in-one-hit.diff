@@ -1,0 +1,15 @@
+diff --git a/src/code/z_collision_check.c b/src/code/z_collision_check.c
+index 2567c3b86..fa6d3ad9b 100644
+--- a/src/code/z_collision_check.c
++++ b/src/code/z_collision_check.c
+@@ -3106,6 +3106,10 @@ void CollisionCheck_ApplyDamage(UNUSED PlayState* play, UNUSED CollisionCheckCon
+     }
+     if (!(col->acFlags & AC_HARD)) {
+         col->actor->colChkInfo.damage += damage;
++        if ((col->actor->category == ACTORCAT_ENEMY) && (col->actor->colChkInfo.damage != 0) &&
++            (col->actor->colChkInfo.damage < col->actor->colChkInfo.health)) {
++            col->actor->colChkInfo.damage = col->actor->colChkInfo.health;
++        }
+     }
+ }
+ 
