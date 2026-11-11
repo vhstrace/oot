@@ -1659,5 +1659,6 @@ passes, and it builds.
   push.
 - Any other actor in `ACTORCAT_ENEMY` (parts or shots an enemy spawns in
   that category) is in the same list and pushes or gets pushed too.
-- Combined with "Every enemy moves with the speed of the enemy before it",
-  both changes apply; they change different functions.
+- The diff applies together with "Every enemy moves with the speed of the
+  enemy before it" (checked with `git apply --check`). That pair was not
+  built.
