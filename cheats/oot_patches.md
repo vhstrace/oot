@@ -425,3 +425,42 @@ is still given, with its normal get-item text, by
 - Big items lose their chest light and fanfare. The get-item pose,
   jingle and text box are not changed, so some wait is still there.
 - Link holds the item up with the small-item pose (`get_itemB`).
+
+## Link picks up pots, bushes and rocks 3 times as fast
+
+**Source diff:** `cheats/patches/link-lifts-with-almost-no-delay.diff`
+**Changes:** built on the Mac. Changes the `ovl_player_actor` overlay.
+**Recorded:** 2026-11-11 00:07:25
+
+**Mechanism:** `func_8083A0F4` (`ovl_player_actor/z_player.c`) starts
+every lift: it picks the action and animation (`carryB` for pots, bushes
+and small rocks, `link_silver_carry` for silver rocks,
+`link_normal_heavy_carry` for the big black boulders,
+`link_normal_nocarry_free` for trying to lift without strength), then
+plays it at normal speed:
+
+```c
+Player_AnimPlayOnce(play, this, anim);
+```
+
+The patch changes that line to
+`LinkAnimation_PlayOnceSetSpeed(play, &this->skelAnime, anim, 3.0f);`.
+The lift actions (`Player_Action_80846050`, `_80846260`,
+`_80846120`, `_80846408`) wait for the animation to end and grab the
+object on a set frame, so the whole lift takes about a third of the time.
+
+**Evidence:** `LinkAnimation_OnFrame` (`src/code/z_skelanime.c`)
+checks whether the frame was crossed since last update, using
+`playSpeed`, so the grab frames (4, 27, 41, 229) still fire at 3x speed.
+The heavy boulder still waits 20 frames after its animation
+(`this->av2.actionVar2++ > 20`). `git apply --check` passes, and it
+builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Throwing and putting things down are not changed.
+- The animation blends in from the previous pose over a few frames
+  (the morph), so it isn't instant.

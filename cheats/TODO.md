@@ -39,7 +39,7 @@ sword beams fire at any health, and the two fireball long codes.
   Use `FrameAdvance_Update`.
 - [x] No delay for opening treasure chests. Shorten the chest-open wait
   in `ovl_En_Box` and the player's chest-open action.
-- [ ] Link picks up pots, bushes and rocks with almost no delay. Speed up
+- [x] Link picks up pots, bushes and rocks with almost no delay. Speed up
   the player's lift action.
 
 ## Debug and start state
