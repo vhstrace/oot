@@ -1260,3 +1260,47 @@ the electric floor/wall and Ice Trap reactions, and lava/hot floor damage
 - Actors that grab or carry Link (Like Like, Wallmaster, Gerudo guards)
   use their own code, not this, and work as before.
 - While swimming, hits work as before.
+
+## Enemies always drop a prize
+
+**Source diff:** `patches/enemies-always-drop-a-prize.diff`
+**Changes:** built on the Mac. Changes `code` (`z_en_item00.c`).
+**Recorded:** 2026-11-11 00:42:21
+
+**Mechanism:** `Item_DropCollectibleRandom` (`src/code/z_en_item00.c`)
+picks a random slot (`Rand_ZeroOne() * 16.0f`) in one of the 16-slot drop
+tables (`sItemDropIds`). It drops nothing in four cases:
+
+- the slot holds `ITEM00_NONE`;
+- the slot holds `ITEM00_FLEXIBLE` and Link needs nothing (enough health,
+  magic, ammo, bombs and rupees), so it does `return;`;
+- the slot's count in `sDropQuantities` is 0;
+- `func_8001F404` turns the item into `ITEM00_NONE` (-1) because Link
+  can't use it (bombs with no Bomb Bag, seeds with no Slingshot, arrows with
+  no bow, magic with no magic meter).
+
+The patch drops a green rupee in each of these cases (and makes a count of
+0 into 1). Everything else, like hearts, magic, fairies when Link is low on
+health, and the drops set by `dropFlag`, works as before. This is the OoT
+version of the ALTTP cheat "Enemies always drop a prize".
+
+**Evidence:** `ITEM00_NONE` is `0xFF` (`include/z_en_item00.h`), and
+`dropId` is a `u8`, so the `-1` from `func_8001F404` compares equal to
+it. Counts of 0 are in table 3 (slots 12 to 15) and table 10 (slot 14).
+`git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Everything that uses `Item_DropCollectibleRandom` always drops
+  something, not only enemies. That includes grass (`ovl_En_Kusa`), small
+  rocks (`ovl_En_Ishi`), bushes and trees (`ovl_En_Wood02`) and hidden
+  item spots (`ovl_En_Wonder_Item`). Many enemies call it with no actor,
+  so the patch can't tell them apart from grass.
+- Enemies that drop items in their own way (not through this function)
+  work as before. Some enemies drop nothing at all.
+- The extra prizes are mostly green rupees.
+- Calls with the `0x8000` flag go to `Item_DropCollectible` and are not
+  changed.

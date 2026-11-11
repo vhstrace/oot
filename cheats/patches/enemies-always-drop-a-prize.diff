@@ -1,0 +1,38 @@
+diff --git a/src/code/z_en_item00.c b/src/code/z_en_item00.c
+index 5c1d325d7..13ee230f7 100644
+--- a/src/code/z_en_item00.c
++++ b/src/code/z_en_item00.c
+@@ -1317,6 +1317,10 @@ void Item_DropCollectibleRandom(PlayState* play, Actor* fromActor, Vec3f* spawnP
+         dropId = sItemDropIds[params + dropTableIndex];
+     }
+ 
++    if (dropId == ITEM00_NONE) {
++        dropId = ITEM00_RUPEE_GREEN;
++    }
++
+     if (dropId == ITEM00_FLEXIBLE) {
+         if (gSaveContext.save.info.playerData.health <= 0x10) { // 1 heart or less
+             Actor_Spawn(&play->actorCtx, play, ACTOR_EN_ELF, spawnPos->x, spawnPos->y + 40.0f, spawnPos->z, 0, 0, 0,
+@@ -1359,15 +1363,21 @@ void Item_DropCollectibleRandom(PlayState* play, Actor* fromActor, Vec3f* spawnP
+             dropTableIndex = 0x0;
+             dropId = ITEM00_RUPEE_RED;
+         } else {
+-            return;
++            dropId = ITEM00_RUPEE_GREEN;
+         }
+     }
+ 
+     if (dropId != ITEM00_NONE) {
+         dropQuantity = sDropQuantities[params + dropTableIndex];
++        if (dropQuantity == 0) {
++            dropQuantity = 1;
++        }
+         while (dropQuantity > 0) {
+             if (!param8000) {
+                 dropId = func_8001F404(dropId);
++                if (dropId == ITEM00_NONE) {
++                    dropId = ITEM00_RUPEE_GREEN;
++                }
+                 if (dropId != ITEM00_NONE) {
+                     spawnedActor = (EnItem00*)Actor_Spawn(&play->actorCtx, play, ACTOR_EN_ITEM00, spawnPos->x,
+                                                           spawnPos->y, spawnPos->z, 0, 0, 0, dropId);

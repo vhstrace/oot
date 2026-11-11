@@ -99,7 +99,7 @@ sword beams fire at any health, and the two fireball long codes.
 
 ## Enemies
 
-- [ ] Enemies always drop a prize. `Item_DropCollectibleRandom`
+- [x] Enemies always drop a prize. `Item_DropCollectibleRandom`
   (`src/code/z_en_item00.c`): skip the "no drop" roll.
 - [ ] Enemies drop cuccos instead of prizes. Spawn `ovl_En_Niw` from
   `Item_DropCollectibleRandom`.
