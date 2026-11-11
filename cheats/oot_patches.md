@@ -181,6 +181,8 @@ builds only), but Link keeps gravity. No `#if` checks here.
 **Changes:** built on the Mac. Changes the `ovl_player_actor` overlay.
 **Recorded:** 2026-11-11 00:02:03
 
+Tags: `demo-ready` `play-start`
+
 **Mechanism:** In `Player_UpdateCommon` (`ovl_player_actor/z_player.c`)
 Link keeps his momentum on floor type 5 (the slippery floor type) and
 with the Hover Boots:
@@ -207,7 +209,9 @@ No `#if` checks here. `git apply --check` passes, and it builds.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-11 (RetroArch, BPS patch): works. The
+  first BPS also had the horse-backwards change by mistake; it was
+  rebuilt without it the same day.
 - Only Link slides. Enemies, Epona and other actors walk as normal.
 - Standing still on a slope may still slide Link down as before; turning
   around fast makes him stop first, then speed up the other way.
