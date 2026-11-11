@@ -751,8 +751,8 @@ passes, and it builds.
 - The sword model and its trail look the same. Only the hit boxes grow.
 - The hit boxes go through walls, so the sword can hit enemies, switches,
   pots and grass behind walls.
-- It also works for the Hammer and Biggoron's Sword. The Deku Stick uses a
-  length of 0, but the 1200 base is now 30000, so it also gets a long
-  reach.
+- It also works for the Hammer, Biggoron's Sword and the Deku Stick. The
+  Deku Stick sets its own length (\`this->unk_85C * 5000.0f\`), but it goes
+  through the same function, so it gets the long reach too.
 - The hit boxes are long but still thin. An enemy right above or below the
   swing's plane can still be missed.
