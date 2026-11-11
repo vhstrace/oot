@@ -910,3 +910,32 @@ more enemies on its way. Walls (`this->touchedPoly`) still stop it.
 - Enemy arrows (negative `params`) also fly through what they hit,
   including Link.
 - Slingshot seeds and Deku Nuts are not changed.
+
+## Arrows fly twice as fast
+
+**Source diff:** `patches/arrows-fly-twice-as-fast.diff`
+**Changes:** built on the Mac. Changes the `ovl_En_Arrow` overlay.
+**Recorded:** 2026-11-11 00:32:26
+
+**Mechanism:** `EnArrow_Shoot` (`z_en_arrow.c`) starts an arrow with
+`Actor_SetProjectileSpeed(&this->actor, 150.0f);` and `this->timer = 12;`.
+The patch changes the speed to `300.0f`. The timer stays at 12 frames, so
+the arrow also goes twice as far before it disappears. This is the OoT
+version of the ALTTP "Sword beams fly twice as fast" cheat.
+
+**Evidence:** the other branch (`params >= ARROW_SEED`, 80.0) is for
+slingshot seeds and Deku Nuts, and it doesn't change. `git apply --check`
+passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Arrows reach about 3600 units in place of 1800 before they vanish.
+- Gravity starts in the last frames (`this->timer < 7.2`), as before, so
+  long shots drop at the end the same way.
+- Enemy arrows (negative `params`) also fly twice as fast.
+- At this speed, an arrow can move past a thin target in one frame. The
+  collider covers the whole path of each frame
+  (`Player_UpdateWeaponInfo`), so this should be rare.
