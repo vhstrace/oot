@@ -1713,8 +1713,8 @@ collected twice. `git apply --check` passes, and it builds.
 **Mechanism:** Link's strength upgrade is checked in three places in
 `ovl_player_actor/z_player.c`:
 
-- `func_8083A0F4` (the lift): for a bomb flower (`ACTOR_EN_BOMBF`) or a
-  bush-type `ACTOR_EN_KUSA` with `Player_GetStrength() <=
+- `func_8083A0F4` (the lift): for a bomb flower (`ACTOR_EN_BOMBF`) or an
+  `ACTOR_EN_KUSA` with `Player_GetStrength() <=
   PLAYER_STR_NONE`, Link plays the "can't pull" animation
   (`gPlayerAnim_link_normal_nocarry_free`, `Player_Action_80846408`)
   instead of lifting.
@@ -1743,8 +1743,8 @@ flower spawns its bomb when Link takes it (`EnBombf_GrowBomb`).
 - The pause screen still shows no bracelet or gauntlets, and child Link
   doesn't wear the bracelet.
 - Push blocks that need strength (`ovl_Obj_Oshihiki`) still need it.
-- Child Link can now lift silver rocks and the golden gauntlet blocks, but
-  those use adult lift animations and timing, which were made for adult
-  Link. They may look wrong for child Link.
+- Child Link can now lift silver rocks and the golden gauntlet blocks.
+  The normal game never lets him, so those lifts may look wrong for child
+  Link.
 - Bronze boulders (`ovl_Obj_Hamishi`) are broken with the hammer, not
   lifted, and are not changed.
