@@ -1,0 +1,16 @@
+#!/bin/sh
+# Cloud sessions may commit only files in cheats/. C source changes go in
+# cheats/patches/<slug>.diff (see .claude/CLAUDE.md), never in the tree.
+# Also refuse anything that looks like a ROM.
+
+bad=$(git diff --cached --name-only --diff-filter=ACMRD | grep -v '^cheats/')
+rom=$(git diff --cached --name-only --diff-filter=ACMR | grep -iE '\.(z64|n64|v64|bin)$')
+
+if [ -n "$bad" ] || [ -n "$rom" ]
+then
+	echo "pre-commit: only files in cheats/ may be committed, and no ROMs." >&2
+	[ -n "$bad" ] && echo "Outside cheats/:" >&2 && echo "$bad" | sed 's/^/  /' >&2
+	[ -n "$rom" ] && echo "ROM-like files:" >&2 && echo "$rom" | sed 's/^/  /' >&2
+	echo "Save C changes with git diff into cheats/patches/<slug>.diff, then git checkout the source." >&2
+	exit 1
+fi
