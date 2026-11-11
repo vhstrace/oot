@@ -1993,7 +1993,8 @@ timer sound in `src/code/z_actor.c`) looks for a playing sound by id in
 effect call (`Sfx_PlaySfxCentered`, `Actor_PlaySfx`, `func_800F4*`
 and so on) ends in `Audio_PlaySfxGeneral`. Outside `sfx.c`, only
 `func_800F4C58` compares an id against `gSfxBanks` (the other uses in
-`general.c` take a bank and entry index). `git apply --check` passes, and it builds.
+`general.c` take a bank and entry index). `git apply --check` passes,
+and it builds.
 
 **Revisions:** US NTSC 1.0 only. Others not checked.
 
