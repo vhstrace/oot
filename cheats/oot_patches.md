@@ -939,3 +939,29 @@ passes, and it builds.
 - At this speed, an arrow can move past a thin target in one frame. The
   collider covers the whole path of each frame
   (`Player_UpdateWeaponInfo`), so this should be rare.
+
+## Arrows fly at quarter speed
+
+**Source diff:** `patches/arrows-fly-at-quarter-speed.diff`
+**Changes:** built on the Mac. Changes the `ovl_En_Arrow` overlay.
+**Recorded:** 2026-11-11 00:32:28
+
+**Mechanism:** `EnArrow_Shoot` (`z_en_arrow.c`) starts an arrow with
+`Actor_SetProjectileSpeed(&this->actor, 150.0f);` and `this->timer = 12;`.
+The patch changes the speed to `37.5f` and the timer to `48`. So arrows
+fly at a quarter of the speed, and still go the same distance (1800 units)
+before they vanish. This is the OoT version of the ALTTP "Sword beams fly
+at quarter speed" cheat.
+
+**Evidence:** `EnArrow_Fly` kills the arrow when the timer reaches 0, and
+turns on gravity (`-0.4`) when `this->timer < 7.2`. Slingshot seeds and
+Deku Nuts use the other branch and don't change. `git apply --check`
+passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Enemy arrows (negative `params`) are also slow.
+- Moving targets are much harder to hit.

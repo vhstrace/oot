@@ -77,7 +77,7 @@ sword beams fire at any health, and the two fireball long codes.
   `ovl_En_Arrow`: don't kill the arrow when it hits an actor.
 - [x] Arrows fly twice as fast (Sword beams fly twice as fast).
   `ovl_En_Arrow`.
-- [ ] Arrows fly at quarter speed (Sword beams fly at quarter speed).
+- [x] Arrows fly at quarter speed (Sword beams fly at quarter speed).
   `ovl_En_Arrow`.
 - [ ] Arrows stay where they appear (Sword beams stay where they appear).
   `ovl_En_Arrow`.

@@ -1,0 +1,15 @@
+diff --git a/src/overlays/actors/ovl_En_Arrow/z_en_arrow.c b/src/overlays/actors/ovl_En_Arrow/z_en_arrow.c
+index c955b04a5..8b4abe677 100644
+--- a/src/overlays/actors/ovl_En_Arrow/z_en_arrow.c
++++ b/src/overlays/actors/ovl_En_Arrow/z_en_arrow.c
+@@ -206,8 +206,8 @@ void EnArrow_Shoot(EnArrow* this, PlayState* play) {
+             this->timer = 15;
+             this->actor.shape.rot.x = this->actor.shape.rot.y = this->actor.shape.rot.z = 0;
+         } else {
+-            Actor_SetProjectileSpeed(&this->actor, 150.0f);
+-            this->timer = 12;
++            Actor_SetProjectileSpeed(&this->actor, 37.5f);
++            this->timer = 48;
+         }
+     }
+ }
