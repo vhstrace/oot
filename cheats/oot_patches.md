@@ -550,3 +550,42 @@ one gate is missing. `git apply --check` passes, and it builds.
 - The other controller 2 debug features (L+R+Z to the map select and so on)
   stay off. They are `#if DEBUG_FEATURES` code in `graph.c` and other
   files.
+
+## A new game starts with the Kokiri Sword and Deku Shield
+
+**Source diff:** `patches/new-game-starts-with-sword-and-shield.diff`
+**Changes:** built on the Mac. Changes `code` (`z_sram.c`).
+**Recorded:** 2026-11-11 00:13:46
+
+**Mechanism:** `Sram_InitNewSave` copies `sNewSaveEquips` and
+`sNewSaveInventory` into a new save. In the original, Link owns and wears
+only the Kokiri Tunic and Kokiri Boots (`equipment` `0x1100`), and the B
+button is empty. The patch:
+
+- puts `ITEM_SWORD_KOKIRI` on the B button;
+- changes the worn `equipment` to `0x1111` (Kokiri Sword and Deku
+  Shield worn, plus the tunic and boots);
+- adds `EQUIP_INV_SWORD_KOKIRI` and `EQUIP_INV_SHIELD_DEKU` to the owned
+  equipment.
+
+The TODO idea was "Link's uncle gives the Master Sword" (from Zelda 3).
+Child Link can't hold the Master Sword, so this gives the child sword and
+shield.
+
+**Evidence:** the equipment nibbles are sword (bits 0-3), shield (4-7),
+tunic (8-11) and boots (12-15), and `EQUIP_VALUE_SWORD_KOKIRI` and
+`EQUIP_VALUE_SHIELD_DEKU` are both 1. The debug save does the same for the
+sword (`buttonItems[0] = ITEM_SWORD_KOKIRI`). The save checksum is made
+again when the file is written, so the constant `sNewSaveChecksum` does
+not need a change. `git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Only new files get this. Old saves are not changed.
+- Mido checks for the sword and shield, so he should let Link pass to the
+  Deku Tree at once.
+- The Kokiri Sword chest and the Deku Shield in the shop are still there.
+  Getting them again does nothing new.

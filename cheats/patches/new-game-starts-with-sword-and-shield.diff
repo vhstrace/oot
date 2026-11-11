@@ -1,0 +1,27 @@
+diff --git a/src/code/z_sram.c b/src/code/z_sram.c
+index 1aa61d095..d594f0138 100644
+--- a/src/code/z_sram.c
++++ b/src/code/z_sram.c
+@@ -138,9 +138,9 @@ static SavePlayerData sNewSavePlayerData = {
+ };
+ 
+ static ItemEquips sNewSaveEquips = {
+-    { ITEM_NONE, ITEM_NONE, ITEM_NONE, ITEM_NONE }, // buttonItems
++    { ITEM_SWORD_KOKIRI, ITEM_NONE, ITEM_NONE, ITEM_NONE }, // buttonItems
+     { SLOT_NONE, SLOT_NONE, SLOT_NONE },            // cButtonSlots
+-    0x1100,                                         // equipment
++    0x1111,                                         // equipment
+ };
+ 
+ static Inventory sNewSaveInventory = {
+@@ -191,7 +191,9 @@ static Inventory sNewSaveInventory = {
+         0, // SLOT_HAMMER
+     },
+     // equipment
+-    (((1 << EQUIP_INV_TUNIC_KOKIRI) << (EQUIP_TYPE_TUNIC * 4)) |
++    (((1 << EQUIP_INV_SWORD_KOKIRI) << (EQUIP_TYPE_SWORD * 4)) |
++     ((1 << EQUIP_INV_SHIELD_DEKU) << (EQUIP_TYPE_SHIELD * 4)) |
++     ((1 << EQUIP_INV_TUNIC_KOKIRI) << (EQUIP_TYPE_TUNIC * 4)) |
+      ((1 << EQUIP_INV_BOOTS_KOKIRI) << (EQUIP_TYPE_BOOTS * 4))),
+     0,                                                              // upgrades
+     0,                                                              // questItems

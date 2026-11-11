@@ -53,7 +53,7 @@ sword beams fire at any health, and the two fireball long codes.
 - [x] Turn on the map select (Turn on the controller 2 debug features).
   `ovl_select` is in the retail ROM. Boot into it, or open it from the
   title screen.
-- [ ] Start a new game with a better sword and shield (Link's uncle gives
+- [x] Start a new game with a better sword and shield (Link's uncle gives
   the Master Sword). Child Link can't hold the Master Sword, so give the
   Kokiri Sword and Deku Shield from the start.
 - [ ] Link's house door leads to an unused or debug room (Link's house
