@@ -1536,3 +1536,44 @@ only in the `hairal_niwa` and `hairal_niwa_n` actor lists, and
 - Other guards (`ovl_En_Heishi2` and `ovl_En_Heishi4`, in the market,
   Kakariko and other places) are NPCs that stand still or talk, and are
   not changed.
+
+## Octoroks spit bombs
+
+**Source diff:** `patches/octoroks-spit-bombs.diff`
+**Changes:** built on the Mac. Changes the `ovl_En_Okuta` overlay.
+**Recorded:** 2026-11-11 00:52:25
+
+**Mechanism:** `EnOkuta_SpawnProjectile` (`ovl_En_Okuta/z_en_okuta.c`)
+spawns the rock as another `ACTOR_EN_OKUTA` with params `0x10`, 25 units
+in front of the Octorok, and it flies straight at Link. The patch spawns a
+lit bomb (`ACTOR_EN_BOM`, `BOMB_BODY`) instead, 50 units in front and
+20 units up, and lobs it at Link: `velocity.y = 12.0f` and
+`speed = (xzDistToPlayer - 50.0f) / 22.0f`, so it comes down about 22
+frames later near where Link stands. The dust puff and the spit sound are
+the same as before. This is the OoT version of the ALTTP cheat "Octoroks
+spit something other than rocks".
+
+**Evidence:** `ovl_En_Bom` uses `OBJECT_GAMEPLAY_KEEP`, so it can spawn
+anywhere. `EnBom_Move` moves the bomb with `Actor_MoveXZGravity`
+(gravity `-1.2f`, set every frame in `EnBom_Update`), bounces it off
+walls and slows it down on the ground. Rotation x and z are 0, since
+`EnBom_Init` uses `shape.rot.z` for extra explosion damage. A bomb
+explodes at once when its OC collider touches an enemy, so it spawns 50
+units out, past the Octorok's collider (radius 20). Octoroks shoot when
+Link is 160 to 560 units away (`EnOkuta_WaitToShoot`), so the speed is
+about 5 to 23. The spit comes on frame 6 of `EnOkuta_Shoot`, while the
+Octorok is jumping, so the bomb starts above the water. `git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested. The arc was worked out from the code, not seen, so the bombs
+  may land a bit short or long, and on higher or lower ground.
+- The bomb has the usual 70-frame fuse. Link can pick it up and throw it
+  back, which kills the Octorok.
+- A bomb that falls into deep water (`depthInWater >= 20.0f`) goes out,
+  as usual, so bombs that fall short into the water don't explode.
+- The bomb explosion hurts Link, enemies and the Octorok itself, and
+  breaks walls and rocks like a normal bomb.
+- Big Octo (`ovl_En_Bigokuta`) is a different actor and is not changed.

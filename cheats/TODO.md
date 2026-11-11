@@ -112,7 +112,7 @@ sword beams fire at any health, and the two fireball long codes.
   room-clear/kill flags, and spawn each enemy more than once.
 - [x] Hyrule Castle guards chase Link at double speed (Soldiers chase
   Link at double speed / Soldiers move faster). `ovl_En_Heishi*`.
-- [ ] Octoroks spit something other than rocks.
+- [x] Octoroks spit something other than rocks.
   `ovl_En_Okuta`: spawn another actor instead of the rock.
 - [ ] Every enemy moves with the speed of the actor before it in the
   actor list (Every enemy moves with the speed of the sprite in the
