@@ -1830,3 +1830,44 @@ first pot, and the object is already loaded. No other actor spawns
   drops it each time it breaks. A pot with a collectible flag (params bits
   9-14) drops its item only once, since `EnItem00_Init` removes an item
   whose flag is already set.
+
+## No music
+
+**Source diff:** `cheats/patches/no-music.diff`
+**Changes:** built on the Mac. Changes `code` (the audio driver part,
+`src/audio/internal/effects.c`).
+**Recorded:** 2026-11-11 01:02:11
+
+**Mechanism:** `Audio_SequenceChannelProcessSound`
+(`src/audio/internal/effects.c`) works out each sequence channel's
+volume:
+
+```c
+channelVolume = channel->volume * channel->volumeScale * channel->seqPlayer->appliedFadeVolume;
+...
+channel->appliedVolume = channelVolume * channelVolume;
+```
+
+Every note's velocity is `layer->velocitySquare2 * channel->appliedVolume`,
+set only in this function. The patch sets `channelVolume` to 0 for every
+sequence player except `SEQ_PLAYER_SFX`. So the background music
+(`SEQ_PLAYER_BGM_MAIN`, `SEQ_PLAYER_BGM_SUB`) and fanfares
+(`SEQ_PLAYER_FANFARE`) still run but make no sound, and sound effects
+play as usual. This is the OoT version of the ALTTP cheat "No music".
+
+**Evidence:** `SEQ_PLAYER_*` is in `include/sequence.h`
+(`BGM_MAIN` 0, `FANFARE` 1, `SFX` 2, `BGM_SUB` 3). `playerIdx` is set
+in `AudioLoad_SyncInitSeqPlayerInternal`. `appliedVolume` is written
+only here and read only for note velocity. The music keeps running, so
+game code that waits for a fanfare to end (item get, song learned)
+works as before. `git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Link's ocarina, and songs that NPCs play on the ocarina, use the sound
+  effect player (`SFX_CHANNEL_OCARINA`), so they are still heard.
+- Area sounds that play as a sequence on the BGM player, such as the
+  nature ambience in Hyrule Field at night, are silent too.

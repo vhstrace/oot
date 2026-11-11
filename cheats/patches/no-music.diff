@@ -1,0 +1,14 @@
+diff --git a/src/audio/internal/effects.c b/src/audio/internal/effects.c
+index 066c62a3d..c42581752 100644
+--- a/src/audio/internal/effects.c
++++ b/src/audio/internal/effects.c
+@@ -15,6 +15,9 @@ void Audio_SequenceChannelProcessSound(SequenceChannel* channel, s32 recalculate
+         if (channel->seqPlayer->muted && (channel->muteBehavior & MUTE_BEHAVIOR_SOFTEN)) {
+             channelVolume = channel->seqPlayer->muteVolumeScale * channelVolume;
+         }
++        if (channel->seqPlayer->playerIdx != SEQ_PLAYER_SFX) {
++            channelVolume = 0.0f;
++        }
+         channel->appliedVolume = channelVolume * channelVolume;
+     }
+ 
