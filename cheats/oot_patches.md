@@ -1164,7 +1164,8 @@ builds.
 
 **Mechanism:** Nayru's Love is the `MagicDark` actor. While it runs,
 `MagicDark_DiamondUpdate` (`z_magic_dark.c`) sets
-`player->invincibilityTimer = -100` (no damage, no knockback) and counts
+`player->invincibilityTimer = -100` (a negative timer means Link takes no
+damage, see `Player_SetInvulnerability`) and counts
 `gSaveContext.nayrusLoveTimer` up by 1 each frame. At 1200 it ends. When a
 new scene loads, `Player_Init` (`z_player.c`) spawns the spell again if
 `nayrusLoveTimer != 0`.
@@ -1193,9 +1194,9 @@ does. `git apply --check` passes, and it builds.
 **Caveats:**
 
 - Not tested.
-- Link takes no damage from hits that Nayru's Love blocks. Falling into a
-  pit, drowning, lava, freezing water and other hazards still work as
-  before.
+- Link takes no damage from hits, but some hits may still knock him back,
+  as with the real spell. Falling into a pit, drowning, lava, freezing
+  water and other hazards still work as before.
 - While the spell is on, the magic state is not idle. As with the real
   spell, Link can't cast other spells or shoot magic arrows, and the
   magic meter (if he has one) flashes.
