@@ -19,7 +19,7 @@ sword beams fire at any health, and the two fireball long codes.
 
 ## Movement
 
-- [ ] Link runs twice as fast (Link walks twice as fast). `R_RUN_SPEED_LIMIT`
+- [x] Link runs twice as fast (Link walks twice as fast). `R_RUN_SPEED_LIMIT`
   and `Player_GetMovementSpeedAndYaw` in `ovl_player_actor/z_player.c`.
 - [ ] Link walks through walls. Skip or neuter the wall part of
   `Player_ProcessSceneCollision` / `Actor_UpdateBgCheckInfo` for the player.

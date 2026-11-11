@@ -89,3 +89,45 @@ rupee tracker type. `git apply --check` passes, and it builds.
   one costs a little graphics memory per frame; a room with many tags may
   run slower.
 - Some markers flash (the actor adds one only every other frame).
+
+## Link runs twice as fast
+
+**Source diff:** `cheats/patches/link-runs-twice-as-fast.diff`
+**Changes:** built on the Mac. Changes the `ovl_player_actor` overlay.
+**Recorded:** 2026-11-11 00:00:05
+
+**Mechanism:** This is the OoT version of the ALTTP cheat "Link walks
+twice as fast". `Player_CalcSpeedAndYawFromControlStick`
+(`ovl_player_actor/z_player.c`) turns the stick into a target speed and
+caps it at `this->unk_880`:
+
+```c
+*outSpeedTarget = (*outSpeedTarget * 0.14f) - (8.0f * floorPitchInfluence * floorPitchInfluence);
+*outSpeedTarget = CLAMP(*outSpeedTarget, 0.0f, speedCap);
+```
+
+`unk_880` comes from `R_RUN_SPEED_LIMIT / 100.0f` (6.0 with the Kokiri
+boots, 5.0 indoors, 3.0 with the Iron Boots, from `sBootData` in
+`z_player_lib.c`). The patch changes `0.14f` to `0.28f`, and changes
+`R_RUN_SPEED_LIMIT / 100.0f` to `/ 50.0f` where it sets `unk_880`
+(two places in `Player_UpdateCommon`'s wall code and one in its
+`else`) and in the clamp in `func_8083DFE0`. Target speed and cap are
+both doubled, so a full stick runs at 12 instead of 6.
+
+**Evidence:** `R_RUN_SPEED_LIMIT` is `REG(45)` (`include/regs.h`),
+set per boots by `Player_SetBootData`. Left alone: the
+`gSaveContext.entranceSpeed` clamp (speed kept through a door) and
+`func_8084AEEC` (`R_RUN_SPEED_LIMIT / 100.0f * 0.8f`, a slide speed
+cap). No `#if` checks in the changed lines. `git apply --check`
+passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Acceleration is not changed, so Link takes longer to reach top speed.
+- Running animations are not sped up, so Link's feet slide.
+- At this speed Link may run off ledges sooner and clip through thin
+  walls more easily.
+- Swimming, rolling, jumping and riding Epona are not changed.

@@ -1,0 +1,43 @@
+diff --git a/src/overlays/actors/ovl_player_actor/z_player.c b/src/overlays/actors/ovl_player_actor/z_player.c
+index b8c908ad2..dada41333 100644
+--- a/src/overlays/actors/ovl_player_actor/z_player.c
++++ b/src/overlays/actors/ovl_player_actor/z_player.c
+@@ -4095,7 +4095,7 @@ s32 Player_CalcSpeedAndYawFromControlStick(PlayState* play, Player* this, f32* o
+                 speedCap = CLAMP_MIN(speedCap, 2.0f);
+             }
+ 
+-            *outSpeedTarget = (*outSpeedTarget * 0.14f) - (8.0f * floorPitchInfluence * floorPitchInfluence);
++            *outSpeedTarget = (*outSpeedTarget * 0.28f) - (8.0f * floorPitchInfluence * floorPitchInfluence);
+             *outSpeedTarget = CLAMP(*outSpeedTarget, 0.0f, speedCap);
+ 
+             return true;
+@@ -7173,7 +7173,7 @@ void func_8083DFE0(Player* this, f32* arg1, s16* arg2) {
+     s16 yawDiff = this->yaw - *arg2;
+ 
+     if (this->meleeWeaponState == 0) {
+-        this->speedXZ = CLAMP(this->speedXZ, -(R_RUN_SPEED_LIMIT / 100.0f), (R_RUN_SPEED_LIMIT / 100.0f));
++        this->speedXZ = CLAMP(this->speedXZ, -(R_RUN_SPEED_LIMIT / 50.0f), (R_RUN_SPEED_LIMIT / 50.0f));
+     }
+ 
+     if (ABS(yawDiff) > 0x6000) {
+@@ -11221,9 +11221,9 @@ void Player_ProcessSceneCollision(PlayState* play, Player* this) {
+         vSpeedScale = sWorldYawToTouchedWall * 0.00008f;
+ 
+         if (!(this->actor.bgCheckFlags & BGCHECKFLAG_GROUND) || vSpeedScale >= 1.0f) {
+-            this->unk_880 = R_RUN_SPEED_LIMIT / 100.0f;
++            this->unk_880 = R_RUN_SPEED_LIMIT / 50.0f;
+         } else {
+-            vSpeedLimit = (R_RUN_SPEED_LIMIT / 100.0f * vSpeedScale);
++            vSpeedLimit = (R_RUN_SPEED_LIMIT / 50.0f * vSpeedScale);
+             this->unk_880 = vSpeedLimit;
+ 
+             if (vSpeedLimit < 0.1f) {
+@@ -11295,7 +11295,7 @@ void Player_ProcessSceneCollision(PlayState* play, Player* this) {
+             }
+         }
+     } else {
+-        this->unk_880 = R_RUN_SPEED_LIMIT / 100.0f;
++        this->unk_880 = R_RUN_SPEED_LIMIT / 50.0f;
+         this->ledgeClimbDelayTimer = 0;
+         this->yDistToLedge = 0.0f;
+     }
