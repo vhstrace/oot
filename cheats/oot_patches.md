@@ -848,7 +848,12 @@ becomes `this->yaw = rideActor->actor.shape.rot.y;` and
 `this->actor.shape.rot.y = rideActor->actor.shape.rot.y + 0x8000;`, so
 Link faces the back of the horse. It also turns the horse model around: in
 `EnHorse_Draw`, the patch adds `0x8000` to `shape.rot.y` before
-`func_800A6360` (the skin draw) and takes it off again after. The horse
+`func_800A6360` (the skin draw) and takes it off again after. It also
+negates `shape.rot.x` (the slope tilt) for the draw and puts it back. The
+skin matrix applies the X turn after the Y turn
+(`SkinMatrix_SetTranslateRotateYXZScale` in `z_skin_awb.c`), so without
+this the turned horse tilts the wrong way on a slope: running uphill, it
+stood on its hind legs. The horse
 moves and steers as before, but its model points the other way, so it runs
 tail first. Link now faces the same way as the drawn horse, so both face
 away from where they are going.
@@ -864,7 +869,8 @@ the turned model. `git apply --check` passes, and it builds.
 
 **Caveats:**
 
-- Not tested.
+- Only the uphill tilt has been tried (it was wrong before the
+  `shape.rot.x` fix). The fixed version is not tested.
 - Don't use it with "Adult Link rides his horse backwards". Both diffs
   change the same line of `z_player.c`, so they don't apply together.
   This diff already has that change.

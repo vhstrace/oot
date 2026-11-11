@@ -1,18 +1,20 @@
 diff --git a/src/overlays/actors/ovl_En_Horse/z_en_horse.c b/src/overlays/actors/ovl_En_Horse/z_en_horse.c
-index 264a7d6eb..8ae14c0f1 100644
+index 264a7d6eb..3fedaa5ec 100644
 --- a/src/overlays/actors/ovl_En_Horse/z_en_horse.c
 +++ b/src/overlays/actors/ovl_En_Horse/z_en_horse.c
-@@ -3856,11 +3856,13 @@ void EnHorse_Draw(Actor* thisx, PlayState* play) {
+@@ -3856,11 +3856,15 @@ void EnHorse_Draw(Actor* thisx, PlayState* play) {
      if (!(this->stateFlags & ENHORSE_INACTIVE)) {
          Gfx_SetupDL_25Opa(play->state.gfxCtx);
          this->stateFlags |= ENHORSE_DRAW;
 +        thisx->shape.rot.y += 0x8000;
++        thisx->shape.rot.x = -thisx->shape.rot.x;
          if (this->stateFlags & ENHORSE_JUMPING) {
              func_800A6360(thisx, play, &this->skin, EnHorse_PostDraw, EnHorse_OverrideLimbDraw, false);
          } else {
              func_800A6360(thisx, play, &this->skin, EnHorse_PostDraw, EnHorse_OverrideLimbDraw, true);
          }
 +        thisx->shape.rot.y -= 0x8000;
++        thisx->shape.rot.x = -thisx->shape.rot.x;
          if (this->postDrawFunc != NULL) {
              this->postDrawFunc(this, play);
          }
