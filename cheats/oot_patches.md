@@ -1703,3 +1703,48 @@ collected twice. `git apply --check` passes, and it builds.
   that he isn't climbing, hanging, holding a bomb and so on), and Link
   plays the get-item pose for Heart Pieces and keys wherever he is.
 - When several items are out, the get-item ones are taken one at a time.
+
+## Lift every rock without the Goron's Bracelet or gauntlets
+
+**Source diff:** `patches/lift-every-rock-without-strength.diff`
+**Changes:** built on the Mac. Changes the `ovl_player_actor` overlay.
+**Recorded:** 2026-11-11 00:57:22
+
+**Mechanism:** Link's strength upgrade is checked in three places in
+`ovl_player_actor/z_player.c`:
+
+- `func_8083A0F4` (the lift): for a bomb flower (`ACTOR_EN_BOMBF`) or a
+  bush-type `ACTOR_EN_KUSA` with `Player_GetStrength() <=
+  PLAYER_STR_NONE`, Link plays the "can't pull" animation
+  (`gPlayerAnim_link_normal_nocarry_free`, `Player_Action_80846408`)
+  instead of lifting.
+- The A button lift: a silver rock (`ACTOR_EN_ISHI` with type 1) returns
+  0 when `strength < PLAYER_STR_SILVER_G`.
+- The A button against a wall: the large block `ACTOR_BG_HEAVY_BLOCK`
+  returns 0 when `Player_GetStrength() < PLAYER_STR_GOLD_G`.
+
+The patch removes all three checks, so Link lifts small rocks, silver
+rocks, the golden gauntlet blocks and bomb flowers with no strength
+upgrade. This is the OoT version of the ALTTP cheat "Lift every rock
+without the Power Glove".
+
+**Evidence:** `Player_GetStrength` (`src/code/z_player_lib.c`) is only
+used in these three places, in the child Goron's Bracelet model, and in
+`ovl_Obj_Oshihiki` (push blocks). `ovl_En_Ishi` and `ovl_En_Bombf` offer
+the carry (`Actor_OfferCarry`) without checking strength, and the bomb
+flower spawns its bomb when Link takes it (`EnBombf_GrowBomb`).
+`git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The pause screen still shows no bracelet or gauntlets, and child Link
+  doesn't wear the bracelet.
+- Push blocks that need strength (`ovl_Obj_Oshihiki`) still need it.
+- Child Link can now lift silver rocks and the golden gauntlet blocks, but
+  those use adult lift animations and timing, which were made for adult
+  Link. They may look wrong for child Link.
+- Bronze boulders (`ovl_Obj_Hamishi`) are broken with the hammer, not
+  lifted, and are not changed.

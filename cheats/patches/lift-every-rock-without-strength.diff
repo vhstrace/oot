@@ -1,0 +1,45 @@
+diff --git a/src/overlays/actors/ovl_player_actor/z_player.c b/src/overlays/actors/ovl_player_actor/z_player.c
+index b8c908ad2..760595ae4 100644
+--- a/src/overlays/actors/ovl_player_actor/z_player.c
++++ b/src/overlays/actors/ovl_player_actor/z_player.c
+@@ -5631,15 +5631,6 @@ void func_8083A0F4(PlayState* play, Player* this) {
+             } else if ((interactActorId == ACTOR_EN_ISHI) && (PARAMS_GET_U(interactRangeActor->params, 0, 4) == 1)) {
+                 Player_SetupAction(play, this, Player_Action_80846260, 0);
+                 anim = &gPlayerAnim_link_silver_carry;
+-            } else if (((interactActorId == ACTOR_EN_BOMBF) || (interactActorId == ACTOR_EN_KUSA)) &&
+-                       (Player_GetStrength() <= PLAYER_STR_NONE)) {
+-                Player_SetupAction(play, this, Player_Action_80846408, 0);
+-                this->actor.world.pos.x =
+-                    (Math_SinS(interactRangeActor->yawTowardsPlayer) * 20.0f) + interactRangeActor->world.pos.x;
+-                this->actor.world.pos.z =
+-                    (Math_CosS(interactRangeActor->yawTowardsPlayer) * 20.0f) + interactRangeActor->world.pos.z;
+-                this->yaw = this->actor.shape.rot.y = interactRangeActor->yawTowardsPlayer + 0x8000;
+-                anim = &gPlayerAnim_link_normal_nocarry_free;
+             } else {
+                 Player_SetupAction(play, this, Player_Action_80846050, 0);
+                 anim = GET_PLAYER_ANIM(PLAYER_ANIMGROUP_carryB, this->modelAnimType);
+@@ -7426,13 +7417,6 @@ s32 Player_ActionHandler_2(Player* this, PlayState* play) {
+                         Player_UseItem(play, this, ITEM_SWORD_CS);
+                     }
+                 } else {
+-                    s32 strength = Player_GetStrength();
+-
+-                    if ((interactedActor->id == ACTOR_EN_ISHI) && (PARAMS_GET_U(interactedActor->params, 0, 4) == 1) &&
+-                        (strength < PLAYER_STR_SILVER_G)) {
+-                        return 0;
+-                    }
+-
+                     Player_SetupWaitForPutAway(play, this, func_8083A0F4);
+                 }
+ 
+@@ -7819,10 +7803,6 @@ s32 Player_ActionHandler_5(Player* this, PlayState* play) {
+                     ((wallPolyActor = DynaPoly_GetActor(&play->colCtx, this->actor.wallBgId)) != NULL)) {
+ 
+                     if (wallPolyActor->actor.id == ACTOR_BG_HEAVY_BLOCK) {
+-                        if (Player_GetStrength() < PLAYER_STR_GOLD_G) {
+-                            return 0;
+-                        }
+-
+                         Player_SetupWaitForPutAway(play, this, func_8083A0F4);
+                         this->stateFlags1 |= PLAYER_STATE1_CARRYING_ACTOR;
+                         this->interactRangeActor = &wallPolyActor->actor;

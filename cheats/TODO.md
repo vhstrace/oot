@@ -127,7 +127,7 @@ sword beams fire at any health, and the two fireball long codes.
 - [x] Items are collected anywhere in the room (Items are collected
   anywhere on the screen). Widen the pickup distance check in
   `ovl_En_Item00` (`src/code/z_en_item00.c`).
-- [ ] Lift every rock without the Goron's Bracelet or gauntlets (Lift
+- [x] Lift every rock without the Goron's Bracelet or gauntlets (Lift
   every rock without the Power Glove). Skip the strength upgrade check
   when lifting (`ovl_En_Ishi`, `ovl_Obj_Hamishi`, silver/black boulders).
 - [ ] Bushes and rocks stay in place after Link lifts them. `ovl_En_Kusa`
