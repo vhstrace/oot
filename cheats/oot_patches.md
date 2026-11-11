@@ -1070,3 +1070,38 @@ becomes a fire arrow with no magic cost. `EnArrow_Init` also gives it the
   the Lens of Truth is on, this may turn it off.
 - The slingshot and enemy arrows don't change. Horseback archery uses
   the horse arrow type, so its arrows change too.
+
+## A Deku Nut casts Din's Fire
+
+**Source diff:** `patches/deku-nut-casts-dins-fire.diff`
+**Changes:** built on the Mac. Changes the `ovl_En_Arrow` overlay.
+**Recorded:** 2026-11-11 00:34:58
+
+**Mechanism:** a thrown Deku Nut is an `EnArrow` with `params == ARROW_NUT`.
+When it hits something, `EnArrow_Fly` (`z_en_arrow.c`) spawns the flash
+(`ACTOR_EN_M_FIRE1`), plays `NA_SE_IT_DEKU` and kills the nut. The patch
+also spawns `ACTOR_MAGIC_FIRE` (Din's Fire) there, unless the nut is a
+cutscene nut (`this->isCsNut`). This is the OoT version of the ALTTP "The
+Lamp casts Bombos" cheat.
+
+**Evidence:** Link's own spell uses the same call
+(`Player_SpawnMagicSpell`: `Actor_Spawn(..., ACTOR_MAGIC_FIRE, pos, 0, 0,
+0, 0)`). `MagicFire_Init` and `MagicFire_Update` take no magic; the magic
+cost is paid in `z_player.c` before the spell starts. `git apply --check`
+passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The fire ball is centered on Link, not on the nut. `MagicFire_Update`
+  copies `player->actor.world.pos` every frame, as when Link casts it.
+- It costs no magic, and Link doesn't need Din's Fire.
+- The nut's flash still stuns enemies, as before.
+- Din's Fire, Farore's Wind and Nayru's Love share one memory space for
+  their code (`ACTOROVL_ALLOC_ABSOLUTE`). Throwing a nut while Nayru's
+  Love or Farore's Wind is active may load Din's Fire over it and crash
+  the game.
+- When the fire goes away, `MagicFire_Destroy` calls `Magic_Reset`. If the
+  Lens of Truth is on, this may turn it off.
