@@ -124,7 +124,7 @@ sword beams fire at any health, and the two fireball long codes.
 
 ## Items and objects
 
-- [ ] Items are collected anywhere in the room (Items are collected
+- [x] Items are collected anywhere in the room (Items are collected
   anywhere on the screen). Widen the pickup distance check in
   `ovl_En_Item00` (`src/code/z_en_item00.c`).
 - [ ] Lift every rock without the Goron's Bracelet or gauntlets (Lift

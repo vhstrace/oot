@@ -1,0 +1,24 @@
+diff --git a/src/code/z_en_item00.c b/src/code/z_en_item00.c
+index 5c1d325d7..7299758ac 100644
+--- a/src/code/z_en_item00.c
++++ b/src/code/z_en_item00.c
+@@ -861,8 +861,8 @@ void EnItem00_Update(Actor* thisx, PlayState* play) {
+         return;
+     }
+ 
+-    if (!((this->actor.xzDistToPlayer <= 30.0f) && (this->actor.yDistToPlayer >= -50.0f) &&
+-          (this->actor.yDistToPlayer <= 50.0f))) {
++    if (!((this->actor.xzDistToPlayer <= 100000.0f) && (this->actor.yDistToPlayer >= -100000.0f) &&
++          (this->actor.yDistToPlayer <= 100000.0f))) {
+         if (!Actor_HasParent(&this->actor, play)) {
+             return;
+         }
+@@ -953,7 +953,7 @@ void EnItem00_Update(Actor* thisx, PlayState* play) {
+     params = &this->actor.params;
+ 
+     if ((getItemId != GI_NONE) && !Actor_HasParent(&this->actor, play)) {
+-        Actor_OfferGetItemNearby(&this->actor, play, getItemId);
++        Actor_OfferGetItem(&this->actor, play, getItemId, 100000.0f, 100000.0f);
+     }
+ 
+     switch (*params) {

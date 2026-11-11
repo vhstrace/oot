@@ -1662,3 +1662,44 @@ passes, and it builds.
 - The diff applies together with "Every enemy moves with the speed of the
   enemy before it" (checked with `git apply --check`). That pair was not
   built.
+
+## Items are collected anywhere in the room
+
+**Source diff:** `patches/items-are-collected-anywhere.diff`
+**Changes:** built on the Mac. Changes `code` (`z_en_item00.c`).
+**Recorded:** 2026-11-11 00:55:53
+
+**Mechanism:** `EnItem00_Update` (`src/code/z_en_item00.c`) gives an
+item (rupees, hearts, bombs, arrows, sticks, nuts, seeds, magic, small
+keys, Heart Pieces and so on) only when Link is close:
+`(this->actor.xzDistToPlayer <= 30.0f) && (this->actor.yDistToPlayer >=
+-50.0f) && (this->actor.yDistToPlayer <= 50.0f)`. Items that use a
+get-item id (`getItemId`) are then offered with
+`Actor_OfferGetItemNearby` (`Actor_OfferGetItem` with a range of 50 by
+10). The patch makes the first check `100000.0f` in every direction, and
+offers get-item items with `Actor_OfferGetItem(..., 100000.0f,
+100000.0f)`. So every loaded item is collected as soon as it can be, from
+anywhere. This is the OoT version of the ALTTP cheat "Items are collected
+anywhere on the screen".
+
+**Evidence:** Without the second change, a far item with a get-item id
+would pass the first check but never be offered, and it would stay where
+it is (`EnItem00_Update` returns until `Actor_HasParent`). The
+collected-item timer `unk_154` (35 frames) still keeps an item from being
+collected twice. `git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Only `ovl_En_Item00` items (drops and placed collectibles) are
+  changed. Gold Skulltula tokens, chests and items given by NPCs work as
+  before.
+- Items placed on high ledges or behind walls in the loaded rooms are
+  collected right away, including Heart Pieces and small keys. That can
+  skip puzzles.
+- Get-item items still need Link to be free (`Actor_OfferGetItem` checks
+  that he isn't climbing, hanging, holding a bomb and so on), and Link
+  plays the get-item pose for Heart Pieces and keys wherever he is.
+- When several items are out, the get-item ones are taken one at a time.
