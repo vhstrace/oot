@@ -1619,3 +1619,45 @@ builds.
 - Any other actor that is in `ACTORCAT_ENEMY` (for example parts or
   shots that an enemy spawns in that category) is in the same list, so it
   gets a neighbor's speed too.
+
+## Every enemy pushes the enemy after it instead of moving itself
+
+**Source diff:** `patches/enemies-push-the-next-enemy.diff`
+**Changes:** built on the Mac. Changes `code` (`z_actor.c`).
+**Recorded:** 2026-11-11 00:54:23
+
+**Mechanism:** `Actor_UpdatePos` (`src/code/z_actor.c`) moves an actor by
+its velocity: `actor->world.pos.x += (actor->velocity.x * speedRate) +
+actor->colChkInfo.displacement.x;`, and the same for y and z.
+`Actor_MoveXZGravity` and `Actor_MoveXYZ` call it, and so do 52 places
+in the actor overlays. The patch adds the x and z velocity of an enemy
+(`ACTORCAT_ENEMY`) to the position of `actor->next`, the next enemy in
+the enemy list, instead of to its own. The enemy still moves itself up and
+down (gravity, jumps) and still gets its own collision push
+(`colChkInfo.displacement`). The last enemy in the list has no `next`
+and moves itself as usual. This is the OoT version of the ALTTP cheat
+"Every enemy pushes the sprite in the next slot instead of moving itself".
+
+**Evidence:** `next` is the next actor of the same category
+(`include/actor.h`). `Actor_AddToCategory` puts each new actor at the
+head of the list, so `next` is the enemy that spawned just before it, and
+the first enemy spawned is the last in the list. `git apply --check`
+passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- `Actor_UpdateAll` saves `prevPos` at the start of each actor's update,
+  after the enemy before it has already pushed it. So the wall check of the
+  pushed enemy doesn't see the push, and enemies may be pushed through
+  walls or off ledges.
+- An enemy far away in the room can push one next to Link, so enemies may
+  slide around with no walking animation.
+- Enemies that move by animation or set their position directly don't
+  push.
+- Any other actor in `ACTORCAT_ENEMY` (parts or shots an enemy spawns in
+  that category) is in the same list and pushes or gets pushed too.
+- Combined with "Every enemy moves with the speed of the enemy before it",
+  both changes apply; they change different functions.

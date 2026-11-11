@@ -118,7 +118,7 @@ sword beams fire at any health, and the two fireball long codes.
   actor list (Every enemy moves with the speed of the sprite in the
   previous slot). `Actor_UpdateAll` / `Actor_MoveXZGravity` in
   `src/code/z_actor.c`.
-- [ ] Every enemy pushes the actor after it in the actor list instead of
+- [x] Every enemy pushes the actor after it in the actor list instead of
   moving itself (Every enemy pushes the sprite in the next slot ...).
   `src/code/z_actor.c`.
 

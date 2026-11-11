@@ -1,0 +1,24 @@
+diff --git a/src/code/z_actor.c b/src/code/z_actor.c
+index 243dc7fbb..83af13a58 100644
+--- a/src/code/z_actor.c
++++ b/src/code/z_actor.c
+@@ -985,10 +985,17 @@ void Actor_Destroy(Actor* actor, PlayState* play) {
+  */
+ void Actor_UpdatePos(Actor* actor) {
+     f32 speedRate = R_UPDATE_RATE * 0.5f;
++    Actor* mover = actor;
+ 
+-    actor->world.pos.x += (actor->velocity.x * speedRate) + actor->colChkInfo.displacement.x;
++    if ((actor->category == ACTORCAT_ENEMY) && (actor->next != NULL)) {
++        mover = actor->next;
++    }
++
++    mover->world.pos.x += actor->velocity.x * speedRate;
++    actor->world.pos.x += actor->colChkInfo.displacement.x;
+     actor->world.pos.y += (actor->velocity.y * speedRate) + actor->colChkInfo.displacement.y;
+-    actor->world.pos.z += (actor->velocity.z * speedRate) + actor->colChkInfo.displacement.z;
++    mover->world.pos.z += actor->velocity.z * speedRate;
++    actor->world.pos.z += actor->colChkInfo.displacement.z;
+ }
+ 
+ /**
