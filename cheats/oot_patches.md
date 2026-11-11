@@ -1468,10 +1468,11 @@ and it builds.
 
 - Not tested.
 - The three copies start at the same spot. Most push each other apart
-  (OC), but enemies with no OC (Skulltulas on walls, for example) may stay
-  on top of each other and look like one.
+  (OC), but enemies that don't move or have no OC collider may stay on
+  top of each other and look like one.
 - Mini-bosses and scripted enemies come as three too (Stalfos, Lizalfos,
-  Iron Knuckles, Dark Link, Poe Sisters, Dead Hand and so on). Their
+  Iron Knuckles, Poe Sisters, Dead Hand and so on). Dark Link is in
+  \`ACTORCAT_BOSS\` and is not copied. Their
   cutscenes, music and room-clear checks were made for one, so some fights
   may act strangely or not end.
 - Enemies that the game spawns later (Stalchildren in Hyrule Field,
