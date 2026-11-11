@@ -1394,10 +1394,8 @@ actor overlays read the field. `git apply --check` passes, and it builds.
 - Enemies that work out the direction to Link in their own way (for
   example `Actor_WorldYawTowardPoint` on Link's position) still come at
   him. Enemies that only check how far Link is still notice him.
-- Enemies that shoot with `yawTowardsPlayer` (Octoroks, Deku Scrubs and
-  others) shoot away from Link. A Deku Scrub's nut can't be sent back at
-  it this way.
+- Octoroks and Deku Scrubs turn to `yawTowardsPlayer` before they shoot,
+  so they shoot away from Link. Enemies that run away from Link on purpose
+  (a hit Deku Scrub, `yawTowardsPlayer + 0x8000`) now run toward him.
 - Bosses are in `ACTORCAT_BOSS`, not `ACTORCAT_ENEMY`, and are not
   changed.
-- Enemies that guard by turning to face Link (shields, Like Likes,
-  Stalfos) show him their back, so they may be easier.
