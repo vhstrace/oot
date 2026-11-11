@@ -1028,9 +1028,9 @@ becomes an ice arrow with no magic cost. `EnArrow_Init` also gives it the
 - A magic arrow shot with too little magic also becomes an ice arrow, in place
   of a plain one.
 - Fire, ice and light arrows that Link has the magic for work as before.
-- `ovl_Arrow_Ice` calls `Magic_Reset` when it goes away. With no magic in use,
-  this should only reset the magic bar's state, but it was not checked
-  in play.
+- `ovl_Arrow_Ice` calls `Magic_Reset` when it goes away, which sets the
+  magic state to `MAGIC_STATE_RESET` and then idle (`Magic_Update`). If
+  the Lens of Truth is on, this may turn it off.
 - The slingshot and enemy arrows don't change. Horseback archery uses
   the horse arrow type, so its arrows change too.
 
@@ -1065,8 +1065,8 @@ becomes a fire arrow with no magic cost. `EnArrow_Init` also gives it the
 - A magic arrow shot with too little magic also becomes a fire arrow, in place
   of a plain one.
 - Fire, ice and light arrows that Link has the magic for work as before.
-- `ovl_Arrow_Fire` calls `Magic_Reset` when it goes away. With no magic in use,
-  this should only reset the magic bar's state, but it was not checked
-  in play.
+- `ovl_Arrow_Fire` calls `Magic_Reset` when it goes away, which sets the
+  magic state to `MAGIC_STATE_RESET` and then idle (`Magic_Update`). If
+  the Lens of Truth is on, this may turn it off.
 - The slingshot and enemy arrows don't change. Horseback archery uses
   the horse arrow type, so its arrows change too.
