@@ -132,7 +132,7 @@ sword beams fire at any health, and the two fireball long codes.
   when lifting (`ovl_En_Ishi`, `ovl_Obj_Hamishi`, silver/black boulders).
 - [x] Bushes and rocks stay in place after Link lifts them. `ovl_En_Kusa`
   and `ovl_En_Ishi`: don't remove the original.
-- [ ] Pots stay in place after Link lifts them. `ovl_Obj_Tsubo`.
+- [x] Pots stay in place after Link lifts them. `ovl_Obj_Tsubo`.
 
 ## Sound and music
 

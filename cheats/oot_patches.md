@@ -1793,3 +1793,40 @@ and bush objects are already loaded when the original is in the room, so
   until Link leaves the room; after that, the rock is gone as before.
 - Type 1 bushes still grow back after a short wait instead of staying at
   once.
+
+## Pots stay in place after Link lifts them
+
+**Source diff:** `cheats/patches/pots-stay-after-lifting.diff`
+**Changes:** built on the Mac. Changes the `ovl_Obj_Tsubo` overlay.
+**Recorded:** 2026-11-11 01:00:41
+
+**Mechanism:** When Link picks up a pot, `ObjTsubo_Idle`
+(`src/overlays/actors/ovl_Obj_Tsubo/z_obj_tsubo.c`) sees
+`Actor_HasParent(&this->actor, play)` and calls
+`ObjTsubo_SetupLiftedUp(this)`. The pot actor goes into Link's hands, so
+its spot is empty.
+
+The patch adds an `Actor_Spawn` of `ACTOR_OBJ_TSUBO` just before that
+call, with the lifted pot's `home` position, `home` rotation and
+`params`. A new pot appears where the old one stood, and Link carries
+the old one as usual. This is the OoT version of the ALTTP cheat "Pots
+stay in place after Link lifts them", and works like "Bushes and rocks
+stay in place after Link lifts them".
+
+**Evidence:** `ObjTsubo_Idle` is the only place the pot starts its
+carried state. `ObjTsubo_Init` snaps the new pot to the floor and finds
+its object (`sObjectIds`, chosen by params bits 8) the same way as the
+first pot, and the object is already loaded. No other actor spawns
+`ACTOR_OBJ_TSUBO`. `git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Only plain pots (`ovl_Obj_Tsubo`). Flying pots (`ovl_En_Tubo_Trap`)
+  and other liftable things are not changed.
+- Each copy can be lifted again. A pot whose item has no collectible flag
+  drops it each time it breaks. A pot with a collectible flag (params bits
+  9-14) drops its item only once, since `EnItem00_Init` removes an item
+  whose flag is already set.

@@ -1,0 +1,14 @@
+diff --git a/src/overlays/actors/ovl_Obj_Tsubo/z_obj_tsubo.c b/src/overlays/actors/ovl_Obj_Tsubo/z_obj_tsubo.c
+index 56583b5f6..28199a509 100644
+--- a/src/overlays/actors/ovl_Obj_Tsubo/z_obj_tsubo.c
++++ b/src/overlays/actors/ovl_Obj_Tsubo/z_obj_tsubo.c
+@@ -256,6 +256,9 @@ void ObjTsubo_Idle(ObjTsubo* this, PlayState* play) {
+     s32 phi_v1;
+ 
+     if (Actor_HasParent(&this->actor, play)) {
++        Actor_Spawn(&play->actorCtx, play, ACTOR_OBJ_TSUBO, this->actor.home.pos.x, this->actor.home.pos.y,
++                    this->actor.home.pos.z, this->actor.home.rot.x, this->actor.home.rot.y, this->actor.home.rot.z,
++                    this->actor.params);
+         ObjTsubo_SetupLiftedUp(this);
+     } else if ((this->actor.bgCheckFlags & BGCHECKFLAG_WATER) && (this->actor.depthInWater > 15.0f)) {
+         ObjTsubo_WaterBreak(this, play);
