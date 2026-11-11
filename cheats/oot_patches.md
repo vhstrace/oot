@@ -1249,8 +1249,9 @@ the electric floor/wall and Ice Trap reactions, and lava/hot floor damage
 **Caveats:**
 
 - Not tested.
-- Link still takes damage and blinks, but he doesn't flinch. Freezing (Freezards, ice traps from
-  hits) and electric shocks still stop him, since those are not knockback.
+- Link still takes damage and blinks, but he doesn't flinch. Freezing
+  (Freezards, ice traps from hits) and electric shocks still stop him,
+  since those are not knockback.
 - Hits that knock back in a special way, such as an Iron Knuckle swing or
   a boss attack, also no longer throw Link. He keeps standing where he is.
   The fire effect of a fire hit (`func_80838280`) is still applied for the
