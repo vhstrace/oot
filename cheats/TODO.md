@@ -14,7 +14,8 @@ soldier, enemies die like a boss, tutorial soldiers go through 256
 messages, the "BAGE" debug name (folded into the debug save item below),
 sword beams fire at any health, and the two fireball long codes.
 
-- [ ] Adult Link rides his horse backwards
+- [x] Adult Link rides his horse backwards
+- [x] Enable `DebugDisplay_*` object display
 
 ## Movement
 
@@ -22,29 +23,20 @@ sword beams fire at any health, and the two fireball long codes.
   and `Player_GetMovementSpeedAndYaw` in `ovl_player_actor/z_player.c`.
 - [ ] Link walks through walls. Skip or neuter the wall part of
   `Player_ProcessSceneCollision` / `Actor_UpdateBgCheckInfo` for the player.
-- [ ] Link walks on deep water. Make the player's water check never put
-  him in the swimming state (treat the water surface as floor).
-- [ ] Link swims on dry land. Enter the swim action on any floor.
 - [ ] All floors are slippery like ice. Return the ice floor property
   from the surface-type lookup in `z_bgcheck.c`.
-- [ ] All floors are conveyor belts (Indoor floors push Link right). Return
-  a conveyor speed/direction from the surface-type lookup in `z_bgcheck.c`.
-- [ ] Link walks in another pose (Link walks in his praying pose). Swap
-  the run animation for another player animation.
 
 ## Speed and time
 
-- [ ] Fastest possible text. Force `msgCtx->textDelay` to 0 and print the
-  whole message at once (`src/code/z_message.c`).
 - [ ] The game runs at half speed. Double the update-rate divisor
   (`R_UPDATE_RATE`).
+- [ ] The game runs faster than normal. (whatever amount is practical without soft-locking)
 - [ ] Frame advance on controller 1 (L pauses the game, R steps one frame).
   `FrameAdvance_Update` (`src/code/z_frame_advance.c`) is in the retail
   build but reads controller 2 (R + D-Down, then Z + R). Point it at
   `input[0]` in `Play_Update`, or change the buttons.
-- [ ] Time moves only while a button is held (Time moves only while R is
-  held). Make `FrameAdvance_Update` return true only while a button is
-  held.
+- [ ] Time moves only while any button or the analog stick is being pressed.
+  Use `FrameAdvance_Update`.
 - [ ] No delay for opening treasure chests. Shorten the chest-open wait
   in `ovl_En_Box` and the player's chest-open action.
 - [ ] Link picks up pots, bushes and rocks with almost no delay. Speed up
@@ -104,8 +96,6 @@ sword beams fire at any health, and the two fireball long codes.
 
 - [ ] Enemies don't knock Link back. Skip the knockback in the player's
   damage handling (`func_80837C0C` and nearby in `z_player.c`).
-- [ ] Every enemy electrocutes Link. Force the electric damage effect
-  when Link is hit.
 
 ## Enemies
 
@@ -122,8 +112,8 @@ sword beams fire at any health, and the two fireball long codes.
   room-clear/kill flags, and spawn each enemy more than once.
 - [ ] Hyrule Castle guards chase Link at double speed (Soldiers chase
   Link at double speed / Soldiers move faster). `ovl_En_Heishi*`.
-- [ ] Octoroks spit Deku Nuts or arrows (Octoroks spit arrows).
-  `ovl_En_Okuta`: spawn another projectile actor instead of the rock.
+- [ ] Octoroks spit something other than rocks.
+  `ovl_En_Okuta`: spawn another actor instead of the rock.
 - [ ] Every enemy moves with the speed of the actor before it in the
   actor list (Every enemy moves with the speed of the sprite in the
   previous slot). `Actor_UpdateAll` / `Actor_MoveXZGravity` in
@@ -137,8 +127,6 @@ sword beams fire at any health, and the two fireball long codes.
 - [ ] Items are collected anywhere in the room (Items are collected
   anywhere on the screen). Widen the pickup distance check in
   `ovl_En_Item00` (`src/code/z_en_item00.c`).
-- [ ] Every bush, pot and rock gives a fairy. `ovl_En_Kusa`,
-  `ovl_Obj_Tsubo`, `ovl_En_Ishi`: drop a fairy instead of the random drop.
 - [ ] Lift every rock without the Goron's Bracelet or gauntlets (Lift
   every rock without the Power Glove). Skip the strength upgrade check
   when lifting (`ovl_En_Ishi`, `ovl_Obj_Hamishi`, silver/black boulders).
