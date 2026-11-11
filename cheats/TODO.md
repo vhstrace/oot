@@ -71,7 +71,7 @@ sword beams fire at any health, and the two fireball long codes.
   collider (`meleeWeaponQuads`) much bigger.
 - [x] Shield blocks shots from any direction. Skip the facing check in
   the player's shield/guard collision.
-- [ ] Thrown objects hit enemies anywhere. Make the collider of thrown
+- [x] Thrown objects hit enemies anywhere. Make the collider of thrown
   pots, rocks and bombs much bigger.
 - [ ] Arrows fly through enemies (Sword beams fly through enemies).
   `ovl_En_Arrow`: don't kill the arrow when it hits an actor.

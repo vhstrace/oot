@@ -794,3 +794,40 @@ health off (`func_80837B18(play, this, 0 - this->actor.colChkInfo.damage)`).
 - Hits with knockback (`knockbackType`, from big attacks, explosions and
   some enemies) are handled before this check and still hurt.
 - Child Link with the Hylian Shield blocks without the recoil, as before.
+
+## Thrown pots and crates hit enemies anywhere nearby
+
+**Source diff:** `patches/thrown-pots-hit-anywhere.diff`
+**Changes:** built on the Mac. Changes the `ovl_Obj_Tsubo` and
+`ovl_Obj_Kibako` overlays.
+**Recorded:** 2026-11-11 00:20:54
+
+**Mechanism:** a thrown pot (`ObjTsubo_Thrown`) or small crate
+(`ObjKibako_Thrown`) attacks with its cylinder collider
+(`AT_ON | AT_TYPE_PLAYER`). It breaks when it touches the ground, a wall,
+or something it hits (`AT_HIT`). The cylinder is small: radius 9, height
+26 for the pot, and radius 12, height 27 for the crate. In the thrown
+state, the patch makes the cylinder radius 300 and height 300, with a
+`yShift` of -150 so it reaches 150 units above and below the object, before
+`CollisionCheck_SetAT`. So the pot or crate hits the first enemy within
+300 units. The patch also drops the `CollisionCheck_SetOC` call in the
+thrown state, so the big cylinder doesn't push actors out of the way.
+
+**Evidence:** `Collider_UpdateCylinder` only copies the actor's position
+into the collider, so the new size stays set. The object is killed when it
+breaks, so the size never goes back to the idle or held state. Rocks
+(`ovl_En_Ishi`) have no attack collider (`ATELEM_NONE`) and `EnIshi_Fly`
+never calls `CollisionCheck_SetAT`, so they can't hit enemies at all, and
+this patch doesn't change them. `git apply --check` passes, and it
+builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The pot breaks on the first thing in range, often right after the throw.
+- Big crates (`ovl_Obj_Kibako2`) and rocks are not changed. Bombs are not
+  changed either: a thrown bomb hits with its explosion, not while it
+  flies, and a bigger explosion would also hurt Link from far away.
+- In flight, the pot or crate is no longer pushed by other actors.
