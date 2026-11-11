@@ -756,3 +756,41 @@ passes, and it builds.
   through the same function, so it gets the long reach too.
 - The hit boxes are long but still thin. An enemy right above or below the
   swing's plane can still be missed.
+
+## The shield blocks hits from any direction
+
+**Source diff:** `patches/shield-blocks-from-any-direction.diff`
+**Changes:** built on the Mac. Changes the `ovl_player_actor` overlay.
+**Recorded:** 2026-11-11 00:19:52
+
+**Mechanism:** Link's shield is a collider (`shieldQuad`) in front of him.
+A hit that touches it sets `AC_BOUNCED`, and `func_808382DC` (the player's
+damage handling) treats that as a block:
+`sp64 = (this->shieldQuad.base.acFlags & AC_BOUNCED) != 0;` and
+`if (sp64 || ...) { ... return 0; }`. A hit from the side or back touches
+Link's body collider (`cylinder`) instead and does damage. The patch adds
+one more case to that `if`: Link is shielding
+(`PLAYER_STATE1_SHIELDING`), has a shield (`currentShield !=
+PLAYER_SHIELD_NONE`), and his body was hit (`cylinder.base.acFlags &
+AC_HIT`). Then the hit is blocked the same way, with the shield-hit
+recoil and no damage.
+
+**Evidence:** the new case is its own condition, so `sp64` doesn't change
+and the fire check after it (which reads
+`shieldQuad.elem.acHitElem`) still runs only for real shield hits. The
+blocking branch returns before `func_80837C0C`, which is what takes the
+health off (`func_80837B18(play, this, 0 - this->actor.colChkInfo.damage)`).
+`git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Only while Link holds up a shield (R, or Z-target with a one-handed
+  weapon). Without a shield, or with his guard down, hits work as before.
+- A shot from behind is not reflected or bounced back like a front shield
+  hit. It stops, as if it hit Link, but Link takes no damage.
+- Hits with knockback (`knockbackType`, from big attacks, explosions and
+  some enemies) are handled before this check and still hurt.
+- Child Link with the Hylian Shield blocks without the recoil, as before.

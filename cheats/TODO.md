@@ -69,7 +69,7 @@ sword beams fire at any health, and the two fireball long codes.
   sword action restart while B is held.
 - [x] Sword hits enemies across most of the screen. Make the sword
   collider (`meleeWeaponQuads`) much bigger.
-- [ ] Shield blocks shots from any direction. Skip the facing check in
+- [x] Shield blocks shots from any direction. Skip the facing check in
   the player's shield/guard collision.
 - [ ] Thrown objects hit enemies anywhere. Make the collider of thrown
   pots, rocks and bombs much bigger.
