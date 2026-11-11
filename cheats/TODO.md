@@ -89,7 +89,7 @@ sword beams fire at any health, and the two fireball long codes.
   Din's Fire actor (`ovl_Magic_Fire`) where the Deku Nut is thrown.
 - [x] Every sword swing makes a spin-attack magic wave (The Fighter's
   Sword shoots beams). Spawn the great-spin effect on each swing.
-- [ ] Nayru's Love is always on (The Magic Cape is always on). Keep the
+- [x] Nayru's Love is always on (The Magic Cape is always on). Keep the
   Nayru's Love timer from running down, or start it on.
 
 ## Damage

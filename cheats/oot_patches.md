@@ -1154,3 +1154,55 @@ builds.
   then B) also shows its ring before Link has the magic meter.
 - The Deku Stick and the Hammer don't make rings.
 - Swings come fast, so several rings can be on screen at once.
+
+## Nayru's Love is always on
+
+**Source diff:** `patches/nayrus-love-always-on.diff`
+**Changes:** built on the Mac. Changes the `ovl_player_actor` and
+`ovl_Magic_Dark` overlays.
+**Recorded:** 2026-11-11 00:37:18
+
+**Mechanism:** Nayru's Love is the `MagicDark` actor. While it runs,
+`MagicDark_DiamondUpdate` (`z_magic_dark.c`) sets
+`player->invincibilityTimer = -100` (no damage, no knockback) and counts
+`gSaveContext.nayrusLoveTimer` up by 1 each frame. At 1200 it ends. When a
+new scene loads, `Player_Init` (`z_player.c`) spawns the spell again if
+`nayrusLoveTimer != 0`.
+
+The patch has two parts:
+
+- In `MagicDark_DiamondUpdate`,
+  `gSaveContext.nayrusLoveTimer = nayrusLoveTimer + 1;` becomes
+  `gSaveContext.nayrusLoveTimer = 1;`, so the timer never reaches 1200
+  (or the 1100 point where it starts to flash).
+- In `Player_Init`, right before that check, it sets
+  `gSaveContext.nayrusLoveTimer = 1` in normal play
+  (`gameMode == GAMEMODE_NORMAL` and no cutscene, the same test
+  `Play_Init` uses to clear the timer). So the spell starts in every
+  scene, from the first one, without Link having it.
+
+This is the OoT version of the ALTTP "The Magic Cape is always on" cheat.
+
+**Evidence:** the diamond's look and sound depend on the timer (below
+1100: full color, `NA_SE_PL_MAGIC_SOUL_NORMAL`). The spawn in `Player_Init`
+also sets `magicState = MAGIC_STATE_METER_FLASH_1`, as the real spell
+does. `git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Link takes no damage from hits that Nayru's Love blocks. Falling into a
+  pit, drowning, lava, freezing water and other hazards still work as
+  before.
+- While the spell is on, the magic state is not idle. As with the real
+  spell, Link can't cast other spells or shoot magic arrows, and the
+  magic meter (if he has one) flashes.
+- Songs that play an ocarina effect remove the diamond. It comes back
+  after the song (`PLAYER_STATE3_RESTORE_NAYRUS_LOVE`), except after warp
+  songs (a known bug in the original, noted in the source), until the next
+  scene loads.
+- Don't use with "A Deku Nut casts Din's Fire". Both spells share one
+  memory space for their code (`ACTOROVL_ALLOC_ABSOLUTE`), so loading Din's
+  Fire while Nayru's Love runs may crash.
