@@ -67,7 +67,7 @@ sword beams fire at any health, and the two fireball long codes.
 - [x] Spin attack charges at once. Start the spin charge counter at full.
 - [x] Hold B to swing the sword again and again with no delay. Let the
   sword action restart while B is held.
-- [ ] Sword hits enemies across most of the screen. Make the sword
+- [x] Sword hits enemies across most of the screen. Make the sword
   collider (`meleeWeaponQuads`) much bigger.
 - [ ] Shield blocks shots from any direction. Skip the facing check in
   the player's shield/guard collision.

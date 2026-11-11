@@ -1,0 +1,13 @@
+diff --git a/src/code/z_player_lib.c b/src/code/z_player_lib.c
+index 6348461e7..b606af876 100644
+--- a/src/code/z_player_lib.c
++++ b/src/code/z_player_lib.c
+@@ -1579,7 +1579,7 @@ void Player_CalcMeleeWeaponTipPositions(Player* this, Vec3f* tipPositions) {
+         sMeleeWeaponTipOffsetFromLeftHand1.x *= 1.0f + ((9 - this->unk_845) * 0.1f);
+     }
+ 
+-    sMeleeWeaponTipOffsetFromLeftHand1.x += 1200.0f;
++    sMeleeWeaponTipOffsetFromLeftHand1.x += 30000.0f;
+     sMeleeWeaponTipOffsetFromLeftHand2.x = sMeleeWeaponTipOffsetFromLeftHand1.x;
+ 
+     Matrix_MultVec3f(&sMeleeWeaponTipOffsetFromLeftHand0, &tipPositions[0]);

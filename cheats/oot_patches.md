@@ -721,3 +721,38 @@ again only while the button of the item in Link's hand is held.
 - Holding B now swings again in place of charging, so the charged spin
   attack can't start. The quick spin (roll the stick, then B) still works.
 - Holding a C button with a Deku Stick in hand also swings again and again.
+
+## The sword hits enemies across most of the screen
+
+**Source diff:** `patches/sword-hits-across-the-screen.diff`
+**Changes:** built on the Mac. Changes `code` (`z_player_lib.c`).
+**Recorded:** 2026-11-11 00:18:36
+
+**Mechanism:** the sword's two hit boxes are `meleeWeaponQuads[0]` and
+`[1]`. Each frame of a swing, `Player_CalcMeleeWeaponTipPositions`
+works out their tips from `sMeleeWeaponTipOffsetFromLeftHand1` and
+`2` (in the hand's model space). Their length is the sword length from
+`sMeleeWeaponLengths` (3000 for the Kokiri Sword, 4000 for the Master
+Sword) plus 1200: `sMeleeWeaponTipOffsetFromLeftHand1.x += 1200.0f;`. The
+patch adds `30000.0f` instead. At Link's scale (0.01) the hit boxes
+reach about 300 units farther, so a swing sweeps a wide arc around Link.
+
+**Evidence:** `Player_UpdateMeleeWeaponInfo` uses only tip positions 1
+and 2 for the two quads. Tip 0 (`sMeleeWeaponTipOffsetFromLeftHand0`) is
+for the sword trail and the wall checks in `z_player.c`
+(`meleeWeaponInfo[0]`), and it doesn't change. `git apply --check`
+passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The sword model and its trail look the same. Only the hit boxes grow.
+- The hit boxes go through walls, so the sword can hit enemies, switches,
+  pots and grass behind walls.
+- It also works for the Hammer and Biggoron's Sword. The Deku Stick uses a
+  length of 0, but the 1200 base is now 30000, so it also gets a long
+  reach.
+- The hit boxes are long but still thin. An enemy right above or below the
+  swing's plane can still be missed.
