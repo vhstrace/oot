@@ -1304,3 +1304,56 @@ it. Counts of 0 are in table 3 (slots 12 to 15) and table 10 (slot 14).
 - The extra prizes are mostly green rupees.
 - Calls with the `0x8000` flag go to `Item_DropCollectible` and are not
   changed.
+
+## Enemies drop cuccos instead of prizes
+
+**Source diff:** `patches/enemies-drop-cuccos.diff`
+**Changes:** built on the Mac. Changes `code` (`z_en_item00.c` and
+`z_scene.c`).
+**Recorded:** 2026-11-11 00:44:26
+
+**Mechanism:** `Item_DropCollectibleRandom` (`src/code/z_en_item00.c`)
+picks an item from the drop tables (`sItemDropIds`). If the result is not
+`ITEM00_NONE`, it spawns one or more `ACTOR_EN_ITEM00` items (or a
+fairy for `ITEM00_FLEXIBLE` when Link is low on health). The patch spawns
+one cucco (`ACTOR_EN_NIW`, params 0, a normal cucco) facing a random way
+instead and returns. When the table gives `ITEM00_NONE`, nothing drops,
+as before. This is the OoT version of the ALTTP cheat "Enemies drop cuccos
+instead of prizes".
+
+A cucco can only spawn when its object `OBJECT_NIW` is loaded
+(`Actor_Spawn` checks `Object_GetSlot`), and most scenes don't load it.
+So the patch also loads `OBJECT_NIW` in `Object_InitContext`
+(`src/code/z_scene.c`), right after `gameplay_keep`, with
+`Object_LoadPersistent`. Persistent objects stay loaded for the whole
+scene, like `gameplay_keep`, the scene's keep object and Link's object.
+
+**Evidence:** `object_niw` is `0x2540` bytes (9.5 KB, from the map).
+The object space is at least 1000 KB. There are 19 object slots
+(`ObjectContext.slots[19]`). Normally up to 3 are persistent, and the
+largest room object list in the ntsc-1.0 scenes has 15 objects (Lake
+Hylia, Market, Death Mountain Crater, Water Temple, Bottom of the Well),
+so with the cucco the most used is 19. Only `Scene_CommandObjectList`
+adds objects after scene start. In scenes that already list `OBJECT_NIW`
+(Kakariko, Lon Lon Ranch), a second copy loads in the room part, and
+`Object_GetSlot` finds the persistent copy first. `git apply --check`
+passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Every scene uses 9.5 KB more object memory. If a room was already close
+  to the limit, the last objects in it could overflow. This was not
+  checked room by room.
+- Like the normal drop, many calls give no drop, so not every kill gives a
+  cucco.
+- Grass, small rocks, bushes and trees (`ovl_En_Kusa`, `ovl_En_Ishi`,
+  `ovl_En_Wood02`) and hidden item spots use the same function, so they
+  drop cuccos too.
+- No fairy, heart or other prize comes from this function any more.
+  Enemies that drop items in their own way work as before.
+- Hitting a cucco many times calls the attacking cuccos, as usual.
+- Not combinable with "Enemies always drop a prize" (both change the same
+  lines).

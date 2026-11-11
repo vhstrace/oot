@@ -1,0 +1,29 @@
+diff --git a/src/code/z_en_item00.c b/src/code/z_en_item00.c
+index 5c1d325d7..057c5fff5 100644
+--- a/src/code/z_en_item00.c
++++ b/src/code/z_en_item00.c
+@@ -1317,6 +1317,12 @@ void Item_DropCollectibleRandom(PlayState* play, Actor* fromActor, Vec3f* spawnP
+         dropId = sItemDropIds[params + dropTableIndex];
+     }
+ 
++    if (dropId != ITEM00_NONE) {
++        Actor_Spawn(&play->actorCtx, play, ACTOR_EN_NIW, spawnPos->x, spawnPos->y, spawnPos->z, 0,
++                    (s16)(Rand_ZeroOne() * 0x10000), 0, 0);
++        return;
++    }
++
+     if (dropId == ITEM00_FLEXIBLE) {
+         if (gSaveContext.save.info.playerData.health <= 0x10) { // 1 heart or less
+             Actor_Spawn(&play->actorCtx, play, ACTOR_EN_ELF, spawnPos->x, spawnPos->y + 40.0f, spawnPos->z, 0, 0, 0,
+diff --git a/src/code/z_scene.c b/src/code/z_scene.c
+index f514264b0..79ee08468 100644
+--- a/src/code/z_scene.c
++++ b/src/code/z_scene.c
+@@ -130,6 +130,7 @@ void Object_InitContext(PlayState* play, ObjectContext* objectCtx) {
+ 
+     objectCtx->mainKeepSlot = Object_LoadPersistent(objectCtx, OBJECT_GAMEPLAY_KEEP);
+     gSegments[4] = OS_K0_TO_PHYSICAL(objectCtx->slots[objectCtx->mainKeepSlot].segment);
++    Object_LoadPersistent(objectCtx, OBJECT_NIW);
+ }
+ 
+ /**

@@ -101,7 +101,7 @@ sword beams fire at any health, and the two fireball long codes.
 
 - [x] Enemies always drop a prize. `Item_DropCollectibleRandom`
   (`src/code/z_en_item00.c`): skip the "no drop" roll.
-- [ ] Enemies drop cuccos instead of prizes. Spawn `ovl_En_Niw` from
+- [x] Enemies drop cuccos instead of prizes. Spawn `ovl_En_Niw` from
   `Item_DropCollectibleRandom`.
 - [ ] Enemies face and walk away from Link. Flip the yaw-to-player in the
   common enemy chase code, or in `Actor_WorldYawTowardActor`.
