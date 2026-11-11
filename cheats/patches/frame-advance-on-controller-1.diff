@@ -1,0 +1,34 @@
+diff --git a/src/code/z_frame_advance.c b/src/code/z_frame_advance.c
+index 05d839539..1c3c80b19 100644
+--- a/src/code/z_frame_advance.c
++++ b/src/code/z_frame_advance.c
+@@ -19,13 +19,12 @@ void FrameAdvance_Init(FrameAdvanceContext* frameAdvCtx) {
+  * This function returns true when frame advance is not active (game will run normally)
+  */
+ s32 FrameAdvance_Update(FrameAdvanceContext* frameAdvCtx, Input* input) {
+-    if (CHECK_BTN_ALL(input->cur.button, BTN_R) && CHECK_BTN_ALL(input->press.button, BTN_DDOWN)) {
++    if (CHECK_BTN_ALL(input->press.button, BTN_L)) {
+         frameAdvCtx->enabled = !frameAdvCtx->enabled;
+     }
+ 
+-    if (!frameAdvCtx->enabled || (CHECK_BTN_ALL(input->cur.button, BTN_Z) &&
+-                                  (CHECK_BTN_ALL(input->press.button, BTN_R) ||
+-                                   (CHECK_BTN_ALL(input->cur.button, BTN_R) && (++frameAdvCtx->timer >= 9))))) {
++    if (!frameAdvCtx->enabled || (CHECK_BTN_ALL(input->press.button, BTN_R) ||
++                                  (CHECK_BTN_ALL(input->cur.button, BTN_R) && (++frameAdvCtx->timer >= 9)))) {
+         frameAdvCtx->timer = 0;
+         return true;
+     }
+diff --git a/src/code/z_play.c b/src/code/z_play.c
+index 91a4c9bf9..bba1597c8 100644
+--- a/src/code/z_play.c
++++ b/src/code/z_play.c
+@@ -624,7 +624,7 @@ void Play_Update(PlayState* this) {
+     gSegments[5] = OS_K0_TO_PHYSICAL(this->objectCtx.slots[this->objectCtx.subKeepSlot].segment);
+     gSegments[2] = OS_K0_TO_PHYSICAL(this->sceneSegment);
+ 
+-    if (FrameAdvance_Update(&this->frameAdvCtx, &input[1])) {
++    if (FrameAdvance_Update(&this->frameAdvCtx, IS_PAUSED(&this->pauseCtx) ? &input[1] : &input[0])) {
+         if ((this->transitionMode == TRANS_MODE_OFF) && (this->transitionTrigger != TRANS_TRIGGER_OFF)) {
+             this->transitionMode = TRANS_MODE_SETUP;
+         }

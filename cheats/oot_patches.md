@@ -288,3 +288,47 @@ and it builds.
   music may drift from it.
 - Timed challenges (Gerudo archery, the Dampé race) also count frames, so
   they get no harder or easier.
+
+## Frame advance on controller 1 (L pauses, R steps one frame)
+
+**Source diff:** `cheats/patches/frame-advance-on-controller-1.diff`
+**Changes:** built on the Mac. Changes `code` (`z_frame_advance.c`,
+`z_play.c`).
+**Recorded:** 2026-11-11 00:05:19
+
+**Mechanism:** The debug frame advance is still in the retail game.
+`Play_Update` (`src/code/z_play.c`) runs the whole game update only
+when `FrameAdvance_Update` returns true:
+
+```c
+if (FrameAdvance_Update(&this->frameAdvCtx, &input[1])) {
+```
+
+`FrameAdvance_Update` (`src/code/z_frame_advance.c`) reads controller 2:
+R + D-Down turns it on or off, and Z + R steps one frame (holding Z + R
+steps every 9 frames). The patch:
+
+- passes `&input[0]` (controller 1) instead, but keeps `&input[1]` while
+  the pause menu is open (`IS_PAUSED(&this->pauseCtx)`), so L in the
+  menu doesn't freeze it;
+- turns frame advance on or off with a press of L;
+- steps one frame on a press of R, and keeps stepping every 9 frames
+  while R is held (no Z needed).
+
+**Evidence:** the call in `Play_Update` is outside every `#if
+DEBUG_FEATURES` block, so retail has it. `FrameAdvance_IsEnabled` (used
+by `z_effect.c`, `z_effect_soft_sprite.c`, `z_kankyo.c`,
+`z_scene_table.c` and the collision debug draw) also stops effects and
+scrolling textures while paused. `Play_Draw` still runs, so the frozen
+scene stays on screen. `git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- R is still the shield button, so Link raises his shield on each frame
+  you step.
+- L also toggles the minimap (`z_map_exp.c`). The press that turns
+  frame advance off runs a frame with L down, so the minimap may toggle.
+- Music keeps playing while the game is frozen.
