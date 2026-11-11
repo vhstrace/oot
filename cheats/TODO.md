@@ -30,7 +30,7 @@ sword beams fire at any health, and the two fireball long codes.
 
 - [x] The game runs at half speed. Double the update-rate divisor
   (`R_UPDATE_RATE`).
-- [ ] The game runs faster than normal. (whatever amount is practical without soft-locking)
+- [x] The game runs faster than normal. (whatever amount is practical without soft-locking)
 - [ ] Frame advance on controller 1 (L pauses the game, R steps one frame).
   `FrameAdvance_Update` (`src/code/z_frame_advance.c`) is in the retail
   build but reads controller 2 (R + D-Down, then Z + R). Point it at

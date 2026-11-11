@@ -247,3 +247,44 @@ that scales motion by it (`Actor_UpdatePos` uses
 - Music and sound effects run on their own timer and stay at normal
   speed. Cutscenes timed to music may drift from it.
 - The title screen and menus run at 30 frames per second instead of 60.
+
+## The game runs 1.5 times as fast
+
+**Source diff:** `cheats/patches/game-runs-faster.diff`
+**Changes:** built on the Mac. Changes `code` (`src/code/graph.c`).
+**Recorded:** 2026-11-11 00:03:31
+
+**Mechanism:** Same line as "The game runs at half speed". During play
+`R_UPDATE_RATE` is 3, so each picture stays up for 3 video frames (20
+frames per second on NTSC). The patch changes
+
+```c
+cfb->updateRate = R_UPDATE_RATE;
+```
+
+to `R_UPDATE_RATE - 1`. Play now waits only 2 video frames per picture
+(30 frames per second), so everything happens up to 1.5 times as fast.
+On the title screen and menus (rate 1) it becomes 0, which the
+scheduler treats the same as 1 (it swaps when `updateTimer <= 0`).
+
+**Evidence:** see "The game runs at half speed". The game logic counts
+frames, not time, so timers, enemy moves and Link all speed up together.
+`R_UPDATE_RATE` itself is not changed, so movement per frame stays the
+same and collision is no less precise. Going to 1 (60 frames per second,
+3 times as fast) was left out: the N64 CPU can't run OoT that fast, so
+it would only make the speed jump around. `git apply --check` passes,
+and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The real gain depends on how busy the scene is. OoT already drops
+  below 20 frames per second in big areas (Hyrule Field, Kakariko); those
+  get little or no faster on real hardware or an accurate emulator.
+  An emulator with CPU overclock helps.
+- Music and sound effects stay at normal speed, so cutscenes timed to
+  music may drift from it.
+- Timed challenges (Gerudo archery, the Dampé race) also count frames, so
+  they get no harder or easier.
