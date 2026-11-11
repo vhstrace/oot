@@ -139,7 +139,7 @@ sword beams fire at any health, and the two fireball long codes.
 - [x] No music. Stop the BGM player or mute the sequence channel.
 - [x] Every song plays with the next instrument. Add 1 to the instrument
   number when a sequence sets one (`src/audio/`).
-- [ ] Music and sound effects play 2 whole tones higher. Add 4 semitones
+- [x] Music and sound effects play 2 whole tones higher. Add 4 semitones
   in the note pitch calculation (`src/audio/`).
 - [ ] Every sound effect comes from the wrong sound list. Shift the sound
   bank part of each sfx id in `Audio_PlaySfxGeneral`.

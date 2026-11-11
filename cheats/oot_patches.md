@@ -1916,3 +1916,43 @@ apply --check` passes, and it builds.
   odd or nearly silent.
 - When the last instrument in a font is set, the part uses instrument 0
   of that font instead.
+
+## Music and sound effects play 2 whole tones higher
+
+**Source diff:** `cheats/patches/sound-plays-4-semitones-higher.diff`
+**Changes:** built on the Mac. Changes `code` (the audio driver part,
+`src/audio/internal/playback.c`).
+**Recorded:** 2026-11-11 01:04:03
+
+**Mechanism:** Each audio update, `Audio_ProcessNotes`
+(`src/audio/internal/playback.c`) works out the playback rate of every
+playing note:
+
+```c
+sampleStateAttrs.frequency *= playbackState->vibratoFreqScale * playbackState->portamentoFreqScale;
+sampleStateAttrs.frequency *= gAudioCtx.audioBufferParameters.resampleRate;
+```
+
+The patch multiplies it by 1.2599211 (2 to the power 4/12) on the next
+line. Every note plays 4 semitones (2 whole tones) higher, and a little
+faster for one-shot samples. This covers music, sound effects, voices,
+drums and the ocarina, since they all go through this code. This is the
+OoT version of the ALTTP cheat "Music and sound effects play 2 whole
+tones higher".
+
+**Evidence:** Both paths before this line (a note being released, which
+uses `attrs->freqScale`, and a playing note, which uses
+`layer->noteFreqScale`) end at these two lines, so the change covers
+both. `Audio_NoteSetResamplingRate` turns the result into the sample
+step. `git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- `Audio_NoteSetResamplingRate` limits the rate to about 4 times the
+  sample rate. A note that already played above about 3.2 times its
+  sample rate is held at 4 times, so it is less than 4 semitones higher.
+- Samples play faster, so sound effects and voices are a little shorter.
+  Note lengths in the music don't change, so the tempo stays the same.

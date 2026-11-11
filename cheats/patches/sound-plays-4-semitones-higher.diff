@@ -1,0 +1,12 @@
+diff --git a/src/audio/internal/playback.c b/src/audio/internal/playback.c
+index 2af3d1b05..11d4cb737 100644
+--- a/src/audio/internal/playback.c
++++ b/src/audio/internal/playback.c
+@@ -306,6 +306,7 @@ void Audio_ProcessNotes(void) {
+ 
+             sampleStateAttrs.frequency *= playbackState->vibratoFreqScale * playbackState->portamentoFreqScale;
+             sampleStateAttrs.frequency *= gAudioCtx.audioBufferParameters.resampleRate;
++            sampleStateAttrs.frequency *= 1.2599211f; // 2^(4/12), 4 semitones up
+             sampleStateAttrs.velocity *= scale;
+             Audio_InitSampleState(note, sampleState2, &sampleStateAttrs);
+             sampleState->bitField1.bookOffset = bookOffset;
