@@ -1033,3 +1033,40 @@ becomes an ice arrow with no magic cost. `EnArrow_Init` also gives it the
   in play.
 - The slingshot and enemy arrows don't change. Horseback archery uses
   the horse arrow type, so its arrows change too.
+
+## Every arrow is a fire arrow
+
+**Source diff:** `patches/every-arrow-is-fire.diff`
+**Changes:** built on the Mac. Changes the `ovl_player_actor` overlay.
+**Recorded:** 2026-11-11 00:33:52
+
+**Mechanism:** `func_8083442C` (`z_player.c`) spawns the arrow when
+Link draws the bow. It gets the arrow type from `func_80834380`
+(`ARROW_NORMAL` for the plain bow, `ARROW_NORMAL_HORSE` on a horse,
+`ARROW_FIRE`/`ICE`/`LIGHT` for magic arrows). A magic arrow takes magic
+with `Magic_RequestChange`, and turns into `ARROW_NORMAL` if Link
+doesn't have enough. The patch adds a check right before
+`Actor_SpawnAsChild(..., ACTOR_EN_ARROW, ...)`: a normal or horse arrow
+becomes `ARROW_FIRE`. `EnArrow_Update` then spawns `ovl_Arrow_Fire` on it, as for a
+real fire arrow. This is the OoT version of the ALTTP "The sword beam is a fire rod shot" cheat.
+
+**Evidence:** the change is after the magic check, so a plain arrow
+becomes a fire arrow with no magic cost. `EnArrow_Init` also gives it the
+`DMG_ARROW_FIRE` damage flags from its `dmgFlags` table. `git apply
+--check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Link still needs the bow and arrows, and each shot uses one arrow. He
+  doesn't need the fire Arrows item or any magic.
+- A magic arrow shot with too little magic also becomes a fire arrow, in place
+  of a plain one.
+- Fire, ice and light arrows that Link has the magic for work as before.
+- `ovl_Arrow_Fire` calls `Magic_Reset` when it goes away. With no magic in use,
+  this should only reset the magic bar's state, but it was not checked
+  in play.
+- The slingshot and enemy arrows don't change. Horseback archery uses
+  the horse arrow type, so its arrows change too.

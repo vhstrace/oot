@@ -83,7 +83,7 @@ sword beams fire at any health, and the two fireball long codes.
   `ovl_En_Arrow`.
 - [x] Every arrow is an ice arrow (The sword beam is an ice rod shot).
   `ovl_En_Arrow` / `ovl_Arrow_Ice`.
-- [ ] Every arrow is a fire arrow (The sword beam is a fire rod shot).
+- [x] Every arrow is a fire arrow (The sword beam is a fire rod shot).
   `ovl_En_Arrow` / `ovl_Arrow_Fire`.
 - [ ] A Deku Nut casts Din's Fire (The Lamp casts Bombos). Spawn the
   Din's Fire actor (`ovl_Magic_Fire`) where the Deku Nut is thrown.
