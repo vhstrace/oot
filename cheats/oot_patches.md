@@ -1228,8 +1228,9 @@ animation for 20 frames), rumbles, plays the hurt voice and returns.
 
 The patch adds a flag `sNoKnockbackHit`. `func_808382DC` sets it around
 its two calls. When the flag is set and Link is not swimming,
-`func_80837C0C` now does what the running case does: hurt-run animation,
-rumble and voice, with no change to his action, speed or facing. This is
+`func_80837C0C` now only rumbles and plays the hurt voice, like the
+running case but without its hurt-run animation. Link's action, animation,
+speed and facing don't change. This is
 the OoT version of the ALTTP cheat "Enemies don't knock Link back".
 
 **Evidence:** `func_80837C0C` still takes the health first
@@ -1248,7 +1249,7 @@ the electric floor/wall and Ice Trap reactions, and lava/hot floor damage
 **Caveats:**
 
 - Not tested.
-- Link still takes damage and blinks. Freezing (Freezards, ice traps from
+- Link still takes damage and blinks, but he doesn't flinch. Freezing (Freezards, ice traps from
   hits) and electric shocks still stop him, since those are not knockback.
 - Hits that knock back in a special way, such as an Iron Knuckle swing or
   a boss attack, also no longer throw Link. He keeps standing where he is.

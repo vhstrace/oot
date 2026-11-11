@@ -1,5 +1,5 @@
 diff --git a/src/overlays/actors/ovl_player_actor/z_player.c b/src/overlays/actors/ovl_player_actor/z_player.c
-index b8c908ad2..7b204e4ea 100644
+index b8c908ad2..15af5f9a2 100644
 --- a/src/overlays/actors/ovl_player_actor/z_player.c
 +++ b/src/overlays/actors/ovl_player_actor/z_player.c
 @@ -536,6 +536,7 @@ static s32 sWorldYawToTouchedWall = 0;
@@ -10,18 +10,17 @@ index b8c908ad2..7b204e4ea 100644
  
  static u16 D_8085361C[] = {
      NA_SE_VO_LI_SWEAT,
-@@ -4665,6 +4666,10 @@ void func_80837C0C(PlayState* play, Player* this, s32 hitResponseType, f32 speed
+@@ -4665,6 +4666,9 @@ void func_80837C0C(PlayState* play, Player* this, s32 hitResponseType, f32 speed
          func_80832224(this);
  
          this->av2.actionVar2 = 20;
 +    } else if (sNoKnockbackHit && !(this->stateFlags1 & PLAYER_STATE1_27)) {
-+        this->unk_890 = 20;
 +        Player_RequestRumble(this, 120, 20, 10, 0);
 +        Player_PlayVoiceSfx(this, NA_SE_VO_LI_DAMAGE_S);
      } else {
          yRot -= this->actor.shape.rot.y;
          if (this->stateFlags1 & PLAYER_STATE1_27) {
-@@ -4876,8 +4881,10 @@ s32 func_808382DC(Player* this, PlayState* play) {
+@@ -4876,8 +4880,10 @@ s32 func_808382DC(Player* this, PlayState* play) {
              }
  
              this->actor.colChkInfo.damage += this->knockbackDamage;
@@ -32,7 +31,7 @@ index b8c908ad2..7b204e4ea 100644
          } else {
              sp64 = (this->shieldQuad.base.acFlags & AC_BOUNCED) != 0;
  
-@@ -4953,7 +4960,9 @@ s32 func_808382DC(Player* this, PlayState* play) {
+@@ -4953,7 +4959,9 @@ s32 func_808382DC(Player* this, PlayState* play) {
                      sp4C = PLAYER_HIT_RESPONSE_NONE;
                  }
  
