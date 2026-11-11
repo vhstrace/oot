@@ -103,7 +103,7 @@ sword beams fire at any health, and the two fireball long codes.
   (`src/code/z_en_item00.c`): skip the "no drop" roll.
 - [x] Enemies drop cuccos instead of prizes. Spawn `ovl_En_Niw` from
   `Item_DropCollectibleRandom`.
-- [ ] Enemies face and walk away from Link. Flip the yaw-to-player in the
+- [x] Enemies face and walk away from Link. Flip the yaw-to-player in the
   common enemy chase code, or in `Actor_WorldYawTowardActor`.
 - [ ] Enemies pass through Link. Turn off enemy-to-player collision
   (OC) in `z_collision_check.c`.

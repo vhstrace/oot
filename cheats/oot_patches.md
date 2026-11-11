@@ -1357,3 +1357,47 @@ passes, and it builds.
 - Hitting a cucco many times calls the attacking cuccos, as usual.
 - Not combinable with "Enemies always drop a prize" (both change the same
   lines).
+
+## Enemies face and walk away from Link
+
+**Source diff:** `patches/enemies-face-and-walk-away-from-link.diff`
+**Changes:** built on the Mac. Changes `code` (`z_actor.c`).
+**Recorded:** 2026-11-11 00:45:45
+
+**Mechanism:** Each frame, `Actor_UpdateAll` (`src/code/z_actor.c`)
+sets `actor->yawTowardsPlayer = Actor_WorldYawTowardActor(actor,
+&player->actor);` for each actor before it updates. Most enemies turn,
+walk and aim with this value. The patch adds `0x8000` (half a turn) to it
+for actors in `ACTORCAT_ENEMY`, so they turn their backs to Link and walk
+off the other way. This is the OoT version of the ALTTP cheat "Enemies
+face and walk away from Link".
+
+Three functions in `z_actor.c` use `yawTowardsPlayer` to check which
+way Link is facing, not the enemy: `Player_IsFacingActor`,
+`Attention_WeightedDistToPlayerSq` (which actor Z-targeting picks) and
+`Attention_ShouldReleaseLockOn`. The patch makes them call
+`Actor_WorldYawTowardActor` instead, so Z-targeting and "is Link looking
+at me" checks work as before.
+
+**Evidence:** The other uses in `code` check the actor's own facing
+(`Actor_IsFacingPlayer`, `Actor_IsFacingAndNearPlayer`, `func_800354B4`
+and the head-turn code), and they now act as if Link were behind the
+enemy, which fits the cheat. The player uses `yawTowardsPlayer` of the
+actor it interacts with or pushes (`z_player.c`), not of enemies. 139
+actor overlays read the field. `git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Enemies that work out the direction to Link in their own way (for
+  example `Actor_WorldYawTowardPoint` on Link's position) still come at
+  him. Enemies that only check how far Link is still notice him.
+- Enemies that shoot with `yawTowardsPlayer` (Octoroks, Deku Scrubs and
+  others) shoot away from Link. A Deku Scrub's nut can't be sent back at
+  it this way.
+- Bosses are in `ACTORCAT_BOSS`, not `ACTORCAT_ENEMY`, and are not
+  changed.
+- Enemies that guard by turning to face Link (shields, Like Likes,
+  Stalfos) show him their back, so they may be easier.
