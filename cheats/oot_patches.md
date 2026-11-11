@@ -838,11 +838,11 @@ builds.
   flies, and a bigger explosion would also hurt Link from far away.
 - In flight, the pot or crate is no longer pushed by other actors.
 
-## Link and his horse both face backwards, and the horse runs backwards
+## Link, Ganondorf and their horses face backwards, and the horses run backwards
 
 **Source diff:** `patches/link-and-horse-face-backwards.diff`
-**Changes:** built on the Mac. Changes the `ovl_En_Horse` and
-`ovl_player_actor` overlays.
+**Changes:** built on the Mac. Changes the `ovl_En_Horse`, `ovl_En_Viewer`
+and `ovl_player_actor` overlays.
 **Recorded:** 2026-11-11 00:23:05
 
 Tags: `demo-ready` `video-ready`
@@ -864,19 +864,37 @@ moves and steers as before, but its model points the other way, so it runs
 tail first. Link now faces the same way as the drawn horse, so both face
 away from where they are going.
 
+Ganondorf and his horse in cutscenes are `En_Viewer` actors: types 3
+and 4 (Ganondorf and his rearing horse in the Hyrule Field drawbridge
+cutscene) and types 5 and 6 (the opening dream). In `EnViewer_Draw`, for
+types 3 to 6, the patch adds `0x8000` to `shape.rot.y` around the draw
+call and also calls `Matrix_RotateY(M_PI, MTXMODE_APPLY)`. Ganondorf's
+skeleton is drawn with the matrix that `Actor_Draw` already built, so
+the extra turn on the matrix turns him. The horse's skin draw builds its
+own matrix from `shape.rot`, so the `shape.rot.y` change turns the horse.
+Ganondorf's cape (`EnViewer_UpdateGanondorfCape`) also reads
+`shape.rot.y`, so it follows him.
+
 **Evidence:** `EnHorse` uses `shape.rot.y` in about 20 places for
 movement and steering, so the patch only changes it while the model is
 drawn and puts it back right after. The rider position comes from limb 30
 of the drawn skin (`Skin_GetLimbPos(skin, 30, &riderOffset,
 &this->riderPos)` in `EnHorse_PostDraw`), so Link stays in the saddle of
-the turned model. `git apply --check` passes, and it builds.
+the turned model. In `EnViewer_UpdatePosition`, Ganondorf and his horse
+both take their position from the same cutscene cue (`actorCues[1]`), so
+turning each one around that point keeps him in the saddle. The scene
+files use types 3 and 4 in `spot00` and types 5 and 6 in `hiral_demo`.
+`Skin_DrawImpl` loads its own matrix and does not use the matrix stack,
+so the extra matrix turn doesn't turn the horse twice.
+`ovl_En_Horse_Ganon` is in no scene's actor list, so it is not changed. `git apply --check` passes, and it builds.
 
 **Revisions:** US NTSC 1.0 only. Others not checked.
 
 **Caveats:**
 
 - Tested by the user on 2026-11-11 (RetroArch, BPS patch), with the
-  `shape.rot.x` fix: works.
+  `shape.rot.x` fix: works. The Ganondorf part was added after that and
+  is not tested.
 - Don't use it with "Adult Link rides his horse backwards". Both diffs
   change the same line of `z_player.c`, so they don't apply together.
   This diff already has that change.
@@ -887,6 +905,8 @@ the turned model. `git apply --check` passes, and it builds.
   from the drawn skin in `EnHorse_PostDraw`, so they turn around with the
   model. Jumps and wall checks still use the direction of travel.
 - The control stick still steers by the direction of travel, as before.
+- Ganondorf on foot (`En_Viewer` types 7 to 9) is not turned. Zelda's
+  horse and Impa in the opening cutscenes are not turned either.
 
 ## Arrows fly through enemies
 
