@@ -996,3 +996,40 @@ arrow doesn't move. `git apply --check` passes, and it builds.
   speed, both 0 at first).
 - Enemy arrows (negative `params`) also stay in place.
 - Slingshot seeds and Deku Nuts are not changed.
+
+## Every arrow is an ice arrow
+
+**Source diff:** `patches/every-arrow-is-ice.diff`
+**Changes:** built on the Mac. Changes the `ovl_player_actor` overlay.
+**Recorded:** 2026-11-11 00:33:50
+
+**Mechanism:** `func_8083442C` (`z_player.c`) spawns the arrow when
+Link draws the bow. It gets the arrow type from `func_80834380`
+(`ARROW_NORMAL` for the plain bow, `ARROW_NORMAL_HORSE` on a horse,
+`ARROW_FIRE`/`ICE`/`LIGHT` for magic arrows). A magic arrow takes magic
+with `Magic_RequestChange`, and turns into `ARROW_NORMAL` if Link
+doesn't have enough. The patch adds a check right before
+`Actor_SpawnAsChild(..., ACTOR_EN_ARROW, ...)`: a normal or horse arrow
+becomes `ARROW_ICE`. `EnArrow_Update` then spawns `ovl_Arrow_Ice` on it, as for a
+real ice arrow. This is the OoT version of the ALTTP "The sword beam is an ice rod shot" cheat.
+
+**Evidence:** the change is after the magic check, so a plain arrow
+becomes an ice arrow with no magic cost. `EnArrow_Init` also gives it the
+`DMG_ARROW_ICE` damage flags from its `dmgFlags` table. `git apply
+--check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Link still needs the bow and arrows, and each shot uses one arrow. He
+  doesn't need the ice Arrows item or any magic.
+- A magic arrow shot with too little magic also becomes an ice arrow, in place
+  of a plain one.
+- Fire, ice and light arrows that Link has the magic for work as before.
+- `ovl_Arrow_Ice` calls `Magic_Reset` when it goes away. With no magic in use,
+  this should only reset the magic bar's state, but it was not checked
+  in play.
+- The slingshot and enemy arrows don't change. Horseback archery uses
+  the horse arrow type, so its arrows change too.

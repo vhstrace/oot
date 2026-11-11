@@ -81,7 +81,7 @@ sword beams fire at any health, and the two fireball long codes.
   `ovl_En_Arrow`.
 - [x] Arrows stay where they appear (Sword beams stay where they appear).
   `ovl_En_Arrow`.
-- [ ] Every arrow is an ice arrow (The sword beam is an ice rod shot).
+- [x] Every arrow is an ice arrow (The sword beam is an ice rod shot).
   `ovl_En_Arrow` / `ovl_Arrow_Ice`.
 - [ ] Every arrow is a fire arrow (The sword beam is a fire rod shot).
   `ovl_En_Arrow` / `ovl_Arrow_Fire`.
