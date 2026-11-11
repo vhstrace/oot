@@ -18,6 +18,26 @@ index 264a7d6eb..3fedaa5ec 100644
          if (this->postDrawFunc != NULL) {
              this->postDrawFunc(this, play);
          }
+diff --git a/src/overlays/actors/ovl_En_Viewer/z_en_viewer.c b/src/overlays/actors/ovl_En_Viewer/z_en_viewer.c
+index 51f0b5691..9f9161ee1 100644
+--- a/src/overlays/actors/ovl_En_Viewer/z_en_viewer.c
++++ b/src/overlays/actors/ovl_En_Viewer/z_en_viewer.c
+@@ -730,7 +730,15 @@ void EnViewer_Draw(Actor* thisx, PlayState* play) {
+         } else if ((play->csCtx.state != CS_STATE_IDLE && play->csCtx.actorCues[1] != NULL) ||
+                    type == ENVIEWER_TYPE_9_GANONDORF) {
+             Gfx_SetupDL_25Opa(play->state.gfxCtx);
++            if (type <= ENVIEWER_TYPE_6_HORSE_GANONDORF) {
++                // Ganondorf on horseback and his horse: turn both around for the draw
++                thisx->shape.rot.y += 0x8000;
++                Matrix_RotateY(M_PI, MTXMODE_APPLY);
++            }
+             sDrawFuncs[this->drawFuncIndex](this, play);
++            if (type <= ENVIEWER_TYPE_6_HORSE_GANONDORF) {
++                thisx->shape.rot.y -= 0x8000;
++            }
+         }
+     }
+     CLOSE_DISPS(play->state.gfxCtx, "../z_en_viewer.c", 1784);
 diff --git a/src/overlays/actors/ovl_player_actor/z_player.c b/src/overlays/actors/ovl_player_actor/z_player.c
 index b8c908ad2..a291f97a4 100644
 --- a/src/overlays/actors/ovl_player_actor/z_player.c
