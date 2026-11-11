@@ -845,6 +845,8 @@ builds.
 `ovl_player_actor` overlays.
 **Recorded:** 2026-11-11 00:23:05
 
+Tags: `demo-ready` `video-ready`
+
 **Mechanism:** this builds on "Adult Link rides his horse backwards". It
 has the same `z_player.c` change: in `Player_Action_8084CC98`,
 `this->yaw = this->actor.shape.rot.y = rideActor->actor.shape.rot.y;`
@@ -873,8 +875,8 @@ the turned model. `git apply --check` passes, and it builds.
 
 **Caveats:**
 
-- Only the uphill tilt has been tried (it was wrong before the
-  `shape.rot.x` fix). The fixed version is not tested.
+- Tested by the user on 2026-11-11 (RetroArch, BPS patch), with the
+  `shape.rot.x` fix: works.
 - Don't use it with "Adult Link rides his horse backwards". Both diffs
   change the same line of `z_player.c`, so they don't apply together.
   This diff already has that change.
