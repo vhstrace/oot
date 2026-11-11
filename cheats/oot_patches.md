@@ -464,3 +464,60 @@ builds.
 - Throwing and putting things down are not changed.
 - The animation blends in from the previous pose over a few frames
   (the morph), so it isn't instant.
+
+## A new game starts with the debug save
+
+**Source diff:** `cheats/patches/new-game-starts-with-debug-save.diff`
+**Changes:** built on the Mac. Changes `code` (`src/code/z_sram.c`).
+**Recorded:** 2026-11-11 00:11:13
+
+**Mechanism:** This is the OoT version of the ALTTP cheat "Start a new
+game with BAGE debug loadout". `Sram_InitSave` (`src/code/z_sram.c`)
+makes a new file. Debug builds give file 1 the debug save; retail always
+makes a blank one:
+
+```c
+#if DEBUG_FEATURES
+    if (fileSelect->buttonIndex != 0) {
+        Sram_InitNewSave();
+    } else {
+        Sram_InitDebugSave();
+    }
+#else
+    Sram_InitNewSave();
+#endif
+    ...
+    gSaveContext.save.cutsceneIndex = CS_INDEX_1;
+```
+
+The patch changes the retail `Sram_InitNewSave()` to
+`Sram_InitDebugSave()`, and `CS_INDEX_1` to `CS_INDEX_NONE` (debug
+builds also skip the intro for file 1). Every new file now starts in
+Link's house as child Link with the debug save: 14 hearts, magic, 150
+rupees, all three swords, shields and tunics, Bow, Fire/Ice/Light Arrows,
+Din's Fire, Farore's Wind, Nayru's Love, Slingshot, Fairy Ocarina,
+Bombchus, Hookshot, Boomerang, Lens of Truth, Magic Bean, Megaton Hammer,
+four bottles (empty, red, green, blue potions), the Pocket Egg and the
+Weird Egg.
+
+**Evidence:** `Sram_InitDebugSave` and its data (`sDebugSavePlayerData`,
+`sDebugSaveEquips`, `sDebugSaveInventory`) are in the retail `code`;
+the title-screen demo (`ovl_opening/z_opening.c`) and the map select
+call it. It sets some early story flags (Saria greeted Link, Mido, Zelda
+fled the castle). `Sram_InitSave` sets the entrance, age and time after
+it, and copies the file name over the debug name "LINK".
+`git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- `magicLevel` is set to 0 by the debug save even though magic is
+  "acquired", so the magic meter may not show until a magic jar or a
+  Great Fairy sets it.
+- Child Link can't use the adult items (Bow, Hookshot, Hammer) until he
+  grows up; they show grayed out.
+- No intro cutscene, so Navi's first meeting is skipped. Story flags for
+  later events are not set, so the story still runs from the start.
+- Files already saved are not changed.

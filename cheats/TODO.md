@@ -44,7 +44,7 @@ sword beams fire at any health, and the two fireball long codes.
 
 ## Debug and start state
 
-- [ ] Start a new game with the debug save (Start a new game with BAGE
+- [x] Start a new game with the debug save (Start a new game with BAGE
   debug loadout). `Sram_InitDebugSave` (`src/code/z_sram.c`) is built
   into retail. Retail calls it only for the title-screen demo
   (`ovl_opening/z_opening.c`); the call for file 1 in `Sram_InitSave` is

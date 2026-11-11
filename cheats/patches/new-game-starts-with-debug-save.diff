@@ -1,0 +1,20 @@
+diff --git a/src/code/z_sram.c b/src/code/z_sram.c
+index 1aa61d095..8bc08a212 100644
+--- a/src/code/z_sram.c
++++ b/src/code/z_sram.c
+@@ -862,13 +862,13 @@ void Sram_InitSave(FileSelectState* fileSelect, SramContext* sramCtx) {
+         Sram_InitDebugSave();
+     }
+ #else
+-    Sram_InitNewSave();
++    Sram_InitDebugSave();
+ #endif
+ 
+     gSaveContext.save.entranceIndex = ENTR_LINKS_HOUSE_0;
+     gSaveContext.save.linkAge = LINK_AGE_CHILD;
+     gSaveContext.save.dayTime = CLOCK_TIME(10, 0);
+-    gSaveContext.save.cutsceneIndex = CS_INDEX_1;
++    gSaveContext.save.cutsceneIndex = CS_INDEX_NONE;
+ 
+ #if DEBUG_FEATURES
+     if (fileSelect->buttonIndex == 0) {
