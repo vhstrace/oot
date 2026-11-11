@@ -1,0 +1,30 @@
+diff --git a/src/overlays/actors/ovl_En_Ishi/z_en_ishi.c b/src/overlays/actors/ovl_En_Ishi/z_en_ishi.c
+index d968a36ff..1d04179aa 100644
+--- a/src/overlays/actors/ovl_En_Ishi/z_en_ishi.c
++++ b/src/overlays/actors/ovl_En_Ishi/z_en_ishi.c
+@@ -368,6 +368,9 @@ void EnIshi_Wait(EnIshi* this, PlayState* play) {
+     s16 type = PARAMS_GET_U(this->actor.params, 0, 1);
+ 
+     if (Actor_HasParent(&this->actor, play)) {
++        Actor_Spawn(&play->actorCtx, play, ACTOR_EN_ISHI, this->actor.home.pos.x, this->actor.home.pos.y,
++                    this->actor.home.pos.z, this->actor.home.rot.x, this->actor.home.rot.y, this->actor.home.rot.z,
++                    this->actor.params);
+         EnIshi_SetupLiftedUp(this);
+         SfxSource_PlaySfxAtFixedWorldPos(play, &this->actor.world.pos, 20, liftSfxIds[type]);
+         if (PARAMS_GET_U(this->actor.params, 4, 1)) {
+diff --git a/src/overlays/actors/ovl_En_Kusa/z_en_kusa.c b/src/overlays/actors/ovl_En_Kusa/z_en_kusa.c
+index 3eba9a073..99382653f 100644
+--- a/src/overlays/actors/ovl_En_Kusa/z_en_kusa.c
++++ b/src/overlays/actors/ovl_En_Kusa/z_en_kusa.c
+@@ -293,6 +293,11 @@ void EnKusa_Main(EnKusa* this, PlayState* play) {
+     STACK_PAD(s32);
+ 
+     if (Actor_HasParent(&this->actor, play)) {
++        if (PARAMS_GET_U(this->actor.params, 0, 2) != ENKUSA_TYPE_1) {
++            Actor_Spawn(&play->actorCtx, play, ACTOR_EN_KUSA, this->actor.home.pos.x, this->actor.home.pos.y,
++                        this->actor.home.pos.z, this->actor.home.rot.x, this->actor.home.rot.y,
++                        this->actor.home.rot.z, this->actor.params);
++        }
+         EnKusa_SetupCarried(this);
+         SfxSource_PlaySfxAtFixedWorldPos(play, &this->actor.world.pos, 20, NA_SE_PL_PULL_UP_PLANT);
+     } else if (this->collider.base.acFlags & AC_HIT) {

@@ -130,7 +130,7 @@ sword beams fire at any health, and the two fireball long codes.
 - [x] Lift every rock without the Goron's Bracelet or gauntlets (Lift
   every rock without the Power Glove). Skip the strength upgrade check
   when lifting (`ovl_En_Ishi`, `ovl_Obj_Hamishi`, silver/black boulders).
-- [ ] Bushes and rocks stay in place after Link lifts them. `ovl_En_Kusa`
+- [x] Bushes and rocks stay in place after Link lifts them. `ovl_En_Kusa`
   and `ovl_En_Ishi`: don't remove the original.
 - [ ] Pots stay in place after Link lifts them. `ovl_Obj_Tsubo`.
 

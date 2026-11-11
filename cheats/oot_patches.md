@@ -1748,3 +1748,48 @@ flower spawns its bomb when Link takes it (`EnBombf_GrowBomb`).
   Link.
 - Bronze boulders (`ovl_Obj_Hamishi`) are broken with the hammer, not
   lifted, and are not changed.
+
+## Bushes and rocks stay in place after Link lifts them
+
+**Source diff:** `cheats/patches/bushes-and-rocks-stay-after-lifting.diff`
+**Changes:** built on the Mac. Changes the `ovl_En_Ishi` and
+`ovl_En_Kusa` overlays.
+**Recorded:** 2026-11-11 00:59:51
+
+**Mechanism:** When Link picks up a rock, `EnIshi_Wait`
+(`src/overlays/actors/ovl_En_Ishi/z_en_ishi.c`) sees
+`Actor_HasParent(&this->actor, play)` and calls
+`EnIshi_SetupLiftedUp(this)`. The rock actor itself goes into Link's
+hands, so its spot is empty. Bushes do the same in `EnKusa_Main`
+(`ovl_En_Kusa/z_en_kusa.c`) with `EnKusa_SetupCarried(this)`.
+
+The patch adds an `Actor_Spawn` of the same actor (`ACTOR_EN_ISHI` or
+`ACTOR_EN_KUSA`) at that point, with the lifted actor's `home`
+position, `home` rotation and `params`. So a new rock or bush appears
+where the old one stood, and Link carries the old one as usual. This is
+the OoT version of the ALTTP cheat "Bushes and rocks stay in place after
+Link lifts them".
+
+Type 1 bushes (`ENKUSA_TYPE_1`) get no copy. In `EnKusa_Fall` they
+already go to `EnKusa_SetupUprootedWaitRegrow` after a throw and grow
+back at home, so a copy would leave two bushes there.
+
+**Evidence:** `EnIshi_Wait` and the `Actor_HasParent` branch of
+`EnKusa_Main` are the only places where each actor starts its carried
+state. `EnKusa_Fall` kills types 0 and 2 and regrows type 1. The rock
+and bush objects are already loaded when the original is in the room, so
+`Actor_Spawn` finds them. `git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Each copy is a full rock or bush, so it can be lifted again. Rocks and
+  bushes that drop items or spawn bugs (En_Ishi params bit 4) do it every
+  time, so this gives as many drops and bugs as you want.
+- A large (silver) rock sets its switch flag when it breaks, and
+  `EnIshi_Init` removes a large rock whose flag is set. The copy stays
+  until Link leaves the room; after that, the rock is gone as before.
+- Type 1 bushes still grow back after a short wait instead of staying at
+  once.
