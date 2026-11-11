@@ -660,3 +660,32 @@ since the u8 can't wrap. `git apply --check` passes, and it builds.
   finish them (for example, enemies that must be stunned first). They may
   not die at once.
 - Enemy-on-enemy hits (rare) are also deadly.
+
+## The spin attack charges at once
+
+**Source diff:** `patches/spin-attack-charges-at-once.diff`
+**Changes:** built on the Mac. Changes the `ovl_player_actor` overlay.
+**Recorded:** 2026-11-11 00:16:47
+
+**Mechanism:** `this->unk_858` is the spin attack charge (0.0 to 1.0).
+When Link starts charging by holding B, `func_80837704` calls
+`func_80837530(play, this, 0x200)`, which sets
+`this->unk_858 = 0.0f;`. Then `func_80844E3C` adds 0.02 each frame
+(`Math_StepToF(&this->unk_858, 1.0f, 0.02f)`), so a full charge takes 50
+frames. The patch starts the charge at `1.0f` instead.
+
+**Evidence:** on release, `func_80844BE4` picks the big spin when
+`this->unk_858 >= 0.85f`. `EnMThunder` (the spin effect) reads the same
+value for its glow and rumble. `git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Holding B after a swing and letting go always gives the big charged spin.
+  The charge-up sound and the glow start at full.
+- The quick spin from rolling the stick (`func_80837530(play, this, 0)`)
+  still starts at 0.5, as before.
+- With the Great Spin magic upgrade, every charged spin uses magic for the
+  big spin, as a full charge does.

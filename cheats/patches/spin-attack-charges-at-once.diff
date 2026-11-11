@@ -1,0 +1,13 @@
+diff --git a/src/overlays/actors/ovl_player_actor/z_player.c b/src/overlays/actors/ovl_player_actor/z_player.c
+index b8c908ad2..8e777e517 100644
+--- a/src/overlays/actors/ovl_player_actor/z_player.c
++++ b/src/overlays/actors/ovl_player_actor/z_player.c
+@@ -4361,7 +4361,7 @@ s32 Player_TryActionInterrupt(PlayState* play, Player* this, SkelAnime* skelAnim
+ 
+ void func_80837530(PlayState* play, Player* this, s32 arg2) {
+     if (arg2 != 0) {
+-        this->unk_858 = 0.0f;
++        this->unk_858 = 1.0f;
+     } else {
+         this->unk_858 = 0.5f;
+     }

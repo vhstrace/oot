@@ -64,7 +64,7 @@ sword beams fire at any health, and the two fireball long codes.
 
 - [x] Every enemy dies in one hit. Raise the damage the player's attacks
   deal, or zero enemy health on any hit.
-- [ ] Spin attack charges at once. Start the spin charge counter at full.
+- [x] Spin attack charges at once. Start the spin charge counter at full.
 - [ ] Hold B to swing the sword again and again with no delay. Let the
   sword action restart while B is held.
 - [ ] Sword hits enemies across most of the screen. Make the sword
