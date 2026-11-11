@@ -1207,3 +1207,54 @@ does. `git apply --check` passes, and it builds.
 - Don't use with "A Deku Nut casts Din's Fire". Both spells share one
   memory space for their code (`ACTOROVL_ALLOC_ABSOLUTE`), so loading Din's
   Fire while Nayru's Love runs may crash.
+
+## Enemies don't knock Link back
+
+**Source diff:** `patches/enemies-dont-knock-link-back.diff`
+**Changes:** built on the Mac. Changes the `ovl_player_actor` overlay.
+**Recorded:** 2026-11-11 00:39:57
+
+**Mechanism:** `func_808382DC` (`z_player.c`) handles hits on Link. It
+calls `func_80837C0C` in two places: for knockback set by an actor
+(`this->knockbackType`) and for a hit on Link's body collider
+(`this->cylinder.base.acFlags & AC_HIT`). `func_80837C0C` takes the
+health, then picks a reaction. For a normal hit on the ground it plays a
+stagger animation (and sets `this->speedXZ = 23.0f` for 5 or more damage).
+For a large knockback, or when Link is in the air, hanging or climbing, it
+throws him with `this->speedXZ = speed` and `this->actor.velocity.y =
+yVelocity`. It already has a case with no knockback: when Link is running
+(`this->speedXZ > 4.0f`), it only sets `this->unk_890 = 20` (the hurt-run
+animation for 20 frames), rumbles, plays the hurt voice and returns.
+
+The patch adds a flag `sNoKnockbackHit`. `func_808382DC` sets it around
+its two calls. When the flag is set and Link is not swimming,
+`func_80837C0C` now does what the running case does: hurt-run animation,
+rumble and voice, with no change to his action, speed or facing. This is
+the OoT version of the ALTTP cheat "Enemies don't knock Link back".
+
+**Evidence:** `func_80837C0C` still takes the health first
+(`func_80837B18`) and sets the 20-frame intangibility
+(`Player_SetIntangibility`) before the new branch, so damage, death and
+the blink after a hit are as before. The frozen (`PLAYER_HIT_RESPONSE_FROZEN`)
+and electric (`PLAYER_HIT_RESPONSE_ELECTRIFIED`) branches come before the
+new one and still work. Other callers of `func_80837C0C` don't set the
+flag: landing from `Player_Action_80844A44`, `Player_StartMode_KnockedOver`,
+the electric floor/wall and Ice Trap reactions, and lava/hot floor damage
+(the third call in `func_808382DC`, which is outside the flag). `git apply
+--check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Link still takes damage and blinks. Freezing (Freezards, ice traps from
+  hits) and electric shocks still stop him, since those are not knockback.
+- Hits that knock back in a special way, such as an Iron Knuckle swing or
+  a boss attack, also no longer throw Link. He keeps standing where he is.
+  The fire effect of a fire hit (`func_80838280`) is still applied for the
+  actor-knockback path, but the "fall" voice line for those hits may play
+  along with the hurt voice.
+- Actors that grab or carry Link (Like Like, Wallmaster, Gerudo guards)
+  use their own code, not this, and work as before.
+- While swimming, hits work as before.

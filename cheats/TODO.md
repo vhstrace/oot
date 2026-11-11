@@ -94,7 +94,7 @@ sword beams fire at any health, and the two fireball long codes.
 
 ## Damage
 
-- [ ] Enemies don't knock Link back. Skip the knockback in the player's
+- [x] Enemies don't knock Link back. Skip the knockback in the player's
   damage handling (`func_80837C0C` and nearby in `z_player.c`).
 
 ## Enemies
