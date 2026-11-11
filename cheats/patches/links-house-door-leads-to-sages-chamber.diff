@@ -1,0 +1,14 @@
+diff --git a/src/overlays/actors/ovl_player_actor/z_player.c b/src/overlays/actors/ovl_player_actor/z_player.c
+index b8c908ad2..07a0eb58f 100644
+--- a/src/overlays/actors/ovl_player_actor/z_player.c
++++ b/src/overlays/actors/ovl_player_actor/z_player.c
+@@ -5208,6 +5208,9 @@ s32 Player_HandleExitsAndVoids(PlayState* play, Player* this, CollisionPoly* pol
+                 Scene_SetTransitionForNextEntrance(play);
+             } else {
+                 play->nextEntranceIndex = play->exitList[exitIndex - 1];
++                if (play->sceneId == SCENE_LINKS_HOUSE) {
++                    play->nextEntranceIndex = ENTR_CHAMBER_OF_THE_SAGES_0;
++                }
+ 
+                 if (play->nextEntranceIndex == ENTR_RETURN_GROTTO) {
+                     gSaveContext.respawnFlag = 2;

@@ -589,3 +589,40 @@ not need a change. `git apply --check` passes, and it builds.
   Deku Tree at once.
 - The Kokiri Sword chest and the Deku Shield in the shop are still there.
   Getting them again does nothing new.
+
+## Link's house door leads to the Chamber of the Sages
+
+**Source diff:** `patches/links-house-door-leads-to-sages-chamber.diff`
+**Changes:** built on the Mac. Changes the `ovl_player_actor` overlay.
+**Recorded:** 2026-11-11 00:15:02
+
+**Mechanism:** when Link walks onto an exit floor,
+`Player_HandleExitsAndVoids` in `z_player.c` does
+`play->nextEntranceIndex = play->exitList[exitIndex - 1];`. The patch adds
+a check right after it: if the scene is `SCENE_LINKS_HOUSE`, the next
+entrance becomes `ENTR_CHAMBER_OF_THE_SAGES_0` (`0x06B`). This is the
+OoT version of the Zelda 3 "Link's house door leads to the Chris Houlihan
+room" idea.
+
+**Evidence:** Link's house has one doorway, and both entries of its exit
+list are `ENTR_KOKIRI_FOREST_3`
+(`link_home_scene_020000A0_ExitList`). The test maps (`testroom`,
+`test01`, `syotes`, `sutaru` and others) are only in the GameCube and
+iQue specs (`spec/scenes_gc_ique.inc`), not in `spec/scenes_n64.inc`, so
+the N64 ROM has no test map to send Link to. The Chamber of the Sages is
+in the ROM, but the player only sees it in cutscenes. `git apply --check`
+passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The Chamber of the Sages has no exit. To leave, use a warp song, Farore's
+  Wind, or save and reload. Before Link has any of these, save and reload
+  is the only way out.
+- What shows up in the chamber (Rauru, sages, a cutscene) depends on the
+  scene's setup for the game's progress. A cutscene might play, or Link
+  might be stuck in a state meant for one.
+- Only the exit from Link's house changes. Going into the house works as
+  before.
