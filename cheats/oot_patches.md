@@ -2046,3 +2046,58 @@ and it builds.
   land on the same few sounds of a small bank.
 - System sounds (menu cursor, text) become voice bank sounds, so the
   pause menu and text boxes make voice sounds.
+
+## Text appears almost at once
+
+**Source diff:** `cheats/patches/text-is-near-instant.diff`
+**Changes:** built on the Mac. Changes `code` (`src/code/z_message.c`).
+**Recorded:** 2026-11-11 13:37:54
+
+**Mechanism:** `Message_DrawText` (`src/code/z_message.c`) draws the
+decoded text up to `msgCtx->textDrawPos` each frame, then moves on by one
+character:
+
+```c
+if (msgCtx->textDelayTimer == 0) {
+    msgCtx->textDrawPos = i + 1;
+    msgCtx->textDelayTimer = msgCtx->textDelay;
+} else {
+    msgCtx->textDelayTimer--;
+}
+```
+
+The patch replaces this with the scan that the game's own "quick text"
+code (`MESSAGE_QUICKTEXT_ENABLE`) uses. It moves `textDrawPos` straight
+to the next stop code: `MESSAGE_AWAIT_BUTTON_PRESS`, `MESSAGE_BOX_BREAK`,
+`MESSAGE_BOX_BREAK_DELAYED`, `MESSAGE_END`, `MESSAGE_TEXTID`,
+`MESSAGE_EVENT`, `MESSAGE_PERSISTENT`, `MESSAGE_OCARINA`,
+`MESSAGE_FADE` or `MESSAGE_FADE2`. So each part of a text box appears in
+one frame. The stop code itself is not passed over: on the next frame,
+`textDrawPos` moves one more step onto it, so it runs as usual. The same
+change is made in `Message_DrawTextWide` (Japanese text).
+
+**Evidence:** `MESSAGE_AWAIT_BUTTON_PRESS` and `MESSAGE_OCARINA` only
+run when they are the newest character (`i + 1 == msgCtx->textDrawPos`),
+which is why the scan stops before them. The other stop codes return from
+the draw loop when it reaches them. Codes such as `MESSAGE_SFX`,
+`MESSAGE_ITEM_ICON` and the choice codes run when they are drawn, with no
+such check. The scan skips the argument byte of `MESSAGE_SHIFT` like the
+game's own scan, and it stops at `decodedTextLen`. The control codes are
+in `include/message_data_fmt.h`. `git apply --check` passes, and it
+builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Text speed codes (`MESSAGE_TEXT_SPEED`) no longer slow the text down.
+  Waits that are part of the message (`MESSAGE_BOX_BREAK_DELAYED`,
+  `MESSAGE_FADE`) still wait as before.
+- An argument byte of another control code (for example a `MESSAGE_SFX`
+  id) can have the same value as a stop code. Then the text stops there
+  for one frame. The game's own quick text has the same behavior.
+- All text that goes through `Message_DrawText` is changed, so the
+  end credits and other text shown by the message system appear at once
+  too. Text is still shown one box at a time, and you still press A to
+  go on.

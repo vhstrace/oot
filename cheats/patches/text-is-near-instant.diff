@@ -1,0 +1,53 @@
+diff --git a/src/code/z_message.c b/src/code/z_message.c
+index bb7c7dbf4..8614d596c 100644
+--- a/src/code/z_message.c
++++ b/src/code/z_message.c
+@@ -1407,12 +1407,18 @@ void Message_DrawTextWide(PlayState* play, Gfx** gfxP) {
+         }
+     }
+ 
+-    if (msgCtx->textDelayTimer == 0) {
+-        msgCtx->textDrawPos = i + 1;
+-        msgCtx->textDelayTimer = msgCtx->textDelay;
+-    } else {
+-        msgCtx->textDelayTimer--;
++    // Near-instant text: show everything up to the next stop code at once
++    for (j = i; j < msgCtx->decodedTextLen; j++) {
++        character = MSG_BUF_DECODED_WIDE[j];
++        if ((character == MESSAGE_WIDE_PERSISTENT) || (character == MESSAGE_WIDE_EVENT) ||
++            (character == MESSAGE_WIDE_BOX_BREAK_DELAYED) || (character == MESSAGE_WIDE_AWAIT_BUTTON_PRESS) ||
++            (character == MESSAGE_WIDE_BOX_BREAK) || (character == MESSAGE_WIDE_END) ||
++            (character == MESSAGE_WIDE_TEXTID) || (character == MESSAGE_WIDE_OCARINA) ||
++            (character == MESSAGE_WIDE_FADE) || (character == MESSAGE_WIDE_FADE2)) {
++            break;
++        }
+     }
++    msgCtx->textDrawPos = (j > i) ? j : i + 1;
+     *gfxP = gfx;
+ }
+ #endif
+@@ -1708,12 +1714,19 @@ void Message_DrawText(PlayState* play, Gfx** gfxP) {
+                 break;
+         }
+     }
+-    if (msgCtx->textDelayTimer == 0) {
+-        msgCtx->textDrawPos = i + 1;
+-        msgCtx->textDelayTimer = msgCtx->textDelay;
+-    } else {
+-        msgCtx->textDelayTimer--;
++    // Near-instant text: show everything up to the next stop code at once
++    for (j = i; j < msgCtx->decodedTextLen; j++) {
++        character = MSG_BUF_DECODED[j];
++        if (character == MESSAGE_SHIFT) {
++            j++;
++        } else if ((character == MESSAGE_PERSISTENT) || (character == MESSAGE_EVENT) ||
++                   (character == MESSAGE_BOX_BREAK_DELAYED) || (character == MESSAGE_AWAIT_BUTTON_PRESS) ||
++                   (character == MESSAGE_BOX_BREAK) || (character == MESSAGE_END) || (character == MESSAGE_TEXTID) ||
++                   (character == MESSAGE_OCARINA) || (character == MESSAGE_FADE) || (character == MESSAGE_FADE2)) {
++            break;
++        }
+     }
++    msgCtx->textDrawPos = (j > i) ? j : i + 1;
+     *gfxP = gfx;
+ }
+ 
