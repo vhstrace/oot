@@ -332,3 +332,50 @@ scene stays on screen. `git apply --check` passes, and it builds.
 - L also toggles the minimap (`z_map_exp.c`). The press that turns
   frame advance off runs a frame with L down, so the minimap may toggle.
 - Music keeps playing while the game is frozen.
+
+## Time moves only while a button or the stick is pressed
+
+**Source diff:** `cheats/patches/time-moves-only-while-input-held.diff`
+**Changes:** built on the Mac. Changes `code` (`z_frame_advance.c`,
+`z_play.c`).
+**Recorded:** 2026-11-11 00:05:21
+
+**Mechanism:** This is the OoT version of the ALTTP cheat "Time moves
+only while R is held". It uses the retail game's frame advance (see
+"Frame advance on controller 1"). `Play_Update` runs the game update only
+when `FrameAdvance_Update` returns true. The patch replaces the body of
+`FrameAdvance_Update` with:
+
+```c
+frameAdvCtx->enabled = !((input->cur.button != 0) || (input->cur.stick_x >= 10) || (input->cur.stick_x <= -10) ||
+                         (input->cur.stick_y >= 10) || (input->cur.stick_y <= -10));
+return !frameAdvCtx->enabled;
+```
+
+and `Play_Update` passes controller 1 (`&input[0]`) and always runs
+while the pause menu is open:
+
+```c
+if (FrameAdvance_Update(&this->frameAdvCtx, &input[0]) || IS_PAUSED(&this->pauseCtx)) {
+```
+
+So the game runs only on frames where some button is down or the stick
+is pushed past 10 (out of about 80). Setting `enabled` also freezes the
+effects and texture scrolling that check `FrameAdvance_IsEnabled`.
+
+**Evidence:** `Input` is in `include/libu64/pad.h`; `cur` is the raw
+`OSContPad` (`button`, `stick_x`, `stick_y`). A press on a frozen
+frame is still seen, since that frame then runs with the button down.
+`git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Everything stops without input: text boxes, cutscenes, scene changes
+  and the Game Over screen. Hold any button (C-Up, D-pad or L are safe in
+  most places) to let them run.
+- Music keeps playing while time is stopped.
+- Some worn N64 sticks rest past 10 and keep time moving; raise the 10 if
+  so.

@@ -35,7 +35,7 @@ sword beams fire at any health, and the two fireball long codes.
   `FrameAdvance_Update` (`src/code/z_frame_advance.c`) is in the retail
   build but reads controller 2 (R + D-Down, then Z + R). Point it at
   `input[0]` in `Play_Update`, or change the buttons.
-- [ ] Time moves only while any button or the analog stick is being pressed.
+- [x] Time moves only while any button or the analog stick is being pressed.
   Use `FrameAdvance_Update`.
 - [ ] No delay for opening treasure chests. Shorten the chest-open wait
   in `ovl_En_Box` and the player's chest-open action.
