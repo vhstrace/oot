@@ -965,3 +965,34 @@ passes, and it builds.
 - Not tested.
 - Enemy arrows (negative `params`) are also slow.
 - Moving targets are much harder to hit.
+
+## Arrows stay where they appear
+
+**Source diff:** `patches/arrows-stay-where-they-appear.diff`
+**Changes:** built on the Mac. Changes the `ovl_En_Arrow` overlay.
+**Recorded:** 2026-11-11 00:32:30
+
+**Mechanism:** `EnArrow_Shoot` (`z_en_arrow.c`) starts an arrow with
+`Actor_SetProjectileSpeed(&this->actor, 150.0f);` and `this->timer = 12;`.
+The patch changes the speed to `0.0f` and the timer to `60`. The arrow
+hangs in the air where Link let it go for about 2 seconds (60 frames at
+30 fps), then vanishes. This is the OoT version of the ALTTP "Sword beams
+stay where they appear" cheat.
+
+**Evidence:** `EnArrow_Fly` turns on gravity (`-0.4`) when
+`this->timer < 7.2`, so in its last 7 frames the arrow drops a little.
+The arrow's collider is the path it moved in the last frame
+(`Player_UpdateWeaponInfo` in `func_809B4800`), and it is cleared when the
+arrow doesn't move. `git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- A still arrow hurts nothing. It can only hit an enemy in its last 7
+  frames, while it drops.
+- The arrow points level (`shape.rot.x` comes from its speed and fall
+  speed, both 0 at first).
+- Enemy arrows (negative `params`) also stay in place.
+- Slingshot seeds and Deku Nuts are not changed.
