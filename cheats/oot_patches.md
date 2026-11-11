@@ -10,6 +10,8 @@ builds them into BPS patches. Newest entry last.
 **Changes:** built on the Mac. Changes the `ovl_player_actor` overlay.
 **Recorded:** 2026-11-10 23:58:11
 
+Tags: `demo-ready` `video-ready`
+
 **Mechanism:** While Link rides Epona, `Player_Action_8084CC98`
 (`ovl_player_actor/z_player.c`) sets his facing to the horse's facing
 each frame:
@@ -35,7 +37,7 @@ frame.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-11 (RetroArch, BPS patch): works.
 - Link's riding animation still plays, so his legs and arms point the
   wrong way on the saddle.
 - Things that use Link's facing while riding (bow aim, sword swings, the
