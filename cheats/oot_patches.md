@@ -1399,3 +1399,35 @@ actor overlays read the field. `git apply --check` passes, and it builds.
   (a hit Deku Scrub, `yawTowardsPlayer + 0x8000`) now run toward him.
 - Bosses are in `ACTORCAT_BOSS`, not `ACTORCAT_ENEMY`, and are not
   changed.
+
+## Enemies pass through Link
+
+**Source diff:** `patches/enemies-pass-through-link.diff`
+**Changes:** built on the Mac. Changes `code` (`z_collision_check.c`).
+**Recorded:** 2026-11-11 00:46:48
+
+**Mechanism:** OC ("object collision") is the collider check that pushes
+actors apart so they don't overlap. `CollisionCheck_OC`
+(`src/code/z_collision_check.c`) tests each pair of OC colliders, unless
+`CollisionCheck_Incompatible` returns true (the OC types don't match, or
+both belong to the same actor). The patch makes
+`CollisionCheck_Incompatible` also return true when one collider belongs
+to Link (`ACTORCAT_PLAYER`) and the other to an enemy
+(`ACTORCAT_ENEMY`). Then enemies and Link walk through each other. This
+is the OoT version of the ALTTP cheat "Enemies pass through Link".
+
+**Evidence:** Damage doesn't use OC. Enemy attacks hit Link with AT/AC
+checks (`CollisionCheck_AT`), and Link's sword hits enemies the same
+way, so both still work. Enemies still collide with each other and with
+other actors. `git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Some enemies use an OC touch with Link to grab him. These no longer
+  grab: Like Like (`ovl_En_Rr`) and the small Floormasters
+  (`ovl_En_Floormas`). Armos (`ovl_En_Am`) use an OC touch to wake up
+  and to stop when they bump into Link, so they may act differently.
+- Bosses (`ACTORCAT_BOSS`) still push Link.

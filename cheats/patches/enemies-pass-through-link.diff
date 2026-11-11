@@ -1,0 +1,16 @@
+diff --git a/src/code/z_collision_check.c b/src/code/z_collision_check.c
+index 2567c3b86..3f3010a2d 100644
+--- a/src/code/z_collision_check.c
++++ b/src/code/z_collision_check.c
+@@ -2939,6 +2939,11 @@ s32 CollisionCheck_Incompatible(Collider* left, Collider* right) {
+     if (left->actor == right->actor) {
+         return true;
+     }
++    if ((left->actor != NULL) && (right->actor != NULL) &&
++        (((left->actor->category == ACTORCAT_PLAYER) && (right->actor->category == ACTORCAT_ENEMY)) ||
++         ((right->actor->category == ACTORCAT_PLAYER) && (left->actor->category == ACTORCAT_ENEMY)))) {
++        return true;
++    }
+     return false;
+ }
+ 

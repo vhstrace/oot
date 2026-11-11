@@ -105,7 +105,7 @@ sword beams fire at any health, and the two fireball long codes.
   `Item_DropCollectibleRandom`.
 - [x] Enemies face and walk away from Link. Flip the yaw-to-player in the
   common enemy chase code, or in `Actor_WorldYawTowardActor`.
-- [ ] Enemies pass through Link. Turn off enemy-to-player collision
+- [x] Enemies pass through Link. Turn off enemy-to-player collision
   (OC) in `z_collision_check.c`.
 - [ ] Enemies spawn several copies and come back after you kill them
   (Overworld enemies spawn several copies ...). Don't set the
