@@ -1577,3 +1577,45 @@ Octorok is jumping, so the bomb starts above the water. `git apply --check` pass
 - The bomb explosion hurts Link, enemies and the Octorok itself, and
   breaks walls and rocks like a normal bomb.
 - Big Octo (`ovl_En_Bigokuta`) is a different actor and is not changed.
+
+## Every enemy moves with the speed of the enemy before it in the list
+
+**Source diff:** `patches/enemies-move-with-previous-enemys-speed.diff`
+**Changes:** built on the Mac. Changes `code` (`z_actor.c`).
+**Recorded:** 2026-11-11 00:53:28
+
+**Mechanism:** Most actors move with `Actor_MoveXZGravity` or
+`Actor_MoveXYZ` (`src/code/z_actor.c`). These turn `actor->speed` and
+the world rotation into a velocity in `Actor_UpdateVelocityXZGravity`
+(`actor->velocity.x = actor->speed * Math_SinS(actor->world.rot.y);` and
+so on) and `Actor_UpdateVelocityXYZ`. The patch adds a small function
+`Actor_GetMoveSpeed`. For an actor in `ACTORCAT_ENEMY` with an
+`actor->prev`, it returns `actor->prev->speed`; for all other actors it
+returns `actor->speed`. The two velocity functions use it in place of
+`actor->speed`. So each enemy moves in its own direction, but at the
+speed of the enemy before it in the enemy list. This is the OoT version of
+the ALTTP cheat "Every enemy moves with the speed of the sprite in the
+previous slot".
+
+**Evidence:** Each actor category has its own linked list
+(`actorCtx->actorLists`, `Actor.prev` and `Actor.next` in
+`include/actor.h`), so `prev` of an enemy is always another enemy.
+`Actor_AddToCategory` puts each new actor at the head of the list, so
+`prev` is the enemy that spawned just after it. The newest enemy has no
+`prev` and keeps its own speed. The enemy's own `speed` value is not
+changed, only how far it moves. `git apply --check` passes, and it
+builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- An enemy after one that stands still can't walk (it can still jump or
+  fall). An enemy after a fast one runs fast. A charging or jumping enemy
+  (Tektite, Wolfos lunge) may barely move if the enemy before it is slow.
+- Enemies that move by their animation (`Actor_UpdatePosByAnimation`) or
+  set their position directly are not changed.
+- Any other actor that is in `ACTORCAT_ENEMY` (for example parts or
+  shots that an enemy spawns in that category) is in the same list, so it
+  gets a neighbor's speed too.

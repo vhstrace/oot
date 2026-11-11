@@ -114,7 +114,7 @@ sword beams fire at any health, and the two fireball long codes.
   Link at double speed / Soldiers move faster). `ovl_En_Heishi*`.
 - [x] Octoroks spit something other than rocks.
   `ovl_En_Okuta`: spawn another actor instead of the rock.
-- [ ] Every enemy moves with the speed of the actor before it in the
+- [x] Every enemy moves with the speed of the actor before it in the
   actor list (Every enemy moves with the speed of the sprite in the
   previous slot). `Actor_UpdateAll` / `Actor_MoveXZGravity` in
   `src/code/z_actor.c`.

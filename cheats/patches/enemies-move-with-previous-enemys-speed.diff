@@ -1,0 +1,39 @@
+diff --git a/src/code/z_actor.c b/src/code/z_actor.c
+index 243dc7fbb..8c33ae926 100644
+--- a/src/code/z_actor.c
++++ b/src/code/z_actor.c
+@@ -994,9 +994,18 @@ void Actor_UpdatePos(Actor* actor) {
+ /**
+  * Update actor's velocity accounting for gravity (without dropping below minimum y velocity)
+  */
++static f32 Actor_GetMoveSpeed(Actor* actor) {
++    if ((actor->category == ACTORCAT_ENEMY) && (actor->prev != NULL)) {
++        return actor->prev->speed;
++    }
++    return actor->speed;
++}
++
+ void Actor_UpdateVelocityXZGravity(Actor* actor) {
+-    actor->velocity.x = actor->speed * Math_SinS(actor->world.rot.y);
+-    actor->velocity.z = actor->speed * Math_CosS(actor->world.rot.y);
++    f32 speed = Actor_GetMoveSpeed(actor);
++
++    actor->velocity.x = speed * Math_SinS(actor->world.rot.y);
++    actor->velocity.z = speed * Math_CosS(actor->world.rot.y);
+ 
+     actor->velocity.y += actor->gravity;
+ 
+@@ -1019,10 +1028,11 @@ void Actor_MoveXZGravity(Actor* actor) {
+  * Update actor's velocity without gravity.
+  */
+ void Actor_UpdateVelocityXYZ(Actor* actor) {
+-    f32 speedXZ = actor->speed * Math_CosS(actor->world.rot.x);
++    f32 speed = Actor_GetMoveSpeed(actor);
++    f32 speedXZ = speed * Math_CosS(actor->world.rot.x);
+ 
+     actor->velocity.x = speedXZ * Math_SinS(actor->world.rot.y);
+-    actor->velocity.y = actor->speed * Math_SinS(actor->world.rot.x);
++    actor->velocity.y = speed * Math_SinS(actor->world.rot.x);
+     actor->velocity.z = speedXZ * Math_CosS(actor->world.rot.y);
+ }
+ 
