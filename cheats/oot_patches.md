@@ -1871,3 +1871,48 @@ works as before. `git apply --check` passes, and it builds.
   effect player (`SFX_CHANNEL_OCARINA`), so they are still heard.
 - Area sounds that play as a sequence on the BGM player, such as the
   nature ambience in Hyrule Field at night, are silent too.
+
+## Every song plays with the next instrument
+
+**Source diff:** `cheats/patches/songs-play-with-next-instrument.diff`
+**Changes:** built on the Mac. Changes `code` (the audio driver part,
+`src/audio/internal/seqplayer.c`).
+**Recorded:** 2026-11-11 01:03:09
+
+**Mechanism:** When a sequence channel runs its "set instrument" command,
+`AudioSeq_SetInstrument` (`src/audio/internal/seqplayer.c`) handles
+synthetic waves (`instId >= 0x80`), drums (`0x7F`) and sound effects
+(`0x7E`) on their own. Any other id is a normal instrument in the
+channel's sound font:
+
+```c
+if ((channel->instOrWave = AudioSeq_GetInstrument(channel, instId, &channel->instrument, &channel->adsr)) == 0) {
+```
+
+The patch adds 1 to `instId` in that last case, for every sequence
+player except `SEQ_PLAYER_SFX`. If the font has no instrument at the new
+id (`Audio_GetInstrumentInner` returns NULL), it uses instrument 0
+instead, so the channel is not left silent. So each music part plays
+with the next instrument in its sound font, and drums and synthetic
+waves stay as they are. This is the OoT version of the ALTTP cheat
+"Every song plays with the next instrument".
+
+**Evidence:** `AudioSeq_SetInstrument` is called only from the channel
+command handler in `seqplayer.c`. `Audio_GetInstrumentInner`
+(`src/audio/internal/playback.c`) returns NULL when the id is
+`>= numInstruments` or the slot is empty; it also sets
+`gAudioCtx.audioErrorFlags`, which only the debug display reads. `git
+apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Sound effects, Link's ocarina and NPC ocarina playback use the sound
+  effect player, so they keep their instruments.
+- The next instrument may be a very different sound (a drum kit sample,
+  a voice) or play in a very different range, so some parts may sound
+  odd or nearly silent.
+- When the last instrument in a font is set, the part uses instrument 0
+  of that font instead.

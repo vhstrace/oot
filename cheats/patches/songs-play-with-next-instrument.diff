@@ -1,0 +1,17 @@
+diff --git a/src/audio/internal/seqplayer.c b/src/audio/internal/seqplayer.c
+index 2bc3e3d43..50c4eecfa 100644
+--- a/src/audio/internal/seqplayer.c
++++ b/src/audio/internal/seqplayer.c
+@@ -1236,6 +1236,12 @@ void AudioSeq_SetInstrument(SequenceChannel* channel, u8 instId) {
+         channel->instrument = (Instrument*)2; // invalid pointer, never dereferenced
+     } else {
+         // Instruments
++        if (channel->seqPlayer->playerIdx != SEQ_PLAYER_SFX) {
++            instId++;
++            if (Audio_GetInstrumentInner(channel->fontId, instId) == NULL) {
++                instId = 0;
++            }
++        }
+         if ((channel->instOrWave = AudioSeq_GetInstrument(channel, instId, &channel->instrument, &channel->adsr)) ==
+             0) {
+             channel->hasInstrument = false;
