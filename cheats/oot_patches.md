@@ -1961,7 +1961,7 @@ step. `git apply --check` passes, and it builds.
 
 **Source diff:** `cheats/patches/sfx-come-from-wrong-list.diff`
 **Changes:** built on the Mac. Changes `code` (the audio part,
-`src/audio/game/sfx.c`).
+`src/audio/game/sfx.c` and `general.c`).
 **Recorded:** 2026-11-11 01:05:42
 
 **Mechanism:** A sound effect id (`include/sfx.h`) is the bank in bits
@@ -1984,14 +1984,16 @@ from the wrong sound list".
 `Audio_StopSfxByPosAndId`, `Audio_StopSfxByTokenAndId`,
 `Audio_StopSfxById` and `Audio_IsSfxPlaying` call it too, so game
 code that stops a looping sound, or waits for one to end, finds it under
-its new id.
+its new id. `func_800F4C58` (`src/audio/game/general.c`, used for the
+timer sound in `src/code/z_actor.c`) looks for a playing sound by id in
+`gSfxBanks`, so it uses the new id for that search too.
 
 **Evidence:** `SFX_BANK`, `SFX_INDEX`, the `BANK_*` enum and the
 `NA_SE_*_BASE`/`_END` values are in `include/sfx.h`. Every sound
 effect call (`Sfx_PlaySfxCentered`, `Actor_PlaySfx`, `func_800F4*`
-and so on) ends in `Audio_PlaySfxGeneral`. Nothing else in
-`src/audio/game/` or `src/code/` compares an id against
-`gSfxBanks`. `git apply --check` passes, and it builds.
+and so on) ends in `Audio_PlaySfxGeneral`. Outside `sfx.c`, only
+`func_800F4C58` compares an id against `gSfxBanks` (the other uses in
+`general.c` take a bank and entry index). `git apply --check` passes, and it builds.
 
 **Revisions:** US NTSC 1.0 only. Others not checked.
 
@@ -2007,5 +2009,5 @@ and so on) ends in `Audio_PlaySfxGeneral`. Nothing else in
   the old id, or until the bank entry is pushed out by other sounds.
 - Bank sizes differ, so many ids in a large bank (enemy has the most)
   land on the same few sounds of a small bank.
-- System sounds (menu cursor, text) become voice sounds, so the pause
-  menu and text boxes make Link's voice sounds.
+- System sounds (menu cursor, text) become voice bank sounds, so the
+  pause menu and text boxes make voice sounds.

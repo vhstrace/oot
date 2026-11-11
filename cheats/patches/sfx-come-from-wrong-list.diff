@@ -1,3 +1,32 @@
+diff --git a/src/audio/game/general.c b/src/audio/game/general.c
+index a874564f8..e16f3369e 100644
+--- a/src/audio/game/general.c
++++ b/src/audio/game/general.c
+@@ -3070,19 +3070,22 @@ void Audio_PlaySfxTransposed(Vec3f* pos, u16 sfxId, s8 semitone) {
+                          &gSfxDefaultReverb);
+ }
+ 
++u32 Audio_WrongSfxListId(u32 sfxId);
++
+ void func_800F4C58(Vec3f* pos, u16 sfxId, u8 ioData) {
++    u16 movedSfxId = Audio_WrongSfxListId(sfxId);
+     u8 channelIndex = 0;
+     u8 i;
+     u8 bankId;
+ 
+-    bankId = SFX_BANK_SHIFT(sfxId);
++    bankId = SFX_BANK_SHIFT(movedSfxId);
+     for (i = 0; i < bankId; i++) {
+         channelIndex += gChannelsPerBank[gSfxChannelLayout][i];
+     }
+ 
+     for (i = 0; i < gChannelsPerBank[gSfxChannelLayout][bankId]; i++) {
+         if ((gActiveSfx[bankId][i].entryIndex != 0xFF) &&
+-            (sfxId == gSfxBanks[bankId][gActiveSfx[bankId][i].entryIndex].sfxId)) {
++            (movedSfxId == gSfxBanks[bankId][gActiveSfx[bankId][i].entryIndex].sfxId)) {
+             AUDIOCMD_CHANNEL_SET_IO(SEQ_PLAYER_SFX, channelIndex, 6, ioData);
+         }
+         channelIndex++;
 diff --git a/src/audio/game/sfx.c b/src/audio/game/sfx.c
 index ec44bd9dd..cfbbc7722 100644
 --- a/src/audio/game/sfx.c
