@@ -1105,3 +1105,52 @@ passes, and it builds.
   the game.
 - When the fire goes away, `MagicFire_Destroy` calls `Magic_Reset`. If the
   Lens of Truth is on, this may turn it off.
+
+## Every sword swing makes a spin attack wave
+
+**Source diff:** `patches/every-swing-makes-spin-wave.diff`
+**Changes:** built on the Mac. Changes the `ovl_player_actor` and
+`ovl_En_M_Thunder` overlays.
+**Recorded:** 2026-11-11 00:36:05
+
+**Mechanism:** the glowing ring of a spin attack is the `EnMThunder`
+actor. Link spawns it in `func_80837530` (`z_player.c`) with params
+`Player_GetMeleeWeaponHeld(this) | magic cost`. When
+`PLAYER_STATE2_17` is set at spawn time (a spin that has already started),
+`EnMThunder_Init` goes straight to `EnMThunder_SpinAttacking`, the
+expanding ring that hits enemies around Link.
+
+The patch has two parts:
+
+- At the end of `func_80837948` (which starts every melee attack), for a
+  sword (`Player_GetMeleeWeaponHeld` 1 to 3) and an attack that is not a
+  spin (`meleeWeaponAnimation < PLAYER_MWA_SPIN_ATTACK_1H`), it sets
+  `PLAYER_STATE2_17`, spawns `ACTOR_EN_M_THUNDER` at Link's waist with
+  magic cost 0, and then clears the flag again if it wasn't set before.
+- In `EnMThunder_Init`, it removes the `!isMagicAcquired` check, so the
+  ring also shows before Link has the magic meter.
+
+This is the OoT version of the ALTTP "The Fighter's Sword shoots beams"
+cheat.
+
+**Evidence:** `Actor_Spawn` runs the actor's init function at once, so
+the flag only needs to be set around the call. `EnMThunder_Init` clears
+`PLAYER_STATE2_17` itself when it starts the ring. With a magic cost of 0,
+`Magic_RequestChange` is never called. `git apply --check` passes, and it
+builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- It costs no magic. The ring is the small one (`M_THUNDER_ATTACK_WEAK`),
+  not the big charged one.
+- No ring shows while the magic state is not idle, for example while the
+  Lens of Truth is on or magic is being used.
+- Each ring calls `Magic_Reset` when it ends, which may turn off the Lens
+  of Truth.
+- With the `isMagicAcquired` check gone, the quick spin (roll the stick,
+  then B) also shows its ring before Link has the magic meter.
+- The Deku Stick and the Hammer don't make rings.
+- Swings come fast, so several rings can be on screen at once.

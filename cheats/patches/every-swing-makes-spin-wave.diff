@@ -1,0 +1,38 @@
+diff --git a/src/overlays/actors/ovl_En_M_Thunder/z_en_m_thunder.c b/src/overlays/actors/ovl_En_M_Thunder/z_en_m_thunder.c
+index ea2433ace..1142deddb 100644
+--- a/src/overlays/actors/ovl_En_M_Thunder/z_en_m_thunder.c
++++ b/src/overlays/actors/ovl_En_M_Thunder/z_en_m_thunder.c
+@@ -100,7 +100,7 @@ void EnMThunder_Init(Actor* thisx, PlayState* play2) {
+     this->isUsingMagic = false;
+ 
+     if (player->stateFlags2 & PLAYER_STATE2_17) {
+-        if (!gSaveContext.save.info.playerData.isMagicAcquired || (gSaveContext.magicState != MAGIC_STATE_IDLE) ||
++        if ((gSaveContext.magicState != MAGIC_STATE_IDLE) ||
+             (PARAMS_GET_S(this->actor.params, 8, 8) &&
+              !(Magic_RequestChange(play, PARAMS_GET_S(this->actor.params, 8, 8), MAGIC_CONSUME_NOW)))) {
+             SFX_PLAY_AT_POS(&player->actor.projectedPos, NA_SE_IT_ROLLING_CUT);
+diff --git a/src/overlays/actors/ovl_player_actor/z_player.c b/src/overlays/actors/ovl_player_actor/z_player.c
+index b8c908ad2..4254b78b0 100644
+--- a/src/overlays/actors/ovl_player_actor/z_player.c
++++ b/src/overlays/actors/ovl_player_actor/z_player.c
+@@ -4556,6 +4556,20 @@ void func_80837948(PlayState* play, Player* this, s32 arg2) {
+ 
+     func_80837918(this, 0, dmgFlags);
+     func_80837918(this, 1, dmgFlags);
++
++    temp = Player_GetMeleeWeaponHeld(this);
++    if ((this->actor.category == ACTORCAT_PLAYER) && (temp >= 1) && (temp <= 3) &&
++        (this->meleeWeaponAnimation < PLAYER_MWA_SPIN_ATTACK_1H)) {
++        u32 hadFlag = this->stateFlags2 & PLAYER_STATE2_17;
++
++        this->stateFlags2 |= PLAYER_STATE2_17;
++        Actor_Spawn(&play->actorCtx, play, ACTOR_EN_M_THUNDER, this->bodyPartsPos[PLAYER_BODYPART_WAIST].x,
++                    this->bodyPartsPos[PLAYER_BODYPART_WAIST].y, this->bodyPartsPos[PLAYER_BODYPART_WAIST].z, 0, 0, 0,
++                    temp);
++        if (!hadFlag) {
++            this->stateFlags2 &= ~PLAYER_STATE2_17;
++        }
++    }
+ }
+ 
+ /**
