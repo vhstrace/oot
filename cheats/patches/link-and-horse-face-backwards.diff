@@ -1,0 +1,32 @@
+diff --git a/src/overlays/actors/ovl_En_Horse/z_en_horse.c b/src/overlays/actors/ovl_En_Horse/z_en_horse.c
+index 264a7d6eb..8ae14c0f1 100644
+--- a/src/overlays/actors/ovl_En_Horse/z_en_horse.c
++++ b/src/overlays/actors/ovl_En_Horse/z_en_horse.c
+@@ -3856,11 +3856,13 @@ void EnHorse_Draw(Actor* thisx, PlayState* play) {
+     if (!(this->stateFlags & ENHORSE_INACTIVE)) {
+         Gfx_SetupDL_25Opa(play->state.gfxCtx);
+         this->stateFlags |= ENHORSE_DRAW;
++        thisx->shape.rot.y += 0x8000;
+         if (this->stateFlags & ENHORSE_JUMPING) {
+             func_800A6360(thisx, play, &this->skin, EnHorse_PostDraw, EnHorse_OverrideLimbDraw, false);
+         } else {
+             func_800A6360(thisx, play, &this->skin, EnHorse_PostDraw, EnHorse_OverrideLimbDraw, true);
+         }
++        thisx->shape.rot.y -= 0x8000;
+         if (this->postDrawFunc != NULL) {
+             this->postDrawFunc(this, play);
+         }
+diff --git a/src/overlays/actors/ovl_player_actor/z_player.c b/src/overlays/actors/ovl_player_actor/z_player.c
+index b8c908ad2..a291f97a4 100644
+--- a/src/overlays/actors/ovl_player_actor/z_player.c
++++ b/src/overlays/actors/ovl_player_actor/z_player.c
+@@ -13314,7 +13314,8 @@ void Player_Action_8084CC98(Player* this, PlayState* play) {
+     this->actor.world.pos.y = (rideActor->actor.world.pos.y + rideActor->riderPos.y) - 27.0f;
+     this->actor.world.pos.z = rideActor->actor.world.pos.z + rideActor->riderPos.z;
+ 
+-    this->yaw = this->actor.shape.rot.y = rideActor->actor.shape.rot.y;
++    this->yaw = rideActor->actor.shape.rot.y;
++    this->actor.shape.rot.y = rideActor->actor.shape.rot.y + 0x8000;
+ 
+     if ((this->csAction != PLAYER_CSACTION_NONE) ||
+         (!Player_IsTalking(play) && ((rideActor->actor.speed != 0.0f) || !Player_ActionHandler_Talk(this, play)) &&

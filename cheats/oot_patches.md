@@ -831,3 +831,45 @@ builds.
   changed either: a thrown bomb hits with its explosion, not while it
   flies, and a bigger explosion would also hurt Link from far away.
 - In flight, the pot or crate is no longer pushed by other actors.
+
+## Link and his horse both face backwards, and the horse runs backwards
+
+**Source diff:** `patches/link-and-horse-face-backwards.diff`
+**Changes:** built on the Mac. Changes the `ovl_En_Horse` and
+`ovl_player_actor` overlays.
+**Recorded:** 2026-11-11 00:23:05
+
+**Mechanism:** this builds on "Adult Link rides his horse backwards". It
+has the same `z_player.c` change: in `Player_Action_8084CC98`,
+`this->yaw = this->actor.shape.rot.y = rideActor->actor.shape.rot.y;`
+becomes `this->yaw = rideActor->actor.shape.rot.y;` and
+`this->actor.shape.rot.y = rideActor->actor.shape.rot.y + 0x8000;`, so
+Link faces the back of the horse. It also turns the horse model around: in
+`EnHorse_Draw`, the patch adds `0x8000` to `shape.rot.y` before
+`func_800A6360` (the skin draw) and takes it off again after. The horse
+moves and steers as before, but its model points the other way, so it runs
+tail first. Link now faces the same way as the drawn horse, so both face
+away from where they are going.
+
+**Evidence:** `EnHorse` uses `shape.rot.y` in about 20 places for
+movement and steering, so the patch only changes it while the model is
+drawn and puts it back right after. The rider position comes from limb 30
+of the drawn skin (`Skin_GetLimbPos(skin, 30, &riderOffset,
+&this->riderPos)` in `EnHorse_PostDraw`), so Link stays in the saddle of
+the turned model. `git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Don't use it with "Adult Link rides his horse backwards". Both diffs
+  change the same line of `z_player.c`, so they don't apply together.
+  This diff already has that change.
+- Every `EnHorse` is turned around, also when no one rides it: Epona in
+  Lon Lon Ranch, Ingo's horse in the race, and horses in cutscenes that
+  use this actor.
+- The horse's hit spheres are set from the drawn skin, so they turn
+  around with the model. The horse's head is now behind it for things
+  like jumping fences.
+- The control stick still steers by the direction of travel, as before.
