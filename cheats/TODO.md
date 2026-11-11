@@ -28,7 +28,7 @@ sword beams fire at any health, and the two fireball long codes.
 
 ## Speed and time
 
-- [ ] The game runs at half speed. Double the update-rate divisor
+- [x] The game runs at half speed. Double the update-rate divisor
   (`R_UPDATE_RATE`).
 - [ ] The game runs faster than normal. (whatever amount is practical without soft-locking)
 - [ ] Frame advance on controller 1 (L pauses the game, R steps one frame).

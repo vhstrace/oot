@@ -209,3 +209,41 @@ No `#if` checks here. `git apply --check` passes, and it builds.
 - Only Link slides. Enemies, Epona and other actors walk as normal.
 - Standing still on a slope may still slide Link down as before; turning
   around fast makes him stop first, then speed up the other way.
+
+## The game runs at half speed
+
+**Source diff:** `cheats/patches/game-runs-at-half-speed.diff`
+**Changes:** built on the Mac. Changes `code` (`src/code/graph.c`).
+**Recorded:** 2026-11-11 00:03:29
+
+**Mechanism:** `Graph_TaskSet00` (`src/code/graph.c`) tells the
+scheduler how many video frames (VIs) each new picture must stay on
+screen:
+
+```c
+cfb->updateRate = R_UPDATE_RATE;
+```
+
+`R_UPDATE_RATE` is 3 during play (20 frames per second on NTSC), and 1
+on the title screen and the file select. The scheduler
+(`Sched_HandleRetrace` in `src/code/sched.c`) won't swap to the next
+picture until `updateTimer` counts down, and the game can't start a
+new frame until a frame buffer is free. The patch changes the line to
+`R_UPDATE_RATE * 2`, so play runs at 10 frames per second, half speed.
+
+**Evidence:** `R_UPDATE_RATE` is `SREG(30)` (`include/regs.h`), set
+to 3 in `GameState_Init` (`game.c`) and by `Play_Update` after
+transitions. `updateRate` is an `s8` in `CfbInfo`
+(`include/sched.h`). `R_UPDATE_RATE` itself is not changed, so code
+that scales motion by it (`Actor_UpdatePos` uses
+`R_UPDATE_RATE * 0.5f`) moves the same distance per frame as before.
+`git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Music and sound effects run on their own timer and stay at normal
+  speed. Cutscenes timed to music may drift from it.
+- The title screen and menus run at 30 frames per second instead of 60.
