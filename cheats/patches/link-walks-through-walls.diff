@@ -1,0 +1,14 @@
+diff --git a/src/overlays/actors/ovl_player_actor/z_player.c b/src/overlays/actors/ovl_player_actor/z_player.c
+index b8c908ad2..779931c57 100644
+--- a/src/overlays/actors/ovl_player_actor/z_player.c
++++ b/src/overlays/actors/ovl_player_actor/z_player.c
+@@ -11128,6 +11128,9 @@ void Player_ProcessSceneCollision(PlayState* play, Player* this) {
+ 
+     Math_Vec3f_Copy(&unusedWorldPos, &this->actor.world.pos);
+ 
++    flags &= ~UPDBGCHECKINFO_FLAG_0;
++    this->actor.bgCheckFlags &= ~BGCHECKFLAG_WALL;
++
+     Actor_UpdateBgCheckInfo(play, &this->actor, vWallCheckHeight, vWallCheckRadius, ceilingCheckHeight, flags);
+ 
+     if (this->actor.bgCheckFlags & BGCHECKFLAG_CEILING) {

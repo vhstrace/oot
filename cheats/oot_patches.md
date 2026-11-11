@@ -110,8 +110,7 @@ caps it at `this->unk_880`:
 boots, 5.0 indoors, 3.0 with the Iron Boots, from `sBootData` in
 `z_player_lib.c`). The patch changes `0.14f` to `0.28f`, and changes
 `R_RUN_SPEED_LIMIT / 100.0f` to `/ 50.0f` where it sets `unk_880`
-(two places in `Player_UpdateCommon`'s wall code and one in its
-`else`) and in the clamp in `func_8083DFE0`. Target speed and cap are
+(three places in `Player_ProcessSceneCollision`) and in the clamp in `func_8083DFE0`. Target speed and cap are
 both doubled, so a full stick runs at 12 instead of 6.
 
 **Evidence:** `R_RUN_SPEED_LIMIT` is `REG(45)` (`include/regs.h`),
@@ -131,3 +130,45 @@ passes, and it builds.
 - At this speed Link may run off ledges sooner and clip through thin
   walls more easily.
 - Swimming, rolling, jumping and riding Epona are not changed.
+
+## Link walks through walls
+
+**Source diff:** `cheats/patches/link-walks-through-walls.diff`
+**Changes:** built on the Mac. Changes the `ovl_player_actor` overlay.
+**Recorded:** 2026-11-11 00:00:54
+
+**Mechanism:** `Player_ProcessSceneCollision`
+(`ovl_player_actor/z_player.c`) picks the background checks for Link,
+almost always with `UPDBGCHECKINFO_FLAG_0` (check wall), then calls:
+
+```c
+Actor_UpdateBgCheckInfo(play, &this->actor, vWallCheckHeight, vWallCheckRadius, ceilingCheckHeight, flags);
+```
+
+With that flag, `Actor_UpdateBgCheckInfo` (`src/code/z_actor.c`) runs
+`BgCheck_EntitySphVsWall3` and pushes the actor back out of any wall.
+The patch adds `flags &= ~UPDBGCHECKINFO_FLAG_0;` and clears
+`BGCHECKFLAG_WALL` just before the call. Floors and ceilings are still
+checked, so Link still stands on the ground.
+
+**Evidence:** flag names from `include/actor.h` (`FLAG_0` "check
+wall", `FLAG_1` ceiling, `FLAG_2` floor and water). Without
+`FLAG_0`, `Actor_UpdateBgCheckInfo` skips the wall block and leaves
+`bgCheckFlags` alone, so the patch clears `BGCHECKFLAG_WALL` itself.
+This is the same idea as the debug noclip (`sNoclipEnabled`, debug
+builds only), but Link keeps gravity. No `#if` checks here.
+`git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The separate "touching a wall" line test (`Player_PosVsWallLineTest`)
+  is not changed. Link may still grab ledges, push blocks, and climb
+  vines when he walks into them.
+- Walking out past the edge of a room can drop Link into the void
+  (he respawns with damage), or put him in a spot where a door or
+  loading zone never triggers.
+- Collision with actors (enemies, NPCs, doors, chests) is a different
+  system and still works.
