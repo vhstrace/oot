@@ -38,3 +38,20 @@ index 5b8b49e67..2c6856713 100644
      Math_ApproachZeroF(&this->headAngle, 0.5f, 2000.0f);
  
      if (this->actor.xzDistToPlayer < 70.0f) {
+diff --git a/src/overlays/actors/ovl_En_Heishi3/z_en_heishi3.c b/src/overlays/actors/ovl_En_Heishi3/z_en_heishi3.c
+index c94958a60..224994d8d 100644
+--- a/src/overlays/actors/ovl_En_Heishi3/z_en_heishi3.c
++++ b/src/overlays/actors/ovl_En_Heishi3/z_en_heishi3.c
+@@ -188,10 +188,10 @@ void EnHeishi3_StandSentinelInCastle(EnHeishi3* this, PlayState* play) {
+ void EnHeishi3_CatchStart(EnHeishi3* this, PlayState* play) {
+     f32 frameCount = Animation_GetLastFrame(&gEnHeishiWalkAnim);
+ 
+-    Animation_Change(&this->skelAnime, &gEnHeishiWalkAnim, 1.0f, 0.0f, (s16)frameCount, ANIMMODE_LOOP, -10.0f);
++    Animation_Change(&this->skelAnime, &gEnHeishiWalkAnim, 2.0f, 0.0f, (s16)frameCount, ANIMMODE_LOOP, -10.0f);
+     this->caughtTimer = 20;
+     this->actionFunc = func_80A55BD4;
+-    this->actor.speed = 2.5f;
++    this->actor.speed = 5.0f;
+ }
+ 
+ void func_80A55BD4(EnHeishi3* this, PlayState* play) {

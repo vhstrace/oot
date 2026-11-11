@@ -1484,10 +1484,11 @@ and it builds.
   may slow down, and if memory runs out some enemies don't spawn.
 - Bosses (`ACTORCAT_BOSS`) are not copied.
 
-## Castle courtyard guards move at double speed
+## Castle guards move at double speed
 
 **Source diff:** `patches/castle-guards-move-at-double-speed.diff`
-**Changes:** built on the Mac. Changes the `ovl_En_Heishi1` overlay.
+**Changes:** built on the Mac. Changes the `ovl_En_Heishi1` and
+`ovl_En_Heishi3` overlays.
 **Recorded:** 2026-11-11 00:49:58
 
 **Mechanism:** `ovl_En_Heishi1` is the patrolling guard in the Hyrule
@@ -1507,7 +1508,12 @@ and the body turn speed and its step, in all four `sAnimParamsInit` rows
 `EnHeishi1_SetupMoveToLink` (animation `3.0f` to `6.0f`) and
 `EnHeishi1_MoveToLink` (`6.0f, 0.4f` to `12.0f, 0.8f`, and `3000.0f,
 300.0f` to `6000.0f, 600.0f`). The head-turn values are not changed, so
-the guards look around at the usual speed. This is the OoT version of the
+the guards look around at the usual speed.
+
+`ovl_En_Heishi3` is the standing guard in the castle grounds
+(`spot15`). When it sees Link, `EnHeishi3_CatchStart` makes it walk
+toward him for 20 frames with `this->actor.speed = 2.5f` and walk
+animation speed `1.0f`. The patch makes these `5.0f` and `2.0f`. This is the OoT version of the
 ALTTP cheats "Soldiers chase Link at double speed" and "Soldiers move
 faster".
 
@@ -1515,7 +1521,8 @@ faster".
 `-10.0f` or `-3.0f`, is the animation morph and is not changed).
 `Math_ApproachF` doesn't overshoot, so the guards still reach each
 waypoint; the waypoint check is within 20 units. `ACTOR_EN_HEISHI1` is
-only in the `hairal_niwa` and `hairal_niwa_n` actor lists. `git apply
+only in the `hairal_niwa` and `hairal_niwa_n` actor lists, and
+`ACTOR_EN_HEISHI3` only in `spot15`. `git apply
 --check` passes, and it builds.
 
 **Revisions:** US NTSC 1.0 only. Others not checked.
@@ -1526,5 +1533,6 @@ only in the `hairal_niwa` and `hairal_niwa_n` actor lists. `git apply
 - OoT guards don't fight. When one sees Link, the game shows a message and
   throws him out, so the faster guards mainly make the courtyard
   sneaking harder.
-- Other guards (`ovl_En_Heishi2`, `3` and `4`, at the castle gate,
-  the market and Kakariko) stand still or talk, and are not changed.
+- Other guards (`ovl_En_Heishi2` and `ovl_En_Heishi4`, in the market,
+  Kakariko and other places) are NPCs that stand still or talk, and are
+  not changed.
