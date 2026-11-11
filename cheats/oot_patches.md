@@ -752,7 +752,7 @@ passes, and it builds.
 - The hit boxes go through walls, so the sword can hit enemies, switches,
   pots and grass behind walls.
 - It also works for the Hammer, Biggoron's Sword and the Deku Stick. The
-  Deku Stick sets its own length (\`this->unk_85C * 5000.0f\`), but it goes
+  Deku Stick sets its own length (`this->unk_85C * 5000.0f`), but it goes
   through the same function, so it gets the long reach too.
 - The hit boxes are long but still thin. An enemy right above or below the
   swing's plane can still be missed.
