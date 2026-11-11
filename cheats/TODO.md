@@ -23,7 +23,7 @@ sword beams fire at any health, and the two fireball long codes.
   and `Player_GetMovementSpeedAndYaw` in `ovl_player_actor/z_player.c`.
 - [x] Link walks through walls. Skip or neuter the wall part of
   `Player_ProcessSceneCollision` / `Actor_UpdateBgCheckInfo` for the player.
-- [ ] All floors are slippery like ice. Return the ice floor property
+- [x] All floors are slippery like ice. Return the ice floor property
   from the surface-type lookup in `z_bgcheck.c`.
 
 ## Speed and time

@@ -172,3 +172,40 @@ builds only), but Link keeps gravity. No `#if` checks here.
   loading zone never triggers.
 - Collision with actors (enemies, NPCs, doors, chests) is a different
   system and still works.
+
+## All floors are slippery like ice
+
+**Source diff:** `cheats/patches/all-floors-slippery-like-ice.diff`
+**Changes:** built on the Mac. Changes the `ovl_player_actor` overlay.
+**Recorded:** 2026-11-11 00:02:03
+
+**Mechanism:** In `Player_UpdateCommon` (`ovl_player_actor/z_player.c`)
+Link keeps his momentum on floor type 5 (the slippery floor type) and
+with the Hover Boots:
+
+```c
+if (((this->actor.bgCheckFlags & BGCHECKFLAG_GROUND) && (sFloorType == FLOOR_TYPE_5) &&
+     (this->currentBoots != PLAYER_BOOTS_IRON)) ||
+    ((this->currentBoots == PLAYER_BOOTS_HOVER) && ...)) {
+```
+
+Inside, `actor.speed` steps toward the wanted speed by only 0.35 per
+frame and `world.rot.y` turns slowly, so Link slides and drifts. The
+patch replaces `(sFloorType == FLOOR_TYPE_5)` with `(1)`, so this runs
+on any ground. The Iron Boots still stop the sliding, as on real slippery
+floors.
+
+**Evidence:** `FLOOR_TYPE_5` is used nowhere else in `src/` (grep).
+`sFloorType` is set from `SurfaceType_GetFloorType` in
+`Player_ProcessSceneCollision`. The patch is in the player only, not in
+`z_bgcheck.c`, so other floor types (lava, quicksand, voids) still work.
+No `#if` checks here. `git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Only Link slides. Enemies, Epona and other actors walk as normal.
+- Standing still on a slope may still slide Link down as before; turning
+  around fast makes him stop first, then speed up the other way.
