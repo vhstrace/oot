@@ -14,6 +14,8 @@ soldier, enemies die like a boss, tutorial soldiers go through 256
 messages, the "BAGE" debug name (folded into the debug save item below),
 sword beams fire at any health, and the two fireball long codes.
 
+- [ ] Adult Link rides his horse backwards
+
 ## Movement
 
 - [ ] Link runs twice as fast (Link walks twice as fast). `R_RUN_SPEED_LIMIT`
@@ -52,8 +54,10 @@ sword beams fire at any health, and the two fireball long codes.
 
 - [ ] Start a new game with the debug save (Start a new game with BAGE
   debug loadout). `Sram_InitDebugSave` (`src/code/z_sram.c`) is built
-  into retail; only the `DEBUG_FEATURES` call to it is cut. Call it from
-  `Sram_InitSave` instead of `Sram_InitNewSave`.
+  into retail. Retail calls it only for the title-screen demo
+  (`ovl_opening/z_opening.c`); the call for file 1 in `Sram_InitSave` is
+  behind `DEBUG_FEATURES`. Call it from `Sram_InitSave` instead of
+  `Sram_InitNewSave`.
 - [ ] Turn on the map select (Turn on the controller 2 debug features).
   `ovl_select` is in the retail ROM. Boot into it, or open it from the
   title screen.
