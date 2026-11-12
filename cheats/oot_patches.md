@@ -2376,13 +2376,14 @@ patch turns every actor (all categories) a little clockwise as seen from
 above:
 
 ```c
-actor->world.rot.y -= 0x100;
-actor->shape.rot.y -= 0x100;
+actor->world.rot.y -= 0x333;
+actor->shape.rot.y -= 0x333;
 ```
 
-0x100 is about 1.4 degrees, so a full turn takes 256 frames (about 13
-seconds at 20 frames per second). The first version used 0x80; doubled
-at the user's request (2026-11-12). Because the turn comes before the
+0x333 (819) is about 4.5 degrees, so a full turn (0x10000) takes 80
+frames: 4 seconds at 20 frames per second, the user's choice
+(2026-11-12). Earlier versions used 0x80 (26 seconds) and 0x100 (13
+seconds). Because the turn comes before the
 update, an actor that sets its facing itself (for example
 `shape.rot.y = this->actor.yawTowardsPlayer`) replaces the turn, and is
 not changed. An actor that only steps its rotation from the current value
@@ -2419,5 +2420,9 @@ own", and it builds.
 - Actors that use `world.rot.y` or `shape.rot.y` for something other
   than facing (as a timer or a mode, or `home.rot` copied back) may act
   oddly.
-- To change the speed, change the two `0x100` in the diff (bigger is
+- The step is per game frame, so where the game drops below 20 frames
+  per second (Hyrule Field, Kakariko), a turn takes longer than 4
+  seconds. With "The game runs 1.5 times as fast" it takes about 2.7
+  seconds.
+- To change the speed, change the two `0x333` in the diff (bigger is
   faster; use `+=` to turn counter-clockwise).
