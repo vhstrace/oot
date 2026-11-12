@@ -1319,7 +1319,7 @@ the electric floor/wall and Ice Trap reactions, and lava/hot floor damage
   use their own code, not this, and work as before.
 - While swimming, hits work as before.
 
-## Enemies always drop a prize
+## Enemies may drop Huge Rupees
 
 **Source diff:** `patches/enemies-always-drop-a-prize.diff`
 **Changes:** built on the Mac. Changes `code` (`z_en_item00.c`).
@@ -1426,8 +1426,8 @@ passes, and it builds.
 - No fairy, heart or other prize comes from this function any more.
   Enemies that drop items in their own way work as before.
 - Hitting a cucco many times calls the attacking cuccos, as usual.
-- Not combinable with "Enemies always drop a prize" (both change the same
-  lines).
+- Not combinable with "Enemies may drop Huge Rupees" (both change
+  the same lines).
 
 ## Enemies face and walk away from Link
 
