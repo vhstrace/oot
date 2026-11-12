@@ -1509,7 +1509,7 @@ other actors. `git apply --check` passes, and it builds.
   and to stop when they bump into Link, so they may act differently.
 - Bosses (`ACTORCAT_BOSS`) still push Link.
 
-## Enemies spawn three at a time and come back after you clear a room
+## Multiple copies spawn for some enemies
 
 **Source diff:** `patches/enemies-spawn-copies-and-come-back.diff`
 **Changes:** built on the Mac. Changes `code` (`z_actor.c`).
