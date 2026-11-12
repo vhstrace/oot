@@ -1,0 +1,20 @@
+diff --git a/src/code/graph.c b/src/code/graph.c
+index 439220b11..868e6e416 100644
+--- a/src/code/graph.c
++++ b/src/code/graph.c
+@@ -486,6 +486,15 @@ void Graph_Update(GraphicsContext* gfxCtx, GameState* gameState) {
+         sGraphPrevUpdateEndTime = timeNow;
+     }
+ 
++#if !DEBUG_FEATURES
++    if (CHECK_BTN_ALL(gameState->input[0].press.button, BTN_Z) &&
++        CHECK_BTN_ALL(gameState->input[0].cur.button, BTN_L | BTN_R)) {
++        gSaveContext.gameMode = GAMEMODE_NORMAL;
++        SET_NEXT_GAMESTATE(gameState, MapSelect_Init, MapSelectState);
++        gameState->running = false;
++    }
++#endif
++
+ #if DEBUG_FEATURES
+     if (gIsCtrlr2Valid && CHECK_BTN_ALL(gameState->input[0].press.button, BTN_Z) &&
+         CHECK_BTN_ALL(gameState->input[0].cur.button, BTN_L | BTN_R)) {

@@ -2189,3 +2189,47 @@ Built with the debug cheats for the test ROM, and alone for the BPS
   music drift from it more than with the 1.5x patch.
 - Changes the same line as "The game runs 1.5 times as fast" and "The
   game runs at half speed", so it can't be combined with them.
+
+## L + R + Z opens the map select
+
+**Source diff:** `patches/l-r-z-opens-map-select.diff`
+**Changes:** built on the Mac. Changes `code` (`graph.c`).
+**Recorded:** 2026-11-12 00:00:25
+
+**Mechanism:** debug builds have a map select combo in `Graph_Update`
+(`src/code/graph.c`), inside `#if DEBUG_FEATURES`:
+
+```c
+if (gIsCtrlr2Valid && CHECK_BTN_ALL(gameState->input[0].press.button, BTN_Z) &&
+    CHECK_BTN_ALL(gameState->input[0].cur.button, BTN_L | BTN_R)) {
+    gSaveContext.gameMode = GAMEMODE_NORMAL;
+    SET_NEXT_GAMESTATE(gameState, MapSelect_Init, MapSelectState);
+    gameState->running = false;
+}
+```
+
+The patch adds the same check in an `#if !DEBUG_FEATURES` block just
+before it, without `gIsCtrlr2Valid` (which needs a second controller).
+So on controller 1, holding L and R and then pressing Z ends the current
+game state and starts the map select.
+
+**Evidence:** `Graph_Update` runs once per frame for every game state
+(title, file select, gameplay, map select). `map_select_state.h` is
+already included in `graph.c` for all versions, and the map select
+overlay (`ovl_select`) is in the ntsc-1.0 ROM (the "File 1 opens the map
+select" patch uses it too). The `#if DEBUG_FEATURES` block is not built
+for ntsc-1.0, so only the new block is active. It changes different lines
+of `graph.c` than the game speed patches, and `git apply --check` passes
+with each of them applied. Built alone for the BPS (checked by applying
+it and comparing).
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Works anywhere, including during gameplay. Holding L and R (minimap
+  toggle and shield) and then pressing Z (target) jumps to the map
+  select at once, with no save.
+- From the map select, the game state and items are whatever the map
+  select sets up, as with the debug ROM.
