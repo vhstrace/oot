@@ -1926,6 +1926,8 @@ first pot, and the object is already loaded. No other actor spawns
 `src/audio/internal/effects.c`).
 **Recorded:** 2026-11-11 01:02:11
 
+Tags: `demo-ready` `play-start`
+
 **Mechanism:** `Audio_SequenceChannelProcessSound`
 (`src/audio/internal/effects.c`) works out each sequence channel's
 volume:
@@ -1954,7 +1956,8 @@ works as before. `git apply --check` passes, and it builds.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-12 (RetroArch, built with the base
+  cheats): works.
 - Link's ocarina, and songs that NPCs play on the ocarina, use the sound
   effect player (`SFX_CHANNEL_OCARINA`), so they are still heard.
 - Area sounds that play as a sequence on the BGM player, such as the
