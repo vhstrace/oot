@@ -1165,7 +1165,7 @@ passes, and it builds.
 `ovl_En_M_Thunder` overlays.
 **Recorded:** 2026-11-11 00:36:05
 
-Tags: `demo-ready` `play-start` `video-ready` `curated`
+Tags: `demo-ready` `video-ready` `curated`
 
 **Mechanism:** the glowing ring of a spin attack is the `EnMThunder`
 actor. Link spawns it in `func_80837530` (`z_player.c`) with params
@@ -1337,14 +1337,22 @@ tables (`sItemDropIds`). It drops nothing in four cases:
   can't use it (bombs with no Bomb Bag, seeds with no Slingshot, arrows with
   no bow, magic with no magic meter).
 
-The patch drops a green rupee in each of these cases (and makes a count of
-0 into 1). Everything else, like hearts, magic, fairies when Link is low on
+The patch drops a Huge Rupee (gold, worth 200,
+`ITEM00_RUPEE_ORANGE`) in each of these cases (and makes a count of 0
+into 1). Everything else, like hearts, magic, fairies when Link is low on
 health, and the drops set by `dropFlag`, works as before. This is the OoT
 version of the ALTTP cheat "Enemies always drop a prize".
 
 **Evidence:** `ITEM00_NONE` is `0xFF` (`include/z_en_item00.h`), and
 `dropId` is a `u8`, so the `-1` from `func_8001F404` compares equal to
 it. Counts of 0 are in table 3 (slots 12 to 15) and table 10 (slot 14).
+`EnItem00` handles `ITEM00_RUPEE_ORANGE` as a dropped item like the other
+rupees: its own scale in `EnItem00_Init`, `sRupeeTex[3]` in
+`EnItem00_DrawRupee` (`params - 0x10`), the rupee sound, and
+`Item_Give(play, ITEM_RUPEE_GOLD)` when collected. An earlier version
+dropped a green rupee; changed to the Huge Rupee at the user's request
+(2026-11-11). The game's own stick-to-green-rupee swap in
+`func_8001F404` (for an adult Link) is not changed.
 `git apply --check` passes, and it builds.
 
 **Revisions:** US NTSC 1.0 only. Others not checked.
@@ -1359,7 +1367,9 @@ it. Counts of 0 are in table 3 (slots 12 to 15) and table 10 (slot 14).
   so the patch can't tell them apart from grass.
 - Enemies that drop items in their own way (not through this function)
   work as before. Some enemies drop nothing at all.
-- The extra prizes are mostly green rupees.
+- The extra prizes are mostly Huge Rupees, 200 each, so the wallet fills
+  up within a few kills. When a slot's count is more than 1 (for example
+  a pile of arrows with no bow), that many Huge Rupees drop at once.
 - Calls with the `0x8000` flag go to `Item_DropCollectible` and are not
   changed.
 
