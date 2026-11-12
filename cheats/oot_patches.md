@@ -2593,6 +2593,8 @@ comes before the one for `extracted/`, so the new file is used
 **Changes:** built on the Mac. Changes `code` (`z_actor.c`).
 **Recorded:** 2026-11-12 12:27:49
 
+Tags: `demo-ready` `video-ready` `play-start`
+
 **Mechanism:** This is "Every actor turns clockwise" with Link and Epona
 left out. As there, `Actor_UpdateAll` (`src/code/z_actor.c`) turns each
 actor by 0x333 (about 4.5 degrees, a full turn in 80 frames) just before
@@ -2626,7 +2628,8 @@ passes, and it builds, alone and with the base cheats.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-12 (RetroArch, built with the base
+  cheats): works.
 - Ingo's horse (`HORSE_HNI`) still turns. If Link rides it, he turns with
   it.
 - Other horses (`En_Horse_Normal` at the ranch, Zelda's and Ganondorf's
