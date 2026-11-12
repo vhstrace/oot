@@ -2318,6 +2318,8 @@ update. `git apply --check` passes, and it builds.
 **Changes:** built on the Mac. Changes `code` (`z_actor.c`).
 **Recorded:** 2026-11-12 01:06:56
 
+Tags: `demo-ready` `video-ready`
+
 **Mechanism:** `Actor_UpdateAll` (`src/code/z_actor.c`) saves each
 actor's position (`Math_Vec3f_Copy(&actor->prevPos, &actor->world.pos);`)
 and then runs its update (`actor->update(actor, play);`). Just before
@@ -2348,7 +2350,8 @@ builds.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-12 (RetroArch, built with the base
+  cheats): works.
 - Enemies that don't run a wall check (many flying or floating ones, and
   ones that set their position directly every frame) can drift through
   walls, or don't drift at all if they reset their position.
