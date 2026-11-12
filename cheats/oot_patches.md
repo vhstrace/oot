@@ -2532,5 +2532,6 @@ in `include/z_math.h`. `git apply --check` passes, and it builds.
   turning animation.
 - It also turns him while rolling, jumping, swimming, being knocked back
   and on ice, since all of these have a speed.
-- The reflection drawn on some floors (`PLAYER_STATE2_26`) builds its
-  own matrix, so it is not turned.
+- In one special state (`PLAYER_STATE2_26`), `Player_Draw` also draws a
+  mirrored copy of Link under the floor. That copy builds its own matrix,
+  so it is not turned.
