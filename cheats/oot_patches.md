@@ -1165,6 +1165,8 @@ passes, and it builds.
 `ovl_En_M_Thunder` overlays.
 **Recorded:** 2026-11-11 00:36:05
 
+Tags: `demo-ready` `play-start` `video-ready` `curated`
+
 **Mechanism:** the glowing ring of a spin attack is the `EnMThunder`
 actor. Link spawns it in `func_80837530` (`z_player.c`) with params
 `Player_GetMeleeWeaponHeld(this) | magic cost`. When
@@ -1195,7 +1197,8 @@ builds.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-11 (RetroArch, built with the base
+  cheats): works.
 - It costs no magic. The ring is the small one (`M_THUNDER_ATTACK_WEAK`),
   not the big charged one.
 - No ring shows while the magic state is not idle, for example while the
