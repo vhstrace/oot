@@ -746,6 +746,8 @@ again only while the button of the item in Link's hand is held.
 **Changes:** built on the Mac. Changes `code` (`z_player_lib.c`).
 **Recorded:** 2026-11-11 00:18:36
 
+Tags: `demo-ready` `play-start` `video-ready` `curated`
+
 **Mechanism:** the sword's two hit boxes are `meleeWeaponQuads[0]` and
 `[1]`. Each frame of a swing, `Player_CalcMeleeWeaponTipPositions`
 works out their tips from `sMeleeWeaponTipOffsetFromLeftHand1` and
@@ -765,7 +767,8 @@ passes, and it builds.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-11 (RetroArch, built with the base
+  cheats): works.
 - The sword model and its trail look the same. Only the hit boxes grow.
 - The hit boxes go through walls, so the sword can hit enemies, switches,
   pots and grass behind walls.
