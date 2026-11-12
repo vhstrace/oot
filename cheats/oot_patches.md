@@ -2548,14 +2548,25 @@ which replaces the extracted title theme (`Sequence_30`,
 (`SF6_INST_1`) with two layers: `LAYER_0D23` (the melody) and
 `LAYER_0DAA` (an overlapping second voice). The patch fills
 `LAYER_0D23` with the notes of the user's `track.mid` (one
-instrument, 8 bars, 25 notes) and empties `LAYER_0DAA`. All other
-channels, and channel 1's volume and vibrato changes, are unchanged.
+instrument, 8 bars, 25 notes) and empties `LAYER_0DAA`. Channel 1's
+volume and vibrato changes are unchanged.
 One MIDI quarter note is one sequence beat (48 ticks), so the song's
 own tempo changes apply, not the MIDI's tempo. The melody starts 288
 ticks into the loop, where the original ocarina came in. It plays once
 per loop (1536 of the 3840 ticks); the rest of the loop has no
 ocarina. Pitches are kept as written (C#, D#, G#), and each note's
 length is kept with a gate value.
+
+The other parts are in C major (under the melody they switch between
+Fmaj7 and Cmaj7 every 4 beats), and `track.mid` is in Db major, so they
+are moved to its key: each other channel (10, 11, 13 and 14, in the
+intro and in the loop) starts with `transpose 1`. In the Cmaj7 bars
+the string pads' B3 (C4 after the transpose) sat a minor 9th under the
+melody's held Db5. Those five notes (four in `LAYER_0EE8`, one in
+`LAYER_0E9C`) become C4 (Db4 after the transpose), so those bars are a
+plain Db major chord. A count of melody notes a semitone away from an
+accompaniment note fell from 26% to 3%. The rest are the melody's F
+over the Gbmaj7 chord (its own major 7th) and short Gb passing notes.
 
 **Evidence:** `include/tables/sequence_table.h` names `Sequence_30`
 the title theme. The Makefile's rule for `assets/audio/sequences/`
@@ -2566,10 +2577,12 @@ comes before the one for `extracted/`, so the new file is used
 
 **Caveats:**
 
-- Not tested.
+- The ocarina part was tested by the user (2026-11-12). The harmony
+  change is not tested.
 - Work in progress. The patch, `track.mid` and the script that makes
   the sequence (`patches/new-title-theme/make_seq.py`) are ignored by
-  `cheats/.gitignore` and are not in git. They exist only on the Mac.
-- The melody is in a different key from the other parts (the original
-  is in D), so it clashes.
+  `cheats/.gitignore` and are not in git. They exist only on the Mac,
+  in a local Git repo in `patches/new-title-theme/`.
+- The whole theme, intro and the part after the melody too, is now a
+  semitone higher than the original.
 - Channel 1's vibrato changes were timed to the original notes.
