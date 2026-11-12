@@ -2364,9 +2364,9 @@ builds.
   spawns in that category) drifts too.
 - To change the speed, change the two `2.0f` in the diff.
 
-## Every actor slowly turns clockwise
+## Every actor turns clockwise
 
-**Source diff:** `patches/actors-turn-slowly-clockwise.diff`
+**Source diff:** `patches/actors-turn-clockwise.diff`
 **Changes:** built on the Mac. Changes `code` (`z_actor.c`).
 **Recorded:** 2026-11-12 01:11:02
 
