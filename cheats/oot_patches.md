@@ -2370,6 +2370,8 @@ builds.
 **Changes:** built on the Mac. Changes `code` (`z_actor.c`).
 **Recorded:** 2026-11-12 01:11:02
 
+Tags: `demo-ready` `video-ready` `play-start`
+
 **Mechanism:** `Actor_UpdateAll` (`src/code/z_actor.c`) runs each actor's
 update with `actor->update(actor, play);`. Just before that call, the
 patch turns every actor (all categories) a little clockwise as seen from
@@ -2406,7 +2408,8 @@ own", and it builds.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-12 (RetroArch, the BPS alone, from a
+  normal game start): works.
 - Every category is changed, not only enemies and NPCs. Moving platforms,
   doors, blocks and other `ACTORCAT_BG` actors have collision that
   follows `shape.rot` (`DynaPoly` in `z_bgcheck.c`), so a platform that
