@@ -266,6 +266,8 @@ that scales motion by it (`Actor_UpdatePos` uses
 **Changes:** built on the Mac. Changes `code` (`src/code/graph.c`).
 **Recorded:** 2026-11-11 00:03:31
 
+Tags: `demo-ready` `play-start` `video-ready` `curated`
+
 **Mechanism:** Same line as "The game runs at half speed". During play
 `R_UPDATE_RATE` is 3, so each picture stays up for 3 video frames (20
 frames per second on NTSC). The patch changes
@@ -291,7 +293,8 @@ and it builds.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-11 (RetroArch, built with the base
+  cheats): works.
 - The real gain depends on how busy the scene is. OoT already drops
   below 20 frames per second in big areas (Hyrule Field, Kakariko); those
   get little or no faster on real hardware or an accurate emulator.
