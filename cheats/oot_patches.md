@@ -2535,3 +2535,41 @@ in `include/z_math.h`. `git apply --check` passes, and it builds.
 - In one special state (`PLAYER_STATE2_26`), `Player_Draw` also draws a
   mirrored copy of Link under the floor. That copy builds its own matrix,
   so it is not turned.
+
+## New title screen theme melody (work in progress)
+
+**Source diff:** `patches/new-title-theme.diff` (local only, see below)
+**Changes:** built on the Mac. Adds `assets/audio/sequences/seq_30.seq`,
+which replaces the extracted title theme (`Sequence_30`,
+`NA_BGM_TITLE`).
+**Recorded:** 2026-11-12 11:52:16
+
+**Mechanism:** In the title theme, channel 1 plays the ocarina
+(`SF6_INST_1`) with two layers: `LAYER_0D23` (the melody) and
+`LAYER_0DAA` (an overlapping second voice). The patch fills
+`LAYER_0D23` with the notes of the user's `track.mid` (one
+instrument, 8 bars, 25 notes) and empties `LAYER_0DAA`. All other
+channels, and channel 1's volume and vibrato changes, are unchanged.
+One MIDI quarter note is one sequence beat (48 ticks), so the song's
+own tempo changes apply, not the MIDI's tempo. The melody starts 288
+ticks into the loop, where the original ocarina came in. It plays once
+per loop (1536 of the 3840 ticks); the rest of the loop has no
+ocarina. Pitches are kept as written (C#, D#, G#), and each note's
+length is kept with a gate value.
+
+**Evidence:** `include/tables/sequence_table.h` names `Sequence_30`
+the title theme. The Makefile's rule for `assets/audio/sequences/`
+comes before the one for `extracted/`, so the new file is used
+(`build/.../seq_30.d` names it).
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Work in progress. The patch, `track.mid` and the script that makes
+  the sequence (`patches/new-title-theme/make_seq.py`) are ignored by
+  `cheats/.gitignore` and are not in git. They exist only on the Mac.
+- The melody is in a different key from the other parts (the original
+  is in D), so it clashes.
+- Channel 1's vibrato changes were timed to the original notes.
