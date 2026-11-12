@@ -1325,6 +1325,8 @@ the electric floor/wall and Ice Trap reactions, and lava/hot floor damage
 **Changes:** built on the Mac. Changes `code` (`z_en_item00.c`).
 **Recorded:** 2026-11-11 00:42:21
 
+Tags: `demo-ready` `curated` `video-ready`
+
 **Mechanism:** `Item_DropCollectibleRandom` (`src/code/z_en_item00.c`)
 picks a random slot (`Rand_ZeroOne() * 16.0f`) in one of the 16-slot drop
 tables (`sItemDropIds`). It drops nothing in four cases:
@@ -1359,7 +1361,8 @@ dropped a green rupee; changed to the Huge Rupee at the user's request
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-11 (RetroArch, built with the base
+  cheats): works.
 - Everything that uses `Item_DropCollectibleRandom` always drops
   something, not only enemies. That includes grass (`ovl_En_Kusa`), small
   rocks (`ovl_En_Ishi`), bushes and trees (`ovl_En_Wood02`) and hidden
