@@ -1970,6 +1970,8 @@ works as before. `git apply --check` passes, and it builds.
 `src/audio/internal/seqplayer.c`).
 **Recorded:** 2026-11-11 01:03:09
 
+Tags: `demo-ready` `play-start`
+
 **Mechanism:** When a sequence channel runs its "set instrument" command,
 `AudioSeq_SetInstrument` (`src/audio/internal/seqplayer.c`) handles
 synthetic waves (`instId >= 0x80`), drums (`0x7F`) and sound effects
@@ -1999,7 +2001,8 @@ apply --check` passes, and it builds.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-12 (RetroArch, built with the base
+  cheats): works.
 - Sound effects, Link's ocarina and NPC ocarina playback use the sound
   effect player, so they keep their instruments.
 - The next instrument may be a very different sound (a drum kit sample,
