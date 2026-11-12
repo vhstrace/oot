@@ -98,6 +98,8 @@ rupee tracker type. `git apply --check` passes, and it builds.
 **Changes:** built on the Mac. Changes the `ovl_player_actor` overlay.
 **Recorded:** 2026-11-11 00:00:05
 
+Tags: `demo-ready` `play-start` `curated` `video-ready`
+
 **Mechanism:** This is the OoT version of the ALTTP cheat "Link walks
 twice as fast". `Player_CalcSpeedAndYawFromControlStick`
 (`ovl_player_actor/z_player.c`) turns the stick into a target speed and
@@ -126,7 +128,8 @@ passes, and it builds.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-11 (RetroArch, built with the debug-save
+  and map-select cheats): works.
 - Acceleration is not changed, so Link takes longer to reach top speed.
 - Running animations are not sped up, so Link's feet slide.
 - At this speed Link may run off ledges sooner and clip through thin
