@@ -1,0 +1,25 @@
+diff --git a/src/code/z_kankyo.c b/src/code/z_kankyo.c
+index 5f1ff092c..bdeb50fdc 100644
+--- a/src/code/z_kankyo.c
++++ b/src/code/z_kankyo.c
+@@ -1454,6 +1454,12 @@ void Environment_DrawSunAndMoon(PlayState* play) {
+     }
+ 
+     if (gSaveContext.save.entranceIndex != ENTR_HYRULE_FIELD_0 || ((void)0, gSaveContext.sceneLayer) != 5) {
++        // gSunDL and gMoonDL multiply by the billboard matrix in segment 1. Use the billboard matrix
++        // turned clockwise on screen by 0x333 per frame, like the actors' turn, for the sun and moon only.
++        Matrix_Put(&play->billboardMtxF);
++        Matrix_RotateZ(BINANG_TO_RAD((s16)(play->gameplayFrames * -0x333)), MTXMODE_APPLY);
++        gSPSegment(POLY_OPA_DISP++, 0x01, MATRIX_FINALIZE(play->state.gfxCtx, "../z_kankyo.c", 2300));
++
+         Matrix_Translate(play->view.eye.x + play->envCtx.sunPos.x, play->view.eye.y + play->envCtx.sunPos.y,
+                          play->view.eye.z + play->envCtx.sunPos.z, MTXMODE_NEW);
+ 
+@@ -1510,6 +1516,7 @@ void Environment_DrawSunAndMoon(PlayState* play) {
+             gDPSetEnvColor(POLY_OPA_DISP++, 80, 70, 20, alpha);
+             gSPDisplayList(POLY_OPA_DISP++, gMoonDL);
+         }
++        gSPSegment(POLY_OPA_DISP++, 0x01, play->billboardMtx);
+     }
+ 
+     CLOSE_DISPS(play->state.gfxCtx, "../z_kankyo.c", 2429);

@@ -2638,46 +2638,53 @@ passes, and it builds, alone and with the base cheats.
   boomerang, arrows, bombs, a carried pot. The other caveats of "Every
   actor turns clockwise" apply too.
 
-## The moon turns clockwise in the sky
+## The sun and moon turn clockwise in the sky
 
-**Source diff:** `patches/moon-turns-clockwise.diff`
+**Source diff:** `patches/sun-and-moon-turn-clockwise.diff`
 **Changes:** built on the Mac. Changes `code` (`z_kankyo.c`).
 **Recorded:** 2026-11-12 12:27:49
 
-Tags: `demo-ready` `video-ready` `play-start` `curated`
-
 **Mechanism:** `Environment_DrawSunAndMoon` (`src/code/z_kankyo.c`)
-draws the night moon with `gSPDisplayList(POLY_OPA_DISP++, gMoonDL);`.
-`gMoonDL` is a 64x64 textured square, and its first command
+draws the sun with `gSPDisplayList(POLY_OPA_DISP++, gSunDL);` and the
+night moon with `gSPDisplayList(POLY_OPA_DISP++, gMoonDL);`. Both are
+textured squares centered on their origin, and the first command of each
 (`gsSPMatrix(0x01000000, ...)`) multiplies by the billboard matrix in
-segment 1, so the square always faces the camera. The patch builds a
-new matrix for segment 1 just for the moon: `play->billboardMtxF`, then
-`Matrix_RotateZ(BINANG_TO_RAD((s16)(play->gameplayFrames * -0x333)),
-MTXMODE_APPLY)`. After `gMoonDL` it sets segment 1 back to
-`play->billboardMtx`. So the moon picture turns clockwise on screen
-about its center, by 0x333 per frame, the same rate as "Every actor
-turns clockwise" (a full turn in 80 frames, 4 seconds at 20 frames per
-second). The sun is not changed.
+segment 1, so the square always faces the camera. Before the sun is
+drawn, the patch puts a new matrix in segment 1: `play->billboardMtxF`,
+then `Matrix_RotateZ(BINANG_TO_RAD((s16)(play->gameplayFrames *
+-0x333)), MTXMODE_APPLY)`. After the moon it sets segment 1 back to
+`play->billboardMtx`. So the sun and moon pictures turn clockwise on
+screen about their centers, by 0x333 per frame, the same rate as "Every
+actor turns clockwise" (a full turn in 80 frames, 4 seconds at 20
+frames per second).
 
 **Evidence:** `play->billboardMtx` is made from `billboardMtxF` with
 `Matrix_MtxFToMtx` in `Play_Draw` (`z_play.c`), the same as
 `MATRIX_FINALIZE` does, so with no turn the matrix is the same as the
 game's. `Matrix_RotateZ` with `MTXMODE_APPLY` turns the square in its
-own plane before the billboard turns it to the camera. In the moon's
-plane, x is right and y is up as seen by the camera, and a positive
-angle turns counter-clockwise, so the angle is negative.
-`gameplayFrames` goes up once per frame that is not paused. `git apply
---check` passes, and it builds, alone and with the base cheats.
+own plane before the billboard turns it to the camera. In that plane, x
+is right and y is up as seen by the camera, and a positive angle turns
+counter-clockwise, so the angle is negative. The function already
+replaces the current matrix with `Matrix_Translate(..., MTXMODE_NEW)`
+for the sun, so `Matrix_Put` there needs no push or pop. The day sun
+texture (`gSun1Tex` to `gSun3Tex`) has rays, so the turn shows. The
+evening texture (`gSunEvening*Tex`, blended in toward dusk) is
+horizontal streaks. `gameplayFrames` goes up once per frame that is not
+paused. `git apply --check` passes, and it builds, alone and with the
+base cheats.
 
 **Revisions:** US NTSC 1.0 only. Others not checked.
 
 **Caveats:**
 
-- Tested by the user on 2026-11-12 (RetroArch, built with the base
-  cheats): works.
-- The moon is drawn only where the sun and moon are shown (outdoor
-  scenes with `gameplay_field_keep`), at night. The first Hyrule Field
-  scene layer 5 doesn't draw it.
-- The moon stops turning while the game is paused.
+- Not tested.
+- The sun and moon are drawn only in scenes that show them (outdoor
+  scenes with `gameplay_field_keep`). Entering Hyrule Field by its first
+  entrance on scene layer 5 draws neither.
+- The sun's lens flare and glare (`Environment_DrawSunLensFlare`) are
+  drawn separately and don't turn.
+- They stop turning while the game is paused.
 - Can be combined with "Every actor turns clockwise" or "Every actor
   except Link and Epona turns clockwise" (different files).
+- This entry was "The moon turns clockwise in the sky" (moon only) until
+  the sun was added on 2026-11-12.
