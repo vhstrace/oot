@@ -648,6 +648,8 @@ passes, and it builds.
 **Changes:** built on the Mac. Changes `code` (`z_collision_check.c`).
 **Recorded:** 2026-11-11 00:15:55
 
+Tags: `demo-ready` `curated`
+
 **Mechanism:** `CollisionCheck_ApplyDamage` works out the damage of each
 hit (from the actor's damage table, or attack minus defense) and adds it
 with `col->actor->colChkInfo.damage += damage;`. The actor then takes it
@@ -665,7 +667,8 @@ since the u8 can't wrap. `git apply --check` passes, and it builds.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-11 (RetroArch, built with the base
+  cheats): works.
 - Only actors in the enemy category. Bosses (`ACTORCAT_BOSS`) take normal
   damage.
 - Hits with 0 damage stay at 0. Deku Nuts, the boomerang and other attacks
