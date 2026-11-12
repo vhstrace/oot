@@ -1,0 +1,26 @@
+diff --git a/src/code/z_actor.c b/src/code/z_actor.c
+index 243dc7fbb..7e8f4ad06 100644
+--- a/src/code/z_actor.c
++++ b/src/code/z_actor.c
+@@ -32,6 +32,7 @@
+ 
+ #include "src/overlays/actors/ovl_Arms_Hook/z_arms_hook.h"
+ #include "src/overlays/actors/ovl_En_Part/z_en_part.h"
++#include "src/overlays/actors/ovl_En_Horse/z_en_horse.h"
+ 
+ #include "assets/objects/gameplay_keep/shadow_circle.h"
+ #include "assets/objects/gameplay_keep/shadow_horse.h"
+@@ -2508,6 +2509,13 @@ void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
+                     if (actor->colorFilterTimer != 0) {
+                         actor->colorFilterTimer--;
+                     }
++                    // Turn slightly clockwise (seen from above) before the update, so an actor
++                    // that sets its facing itself overrides the turn. Link and Epona don't turn.
++                    if ((actor->id != ACTOR_PLAYER) && (actor->id != ACTOR_EN_HORSE_LINK_CHILD) &&
++                        !((actor->id == ACTOR_EN_HORSE) && (((EnHorse*)actor)->type == HORSE_EPONA))) {
++                        actor->world.rot.y -= 0x333;
++                        actor->shape.rot.y -= 0x333;
++                    }
+                     actor->update(actor, play);
+                     DynaPoly_UnsetAllInteractFlags(play, &play->colCtx.dyna, actor);
+                 }

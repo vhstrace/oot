@@ -2586,3 +2586,92 @@ comes before the one for `extracted/`, so the new file is used
 - The whole theme, intro and the part after the melody too, is now a
   semitone higher than the original.
 - Channel 1's vibrato changes were timed to the original notes.
+
+## Every actor except Link and Epona turns clockwise
+
+**Source diff:** `patches/actors-except-link-and-epona-turn-clockwise.diff`
+**Changes:** built on the Mac. Changes `code` (`z_actor.c`).
+**Recorded:** 2026-11-12 12:27:49
+
+**Mechanism:** This is "Every actor turns clockwise" with Link and Epona
+left out. As there, `Actor_UpdateAll` (`src/code/z_actor.c`) turns each
+actor by 0x333 (about 4.5 degrees, a full turn in 80 frames) just before
+`actor->update(actor, play);`:
+
+```c
+if ((actor->id != ACTOR_PLAYER) && (actor->id != ACTOR_EN_HORSE_LINK_CHILD) &&
+    !((actor->id == ACTOR_EN_HORSE) && (((EnHorse*)actor)->type == HORSE_EPONA))) {
+    actor->world.rot.y -= 0x333;
+    actor->shape.rot.y -= 0x333;
+}
+```
+
+Link (`ACTOR_PLAYER`), adult Epona (`ACTOR_EN_HORSE` with `type`
+`HORSE_EPONA`) and young Epona at Lon Lon Ranch
+(`ACTOR_EN_HORSE_LINK_CHILD`) are skipped. Every other actor turns as in
+the old entry. Adds `#include` of
+`src/overlays/actors/ovl_En_Horse/z_en_horse.h` for `EnHorse` and
+`HORSE_EPONA`.
+
+**Evidence:** On foot, the turn is skipped for Link, so his `yaw` and
+`shape.rot.y` are only set by `z_player.c`. On a horse, Link sets
+`this->yaw = this->actor.shape.rot.y = rideActor->actor.shape.rot.y;`
+(`z_player.c`, two places), so he faces the way the horse faces. Since
+Epona is not turned either, Link doesn't turn while riding her. `EnHorse`
+sets `type` in its init: `HORSE_HNI` for Ingo's horse (Lon Lon Ranch,
+the race, Gerudo's Fortress), `HORSE_EPONA` otherwise. `git apply --check`
+passes, and it builds, alone and with the base cheats.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Ingo's horse (`HORSE_HNI`) still turns. If Link rides it, he turns with
+  it.
+- Other horses (`En_Horse_Normal` at the ranch, Zelda's and Ganondorf's
+  horses in cutscenes) still turn.
+- Things Link holds or throws are their own actors and still turn: the
+  boomerang, arrows, bombs, a carried pot. The other caveats of "Every
+  actor turns clockwise" apply too.
+
+## The moon turns clockwise in the sky
+
+**Source diff:** `patches/moon-turns-clockwise.diff`
+**Changes:** built on the Mac. Changes `code` (`z_kankyo.c`).
+**Recorded:** 2026-11-12 12:27:49
+
+**Mechanism:** `Environment_DrawSunAndMoon` (`src/code/z_kankyo.c`)
+draws the night moon with `gSPDisplayList(POLY_OPA_DISP++, gMoonDL);`.
+`gMoonDL` is a 64x64 textured square, and its first command
+(`gsSPMatrix(0x01000000, ...)`) multiplies by the billboard matrix in
+segment 1, so the square always faces the camera. The patch builds a
+new matrix for segment 1 just for the moon: `play->billboardMtxF`, then
+`Matrix_RotateZ(BINANG_TO_RAD((s16)(play->gameplayFrames * -0x333)),
+MTXMODE_APPLY)`. After `gMoonDL` it sets segment 1 back to
+`play->billboardMtx`. So the moon picture turns clockwise on screen
+about its center, by 0x333 per frame, the same rate as "Every actor
+turns clockwise" (a full turn in 80 frames, 4 seconds at 20 frames per
+second). The sun is not changed.
+
+**Evidence:** `play->billboardMtx` is made from `billboardMtxF` with
+`Matrix_MtxFToMtx` in `Play_Draw` (`z_play.c`), the same as
+`MATRIX_FINALIZE` does, so with no turn the matrix is the same as the
+game's. `Matrix_RotateZ` with `MTXMODE_APPLY` turns the square in its
+own plane before the billboard turns it to the camera. In the moon's
+plane, x is right and y is up as seen by the camera, and a positive
+angle turns counter-clockwise, so the angle is negative.
+`gameplayFrames` goes up once per frame that is not paused. `git apply
+--check` passes, and it builds, alone and with the base cheats.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The moon is drawn only where the sun and moon are shown (outdoor
+  scenes with `gameplay_field_keep`), at night. The first Hyrule Field
+  scene layer 5 doesn't draw it.
+- The moon stops turning while the game is paused.
+- Can be combined with "Every actor turns clockwise" or "Every actor
+  except Link and Epona turns clockwise" (different files).
