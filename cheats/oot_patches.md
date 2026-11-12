@@ -1126,6 +1126,8 @@ becomes a fire arrow with no magic cost. `EnArrow_Init` also gives it the
 **Changes:** built on the Mac. Changes the `ovl_En_Arrow` overlay.
 **Recorded:** 2026-11-11 00:34:58
 
+Tags: `demo-ready` `curated` `video-ready`
+
 **Mechanism:** a thrown Deku Nut is an `EnArrow` with `params == ARROW_NUT`.
 When it hits something, `EnArrow_Fly` (`z_en_arrow.c`) spawns the flash
 (`ACTOR_EN_M_FIRE1`), plays `NA_SE_IT_DEKU` and kills the nut. The patch
@@ -1143,7 +1145,8 @@ passes, and it builds.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-11 (RetroArch, built with the base
+  cheats): works.
 - The fire ball is centered on Link, not on the nut. `MagicFire_Update`
   copies `player->actor.world.pos` every frame, as when Link casts it.
 - It costs no magic, and Link doesn't need Din's Fire.
