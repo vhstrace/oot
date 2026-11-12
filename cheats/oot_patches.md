@@ -2376,12 +2376,13 @@ patch turns every actor (all categories) a little clockwise as seen from
 above:
 
 ```c
-actor->world.rot.y -= 0x80;
-actor->shape.rot.y -= 0x80;
+actor->world.rot.y -= 0x100;
+actor->shape.rot.y -= 0x100;
 ```
 
-0x80 is about 0.7 degrees, so a full turn takes 512 frames (about 26
-seconds at 20 frames per second). Because the turn comes before the
+0x100 is about 1.4 degrees, so a full turn takes 256 frames (about 13
+seconds at 20 frames per second). The first version used 0x80; doubled
+at the user's request (2026-11-12). Because the turn comes before the
 update, an actor that sets its facing itself (for example
 `shape.rot.y = this->actor.yawTowardsPlayer`) replaces the turn, and is
 not changed. An actor that only steps its rotation from the current value
@@ -2418,5 +2419,5 @@ own", and it builds.
 - Actors that use `world.rot.y` or `shape.rot.y` for something other
   than facing (as a timer or a mode, or `home.rot` copied back) may act
   oddly.
-- To change the speed, change the two `0x80` in the diff (bigger is
+- To change the speed, change the two `0x100` in the diff (bigger is
   faster; use `+=` to turn counter-clockwise).
