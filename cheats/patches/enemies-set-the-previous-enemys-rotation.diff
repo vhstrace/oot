@@ -1,0 +1,27 @@
+diff --git a/src/code/z_actor.c b/src/code/z_actor.c
+index 243dc7fbb..8aff09d1a 100644
+--- a/src/code/z_actor.c
++++ b/src/code/z_actor.c
+@@ -2508,7 +2508,21 @@ void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
+                     if (actor->colorFilterTimer != 0) {
+                         actor->colorFilterTimer--;
+                     }
+-                    actor->update(actor, play);
++                    if ((actor->category == ACTORCAT_ENEMY) && (actor->prev != NULL)) {
++                        // The enemy's new rotation goes to the enemy before it in the list;
++                        // its own rotation is put back.
++                        Actor* rotTarget = actor->prev;
++                        Vec3s worldRot = actor->world.rot;
++                        Vec3s shapeRot = actor->shape.rot;
++
++                        actor->update(actor, play);
++                        rotTarget->world.rot = actor->world.rot;
++                        rotTarget->shape.rot = actor->shape.rot;
++                        actor->world.rot = worldRot;
++                        actor->shape.rot = shapeRot;
++                    } else {
++                        actor->update(actor, play);
++                    }
+                     DynaPoly_UnsetAllInteractFlags(play, &play->colCtx.dyna, actor);
+                 }
+ 

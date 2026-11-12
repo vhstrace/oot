@@ -2247,3 +2247,67 @@ it and comparing).
   select at once, with no save.
 - From the map select, the game state and items are whatever the map
   select sets up, as with the debug ROM.
+
+## Every enemy sets the rotation of the enemy before it instead of its own
+
+**Source diff:** `patches/enemies-set-the-previous-enemys-rotation.diff`
+**Changes:** built on the Mac. Changes `code` (`z_actor.c`).
+**Recorded:** 2026-11-12 01:02:20
+
+**Mechanism:** Enemies set their own rotation in their update functions
+(`world.rot`, the direction they move, and `shape.rot`, the direction
+they face), in many different ways (`Math_SmoothStepToS`,
+`Math_ApproachS`, direct writes). All of these run inside one call in
+`Actor_UpdateAll` (`src/code/z_actor.c`):
+
+```c
+actor->update(actor, play);
+```
+
+For an actor in `ACTORCAT_ENEMY` with an `actor->prev`, the patch saves
+the enemy's `world.rot` and `shape.rot`, runs the update, copies the
+rotation that the update set to `actor->prev` (the enemy before it in
+the enemy list), and puts the enemy's own rotation back. Other actors,
+and the newest enemy (the head of the list, which has no `prev`), update
+as before. This is the rotation version of "Every enemy pushes the enemy
+before it instead of moving itself".
+
+**Evidence:** `Actor_AddToCategory` puts each new actor at the head of
+its category's list, so `prev` is the enemy that spawned just after it.
+`Actor_UpdateAll` starts at the head and follows `next`, so each enemy
+updates before the one after it. In one frame, the enemy after an enemy
+runs later and sets the enemy's rotation, after the enemy has used it.
+So each enemy turns the way the enemy after it wants to turn. The target
+is read before the update: an enemy that spawns a new enemy during its
+update gets a new `prev` (the new actor goes to the head), and the
+rotation should not go to it. Actors are only deleted in this loop at
+their own turn, so `prev`, whose turn is over, can't be freed during the
+update. `git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- During its own update, an enemy still moves with the rotation it just
+  set (`Actor_MoveXZGravity` runs inside the update). Only after that is
+  its rotation put back. So an enemy turns toward its target for one
+  frame of movement, then gets the rotation of the enemy after it.
+  Enemies will mostly face and walk the way their neighbor wants, and may
+  jitter.
+- The oldest enemy (the last in the list) is turned by nobody, and its
+  own turns are put back, so it keeps the rotation it had when the patch
+  first took effect (unless an attack or its code sets it from outside
+  its update).
+- An enemy alone in the room is both newest and oldest; it has no `prev`
+  and turns as usual.
+- `world.rot.x` and `shape.rot.x`/`z` (pitch and roll) move with it, so
+  flying enemies (Keese, Guay) and enemies that tilt get their
+  neighbor's pitch too.
+- Any other actor in `ACTORCAT_ENEMY` (parts or shots an enemy spawns in
+  that category) is in the same list and passes on or gets a rotation
+  too.
+- Changes a different function from "Every enemy pushes the enemy before
+  it" and "Every enemy moves with the speed of the enemy after it", so
+  the three diffs apply together (checked with `git apply --check`).
+  Not built together.
