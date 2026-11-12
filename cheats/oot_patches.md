@@ -1515,6 +1515,8 @@ other actors. `git apply --check` passes, and it builds.
 **Changes:** built on the Mac. Changes `code` (`z_actor.c`).
 **Recorded:** 2026-11-11 00:48:18
 
+Tags: `demo-ready` `video-ready`
+
 **Mechanism:** When a room loads, `Actor_SpawnEntry`
 (`src/code/z_actor.c`) spawns each actor in the room's actor list with
 `Actor_Spawn`. The patch checks the new actor, and if it is in
@@ -1543,7 +1545,8 @@ and it builds.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-12 (RetroArch, built with the base
+  cheats): works.
 - The three copies start at the same spot. Most push each other apart
   (OC), but enemies that don't move or have no OC collider may stay on
   top of each other and look like one.
