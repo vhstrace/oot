@@ -1,0 +1,24 @@
+diff --git a/src/code/z_actor.c b/src/code/z_actor.c
+index 243dc7fbb..2e000718b 100644
+--- a/src/code/z_actor.c
++++ b/src/code/z_actor.c
+@@ -2,6 +2,7 @@
+ #include "attributes.h"
+ #include "libu64/overlay.h"
+ #include "array_count.h"
++#include "controller.h"
+ #include "fault.h"
+ #include "gfx.h"
+ #include "gfx_setupdl.h"
+@@ -2476,6 +2477,11 @@ void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
+                           (actor->parent == &player->actor)))) {
+                 CollisionCheck_ResetDamage(&actor->colChkInfo);
+                 actor = actor->next;
++            } else if ((actor->category == ACTORCAT_ENEMY) && (actor->update != NULL) &&
++                       CHECK_BTN_ALL(play->state.input[0].cur.button, BTN_L)) {
++                // Holding L on controller 1 freezes enemies, like the game's own freeze above.
++                CollisionCheck_ResetDamage(&actor->colChkInfo);
++                actor = actor->next;
+             } else if (actor->update == NULL) {
+                 if (!actor->isDrawn) {
+                     actor = Actor_Delete(&play->actorCtx, actor, play);

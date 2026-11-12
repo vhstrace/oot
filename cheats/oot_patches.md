@@ -2426,3 +2426,55 @@ own", and it builds.
   seconds.
 - To change the speed, change the two `0x333` in the diff (bigger is
   faster; use `+=` to turn counter-clockwise).
+
+## Freeze time for enemies by holding L
+
+**Source diff:** `patches/hold-l-freezes-enemies.diff`
+**Changes:** built on the Mac. Changes `code` (`z_actor.c`).
+**Recorded:** 2026-11-12 01:36:17
+
+**Mechanism:** `Actor_UpdateAll` (`src/code/z_actor.c`) already skips
+the update of actors that the game freezes (for example while Link
+talks): it only calls `CollisionCheck_ResetDamage(&actor->colChkInfo);`
+and goes on to the next actor. The patch adds a branch right after that
+one: while L is held on controller 1
+(`CHECK_BTN_ALL(play->state.input[0].cur.button, BTN_L)`), every actor in
+`ACTORCAT_ENEMY` is skipped the same way. Enemies stop moving, stop
+their animations, timers and attacks, and are still drawn where they
+are. Let go of L and they go on from where they were. Link and all other
+actors keep running. Enemies whose `update` is `NULL` (killed) are not
+skipped, so they are still deleted as usual. Adds
+`#include "controller.h"` for the button macros.
+
+**Evidence:** In the US N64 retail build, L does only two things during
+play: pressing it turns the minimap on or off (`z_map_exp.c`, two
+places), and holding it while playing notes freely on the ocarina
+restarts song input (`AudioOcarina_CheckSongsWithoutMusicStaff`). The
+other uses of L (noclip and the message debugger in `z_player.c` and
+`z_message.c`, the flag editor, L+R+Z map select in `graph.c`) are only
+in `DEBUG_FEATURES` builds. L + C-up in `z_kaleido_setup.c` does nothing
+without `DEBUG_FEATURES`. So holding L does not change sword, shield,
+Z-targeting, items or movement. `git apply --check` passes, and it
+builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Each new press of L also turns the minimap on or off, as in the
+  original game.
+- Don't hold L while playing a song on the ocarina: L restarts the song
+  input.
+- A frozen enemy doesn't set up its colliders (that happens in its
+  update), so while L is held Link's sword and arrows pass through
+  enemies, and enemies can't hurt Link by touch. Hits that land before
+  the freeze are dropped (`CollisionCheck_ResetDamage`), like the game's
+  own freeze.
+- Bosses (`ACTORCAT_BOSS`) are not frozen. Enemy shots and parts in
+  other categories keep moving; ones in `ACTORCAT_ENEMY` freeze too.
+- Don't combine with "Frame advance on controller 1 (L pauses, R steps
+  one frame)": there, L pauses the game, so enemies would freeze each
+  time it pauses.
+- Works with "L + R + Z opens the map select" (a different file). While
+  L and R are held for it, enemies freeze too, which does no harm.
