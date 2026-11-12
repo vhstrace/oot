@@ -1,0 +1,17 @@
+diff --git a/src/code/z_actor.c b/src/code/z_actor.c
+index 243dc7fbb..3b12515c8 100644
+--- a/src/code/z_actor.c
++++ b/src/code/z_actor.c
+@@ -2508,6 +2508,12 @@ void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
+                     if (actor->colorFilterTimer != 0) {
+                         actor->colorFilterTimer--;
+                     }
++                    if (actor->category == ACTORCAT_ENEMY) {
++                        // Drift forward along the facing direction. This is after prevPos is
++                        // saved, so the enemy's own wall check in its update sees the move.
++                        actor->world.pos.x += 2.0f * Math_SinS(actor->shape.rot.y);
++                        actor->world.pos.z += 2.0f * Math_CosS(actor->shape.rot.y);
++                    }
+                     actor->update(actor, play);
+                     DynaPoly_UnsetAllInteractFlags(play, &play->colCtx.dyna, actor);
+                 }

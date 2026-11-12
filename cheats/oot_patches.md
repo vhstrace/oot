@@ -2311,3 +2311,52 @@ update. `git apply --check` passes, and it builds.
   it" and "Every enemy moves with the speed of the enemy after it", so
   the three diffs apply together (checked with `git apply --check`).
   Not built together.
+
+## Every enemy slowly drifts forward the way it faces
+
+**Source diff:** `patches/enemies-drift-forward.diff`
+**Changes:** built on the Mac. Changes `code` (`z_actor.c`).
+**Recorded:** 2026-11-12 01:06:56
+
+**Mechanism:** `Actor_UpdateAll` (`src/code/z_actor.c`) saves each
+actor's position (`Math_Vec3f_Copy(&actor->prevPos, &actor->world.pos);`)
+and then runs its update (`actor->update(actor, play);`). Just before
+the update, the patch moves every actor in `ACTORCAT_ENEMY` 2 units
+forward along its facing:
+
+```c
+actor->world.pos.x += 2.0f * Math_SinS(actor->shape.rot.y);
+actor->world.pos.z += 2.0f * Math_CosS(actor->shape.rot.y);
+```
+
+This adds to whatever the enemy does itself, every game frame (2 units
+per frame is 40 units a second at 20 frames per second; Link runs at
+about 13 units per frame).
+
+**Evidence:** `shape.rot.y` is the direction the model is drawn facing
+(`ActorShape` in `include/actor.h`); `world.rot.y` is the direction it
+moves, and for most enemies the two are the same. The move is made after
+`prevPos` is saved, so the wall check that an enemy runs in its own
+update (`Actor_UpdateBgCheckInfo`, which tests from `prevPos` to
+`world.pos`) sees it and stops the enemy at walls. It runs only when the
+enemy really updates (not frozen, inside the culling volume, `freezeTimer`
+at 0). `git apply --check` passes, alone and together with "Every enemy
+sets the rotation of the enemy before it instead of its own", and it
+builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Enemies that don't run a wall check (many flying or floating ones, and
+  ones that set their position directly every frame) can drift through
+  walls, or don't drift at all if they reset their position.
+- Enemies that stand still and wait (Deku Baba, Armos before waking,
+  Like Like, Gohma eggs) slide slowly forward. Ground enemies can slide
+  off ledges and fall.
+- Enemies that turn to face Link will slowly drift toward him.
+- Bosses are in `ACTORCAT_BOSS`, not `ACTORCAT_ENEMY`, so they are not
+  changed. Any other actor in `ACTORCAT_ENEMY` (parts or shots an enemy
+  spawns in that category) drifts too.
+- To change the speed, change the two `2.0f` in the diff.
