@@ -1438,6 +1438,8 @@ passes, and it builds.
 **Changes:** built on the Mac. Changes `code` (`z_actor.c`).
 **Recorded:** 2026-11-11 00:45:45
 
+Tags: `demo-ready` `video-ready`
+
 **Mechanism:** Each frame, `Actor_UpdateAll` (`src/code/z_actor.c`)
 sets `actor->yawTowardsPlayer = Actor_WorldYawTowardActor(actor,
 &player->actor);` for each actor before it updates. Most enemies turn,
@@ -1464,7 +1466,8 @@ actor overlays read the field. `git apply --check` passes, and it builds.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-12 (RetroArch, built with the base
+  cheats): works.
 - Enemies that work out the direction to Link in their own way (for
   example `Actor_WorldYawTowardPoint` on Link's position) still come at
   him. Enemies that only check how far Link is still notice him.
