@@ -225,6 +225,8 @@ No `#if` checks here. `git apply --check` passes, and it builds.
 **Changes:** built on the Mac. Changes `code` (`src/code/graph.c`).
 **Recorded:** 2026-11-11 00:03:29
 
+Tags: `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** `Graph_TaskSet00` (`src/code/graph.c`) tells the
 scheduler how many video frames (VIs) each new picture must stay on
 screen:
@@ -252,7 +254,8 @@ that scales motion by it (`Actor_UpdatePos` uses
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-11 (RetroArch, built with the base
+  cheats): works.
 - Music and sound effects run on their own timer and stay at normal
   speed. Cutscenes timed to music may drift from it.
 - The title screen and menus run at 30 frames per second instead of 60.
