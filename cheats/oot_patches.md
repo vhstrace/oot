@@ -2644,6 +2644,8 @@ passes, and it builds, alone and with the base cheats.
 **Changes:** built on the Mac. Changes `code` (`z_kankyo.c`).
 **Recorded:** 2026-11-12 12:27:49
 
+Tags: `demo-ready` `video-ready` `play-start` `curated`
+
 **Mechanism:** `Environment_DrawSunAndMoon` (`src/code/z_kankyo.c`)
 draws the night moon with `gSPDisplayList(POLY_OPA_DISP++, gMoonDL);`.
 `gMoonDL` is a 64x64 textured square, and its first command
@@ -2671,7 +2673,8 @@ angle turns counter-clockwise, so the angle is negative.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-12 (RetroArch, built with the base
+  cheats): works.
 - The moon is drawn only where the sun and moon are shown (outdoor
   scenes with `gameplay_field_keep`), at night. The first Hyrule Field
   scene layer 5 doesn't draw it.
