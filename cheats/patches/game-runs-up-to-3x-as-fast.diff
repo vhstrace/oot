@@ -1,0 +1,13 @@
+diff --git a/src/code/graph.c b/src/code/graph.c
+index 439220b11..eed82ce02 100644
+--- a/src/code/graph.c
++++ b/src/code/graph.c
+@@ -336,7 +336,7 @@ void Graph_TaskSet00(GraphicsContext* gfxCtx) {
+         cfb->yScale = gfxCtx->yScale;
+ #endif
+         cfb->unk_10 = 0;
+-        cfb->updateRate = R_UPDATE_RATE;
++        cfb->updateRate = 1;
+ 
+         scTask->framebuffer = cfb;
+     }

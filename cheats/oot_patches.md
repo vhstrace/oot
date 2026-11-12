@@ -285,8 +285,8 @@ scheduler treats the same as 1 (it swaps when `updateTimer <= 0`).
 frames, not time, so timers, enemy moves and Link all speed up together.
 `R_UPDATE_RATE` itself is not changed, so movement per frame stays the
 same and collision is no less precise. Going to 1 (60 frames per second,
-3 times as fast) was left out: the N64 CPU can't run OoT that fast, so
-it would only make the speed jump around. `git apply --check` passes,
+3 times as fast) is its own entry, "The game runs up to 3 times as
+fast". `git apply --check` passes,
 and it builds.
 
 **Revisions:** US NTSC 1.0 only. Others not checked.
@@ -2110,3 +2110,48 @@ builds.
   end credits and other text shown by the message system appear at once
   too. Text is still shown one box at a time, and you still press A to
   go on.
+
+## The game runs up to 3 times as fast
+
+**Source diff:** `cheats/patches/game-runs-up-to-3x-as-fast.diff`
+**Changes:** built on the Mac. Changes `code` (`src/code/graph.c`).
+**Recorded:** 2026-11-11 20:39:53
+
+**Mechanism:** This is the 60 frames per second version of "The game
+runs 1.5 times as fast". `Graph_TaskSet00` (`src/code/graph.c`) sets
+how many video frames each picture stays up:
+
+```c
+cfb->updateRate = R_UPDATE_RATE;
+```
+
+During play `R_UPDATE_RATE` is 3 (20 frames per second on NTSC). The
+patch sets it to 1 everywhere. The scheduler (`src/code/sched.c`)
+copies it to `updateTimer`, counts it down once per video frame, and
+swaps to the next picture when it reaches 0. So a new picture can be
+shown every video frame, and the game runs as fast as the CPU and RSP
+can make frames, up to 60 per second (3 times as fast).
+
+**Evidence:** the game logic counts frames, not time, so everything
+speeds up together. `R_UPDATE_RATE` itself is not changed, so movement
+per frame and the code that reads it (`Letterbox_Update`, the scene
+transitions) work as before. The title screen and menus already use rate
+1, so they don't change. `git apply --check` passes, and it builds.
+Built with the debug cheats for the test ROM, and alone for the BPS
+(checked by applying it and comparing).
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- On real hardware or an accurate emulator, the N64 can't make OoT's
+  frames that fast in most places. The game will run as fast as it can,
+  so the speed changes from place to place and from moment to moment
+  (faster indoors and in small rooms, much less in Hyrule Field or
+  Kakariko). That was the reason it was left out of the 1.5x entry. An
+  emulator with CPU overclock (and a fast RDP) helps the most.
+- Music and sound effects stay at normal speed, so cutscenes timed to
+  music drift from it more than with the 1.5x patch.
+- Changes the same line as "The game runs 1.5 times as fast" and "The
+  game runs at half speed", so it can't be combined with them.
