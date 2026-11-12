@@ -1658,9 +1658,9 @@ Octorok is jumping, so the bomb starts above the water. `git apply --check` pass
   breaks walls and rocks like a normal bomb.
 - Big Octo (`ovl_En_Bigokuta`) is a different actor and is not changed.
 
-## Every enemy moves with the speed of the enemy before it in the list
+## Every enemy moves with the speed of the enemy after it in the list
 
-**Source diff:** `patches/enemies-move-with-previous-enemys-speed.diff`
+**Source diff:** `patches/enemies-move-with-next-enemys-speed.diff`
 **Changes:** built on the Mac. Changes `code` (`z_actor.c`).
 **Recorded:** 2026-11-11 00:53:28
 
@@ -1670,39 +1670,44 @@ the world rotation into a velocity in `Actor_UpdateVelocityXZGravity`
 (`actor->velocity.x = actor->speed * Math_SinS(actor->world.rot.y);` and
 so on) and `Actor_UpdateVelocityXYZ`. The patch adds a small function
 `Actor_GetMoveSpeed`. For an actor in `ACTORCAT_ENEMY` with an
-`actor->prev`, it returns `actor->prev->speed`; for all other actors it
+`actor->next`, it returns `actor->next->speed`; for all other actors it
 returns `actor->speed`. The two velocity functions use it in place of
 `actor->speed`. So each enemy moves in its own direction, but at the
-speed of the enemy before it in the enemy list. This is the OoT version of
-the ALTTP cheat "Every enemy moves with the speed of the sprite in the
-previous slot".
+speed of the enemy after it in the enemy list: each enemy's speed acts on
+the enemy before it. This is the OoT version of the ALTTP cheat "Every
+enemy moves with the speed of the sprite in the previous slot", turned
+around at the user's request (2026-11-12; the first version used
+`actor->prev`).
 
 **Evidence:** Each actor category has its own linked list
 (`actorCtx->actorLists`, `Actor.prev` and `Actor.next` in
-`include/actor.h`), so `prev` of an enemy is always another enemy.
+`include/actor.h`), so `next` of an enemy is always another enemy.
 `Actor_AddToCategory` puts each new actor at the head of the list, so
-`prev` is the enemy that spawned just after it. The newest enemy has no
-`prev` and keeps its own speed. The enemy's own `speed` value is not
-changed, only how far it moves. `git apply --check` passes, and it
-builds.
+`next` is the enemy that spawned just before it. `Actor_UpdateAll` starts
+at the head and follows `next`, so the enemy after an enemy updates later
+in the same frame, and its speed is read from the frame before. The
+oldest enemy (the last in the list) has no `next` and keeps its own
+speed. The enemy's own `speed` value is not changed, only how far it
+moves. `git apply --check` passes, and it builds.
 
 **Revisions:** US NTSC 1.0 only. Others not checked.
 
 **Caveats:**
 
 - Not tested.
-- An enemy after one that stands still can't walk (it can still jump or
-  fall). An enemy after a fast one runs fast. A charging or jumping enemy
-  (Tektite, Wolfos lunge) may barely move if the enemy before it is slow.
+- An enemy before one that stands still can't walk (it can still jump or
+  fall). An enemy before a fast one runs fast. A charging or jumping
+  enemy (Tektite, Wolfos lunge) may barely move if the enemy after it is
+  slow.
 - Enemies that move by their animation (`Actor_UpdatePosByAnimation`) or
   set their position directly are not changed.
 - Any other actor that is in `ACTORCAT_ENEMY` (for example parts or
   shots that an enemy spawns in that category) is in the same list, so it
   gets a neighbor's speed too.
 
-## Every enemy pushes the enemy after it instead of moving itself
+## Every enemy pushes the enemy before it instead of moving itself
 
-**Source diff:** `patches/enemies-push-the-next-enemy.diff`
+**Source diff:** `patches/enemies-push-the-previous-enemy.diff`
 **Changes:** built on the Mac. Changes `code` (`z_actor.c`).
 **Recorded:** 2026-11-11 00:54:23
 
@@ -1711,28 +1716,31 @@ its velocity: `actor->world.pos.x += (actor->velocity.x * speedRate) +
 actor->colChkInfo.displacement.x;`, and the same for y and z.
 `Actor_MoveXZGravity` and `Actor_MoveXYZ` call it, and so do 52 places
 in the actor overlays. The patch adds the x and z velocity of an enemy
-(`ACTORCAT_ENEMY`) to the position of `actor->next`, the next enemy in
-the enemy list, instead of to its own. The enemy still moves itself up and
-down (gravity, jumps) and still gets its own collision push
-(`colChkInfo.displacement`). The last enemy in the list has no `next`
+(`ACTORCAT_ENEMY`) to the position of `actor->prev`, the enemy before it
+in the enemy list, instead of to its own. The enemy still moves itself up
+and down (gravity, jumps) and still gets its own collision push
+(`colChkInfo.displacement`). The first enemy in the list has no `prev`
 and moves itself as usual. This is the OoT version of the ALTTP cheat
-"Every enemy pushes the sprite in the next slot instead of moving itself".
+"Every enemy pushes the sprite in the next slot instead of moving
+itself", turned around at the user's request (2026-11-12; the first
+version pushed `actor->next`).
 
-**Evidence:** `next` is the next actor of the same category
+**Evidence:** `prev` is the actor before it in the same category
 (`include/actor.h`). `Actor_AddToCategory` puts each new actor at the
-head of the list, so `next` is the enemy that spawned just before it, and
-the first enemy spawned is the last in the list. `git apply --check`
-passes, and it builds.
+head of the list, so `prev` is the enemy that spawned just after it, and
+the newest enemy (the head) has no `prev`. `git apply --check` passes,
+and it builds.
 
 **Revisions:** US NTSC 1.0 only. Others not checked.
 
 **Caveats:**
 
 - Not tested.
-- `Actor_UpdateAll` saves `prevPos` at the start of each actor's update,
-  after the enemy before it has already pushed it. So the wall check of the
-  pushed enemy doesn't see the push, and enemies may be pushed through
-  walls or off ledges.
+- `Actor_UpdateAll` starts at the head and follows `next`, so the enemy
+  before an enemy has already run its update (and its wall and floor
+  check) this frame when it is pushed. The next frame saves `prevPos`
+  after the push. So the wall check never sees the push, and enemies may
+  be pushed through walls or off ledges.
 - An enemy far away in the room can push one next to Link, so enemies may
   slide around with no walking animation.
 - Enemies that move by animation or set their position directly don't
@@ -1740,7 +1748,7 @@ passes, and it builds.
 - Any other actor in `ACTORCAT_ENEMY` (parts or shots an enemy spawns in
   that category) is in the same list and pushes or gets pushed too.
 - The diff applies together with "Every enemy moves with the speed of the
-  enemy before it" (checked with `git apply --check`). That pair was not
+  enemy after it" (checked with `git apply --check`). That pair was not
   built.
 
 ## Items are collected anywhere in the room

@@ -1,5 +1,5 @@
 diff --git a/src/code/z_actor.c b/src/code/z_actor.c
-index 243dc7fbb..8c33ae926 100644
+index 243dc7fbb..522bcd68e 100644
 --- a/src/code/z_actor.c
 +++ b/src/code/z_actor.c
 @@ -994,9 +994,18 @@ void Actor_UpdatePos(Actor* actor) {
@@ -7,8 +7,8 @@ index 243dc7fbb..8c33ae926 100644
   * Update actor's velocity accounting for gravity (without dropping below minimum y velocity)
   */
 +static f32 Actor_GetMoveSpeed(Actor* actor) {
-+    if ((actor->category == ACTORCAT_ENEMY) && (actor->prev != NULL)) {
-+        return actor->prev->speed;
++    if ((actor->category == ACTORCAT_ENEMY) && (actor->next != NULL)) {
++        return actor->next->speed;
 +    }
 +    return actor->speed;
 +}
