@@ -2490,3 +2490,47 @@ builds.
   time it pauses.
 - Works with "L + R + Z opens the map select" (a different file). While
   L and R are held for it, enemies freeze too, which does no harm.
+
+## Link always faces away from the way he walks or runs
+
+**Source diff:** `patches/link-faces-away-from-where-he-moves.diff`
+**Changes:** built on the Mac. Changes the `ovl_player_actor` overlay
+(`z_player.c`).
+**Recorded:** 2026-11-12 02:17:55
+
+**Mechanism:** Link moves along `actor.world.rot.y` at `actor.speed`
+(`Actor_UpdateVelocityXZGravity`), and his model is drawn turned to
+`actor.shape.rot.y`. `Actor_Draw` builds the model matrix from
+`shape.rot` before it calls `Player_Draw`. The patch adds this at the
+start of `Player_Draw`: when `actor.speed` is not 0, it works out the
+way Link moves (`world.rot.y`, plus `0x8000` when the speed is
+negative, as in a backflip or knockback), adds `0x8000` to get the
+opposite, and calls `Matrix_RotateY` by the difference from
+`shape.rot.y`. So whenever Link moves sideways along the ground or in
+the air, his model faces straight away from the way he moves. Standing
+still, he faces as usual. `shape.rot.y` itself is not changed, so
+steering, targeting and the camera work as before. This is like
+"Link, Ganondorf and their horses face backwards", which turns models
+only while they are drawn.
+
+**Evidence:** `Player_Update` sets `world.rot.y` from `this->yaw` and
+`actor.speed` from `this->speedXZ` (or steps them on ice and hover
+boots). The skeleton (`Player_DrawImpl`), mask and held items are all
+drawn with the turned matrix, so they turn with him. `BINANG_TO_RAD` is
+in `include/z_math.h`. `git apply --check` passes, and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Body part positions are taken while the model is drawn
+  (`Player_PostLimbDrawGameplay`). So while he moves, his sword hits,
+  shield and head (camera focus) are on the turned side too. A jump
+  attack or a slash while moving hits behind Link.
+- He snaps around at once when he starts or stops moving. There is no
+  turning animation.
+- It also turns him while rolling, jumping, swimming, being knocked back
+  and on ice, since all of these have a speed.
+- The reflection drawn on some floors (`PLAYER_STATE2_26`) builds its
+  own matrix, so it is not turned.

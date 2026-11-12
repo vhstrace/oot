@@ -1,0 +1,19 @@
+diff --git a/src/overlays/actors/ovl_player_actor/z_player.c b/src/overlays/actors/ovl_player_actor/z_player.c
+index b8c908ad2..23506bbbc 100644
+--- a/src/overlays/actors/ovl_player_actor/z_player.c
++++ b/src/overlays/actors/ovl_player_actor/z_player.c
+@@ -12262,6 +12262,14 @@ void Player_Draw(Actor* thisx, PlayState* play2) {
+         s32 lod;
+         STACK_PAD(s32);
+ 
++        if (this->actor.speed != 0.0f) {
++            // Turn the model to face away from the way Link moves.
++            // Speed < 0 means he moves opposite to world.rot.y.
++            s16 faceYaw = this->actor.world.rot.y + ((this->actor.speed > 0.0f) ? 0x8000 : 0);
++
++            Matrix_RotateY(BINANG_TO_RAD((s16)(faceYaw - this->actor.shape.rot.y)), MTXMODE_APPLY);
++        }
++
+         if ((this->csAction != PLAYER_CSACTION_NONE) || (Player_CheckHostileLockOn(this) && 0) ||
+             (this->actor.projectedPos.z < 160.0f)) {
+             lod = 0;
