@@ -2536,7 +2536,7 @@ in `include/z_math.h`. `git apply --check` passes, and it builds.
   mirrored copy of Link under the floor. That copy builds its own matrix,
   so it is not turned.
 
-## New title screen theme melody (work in progress)
+## New title screen theme melody
 
 **Source diff:** `patches/new-title-theme.diff` (local only, see below)
 **Changes:** built on the Mac. Adds `assets/audio/sequences/seq_30.seq`,
@@ -2579,8 +2579,8 @@ comes before the one for `extracted/`, so the new file is used
 
 - The ocarina part was tested by the user (2026-11-12). The harmony
   change is not tested.
-- Work in progress. The patch, `track.mid` and the script that makes
-  the sequence (`patches/new-title-theme/make_seq.py`) are ignored by
+- The patch, `track.mid` and the script that makes the sequence
+  (`patches/new-title-theme/make_seq.py`) are ignored by
   `cheats/.gitignore` and are not in git. They exist only on the Mac,
   in a local Git repo in `patches/new-title-theme/`.
 - The whole theme, intro and the part after the melody too, is now a
