@@ -1383,6 +1383,8 @@ dropped a green rupee; changed to the Huge Rupee at the user's request
 `z_scene.c`).
 **Recorded:** 2026-11-11 00:44:26
 
+Tags: `demo-ready` `video-ready`
+
 **Mechanism:** `Item_DropCollectibleRandom` (`src/code/z_en_item00.c`)
 picks an item from the drop tables (`sItemDropIds`). If the result is not
 `ITEM00_NONE`, it spawns one or more `ACTOR_EN_ITEM00` items (or a
@@ -1414,7 +1416,8 @@ passes, and it builds.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-11 (RetroArch, built with the base
+  cheats): works.
 - Every scene uses 9.5 KB more object memory. If a room was already close
   to the limit, the last objects in it could overflow. This was not
   checked room by room.
