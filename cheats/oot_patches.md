@@ -266,7 +266,7 @@ that scales motion by it (`Actor_UpdatePos` uses
 **Changes:** built on the Mac. Changes `code` (`src/code/graph.c`).
 **Recorded:** 2026-11-11 00:03:31
 
-Tags: `demo-ready` `play-start` `video-ready` `curated`
+Tags: `demo-ready` `play-start` `video-ready`
 
 **Mechanism:** Same line as "The game runs at half speed". During play
 `R_UPDATE_RATE` is 3, so each picture stays up for 3 video frames (20
