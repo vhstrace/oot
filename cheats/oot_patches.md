@@ -2117,6 +2117,8 @@ builds.
 **Changes:** built on the Mac. Changes `code` (`src/code/graph.c`).
 **Recorded:** 2026-11-11 20:39:53
 
+Tags: `demo-ready` `play-start` `video-ready` `curated`
+
 **Mechanism:** This is the 60 frames per second version of "The game
 runs 1.5 times as fast". `Graph_TaskSet00` (`src/code/graph.c`) sets
 how many video frames each picture stays up:
@@ -2144,7 +2146,8 @@ Built with the debug cheats for the test ROM, and alone for the BPS
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-11 (RetroArch, built with the base
+  cheats): works.
 - On real hardware or an accurate emulator, the N64 can't make OoT's
   frames that fast in most places. The game will run as fast as it can,
   so the speed changes from place to place and from moment to moment
