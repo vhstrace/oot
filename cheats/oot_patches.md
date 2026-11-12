@@ -1269,6 +1269,8 @@ does. `git apply --check` passes, and it builds.
 **Changes:** built on the Mac. Changes the `ovl_player_actor` overlay.
 **Recorded:** 2026-11-11 00:39:57
 
+Tags: `demo-ready` `play-start` `curated`
+
 **Mechanism:** `func_808382DC` (`z_player.c`) handles hits on Link. It
 calls `func_80837C0C` in two places: for knockback set by an actor
 (`this->knockbackType`) and for a hit on Link's body collider
@@ -1303,7 +1305,8 @@ the electric floor/wall and Ice Trap reactions, and lava/hot floor damage
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-11 (RetroArch, built with the base
+  cheats): works.
 - Link still takes damage and blinks, but he doesn't flinch. Freezing
   (Freezards, ice traps from hits) and electric shocks still stop him,
   since those are not knockback.
