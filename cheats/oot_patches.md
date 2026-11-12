@@ -2058,6 +2058,8 @@ step. `git apply --check` passes, and it builds.
 `src/audio/game/sfx.c` and `general.c`).
 **Recorded:** 2026-11-11 01:05:42
 
+Tags: `demo-ready` `play-start` `video-ready`
+
 **Mechanism:** A sound effect id (`include/sfx.h`) is the bank in bits
 12-15, flags in bits 9-11 and the index in the bank in bits 0-8
 (`SFX_BANK`, `SFX_INDEX`). The bank picks which list of sounds in
@@ -2094,7 +2096,8 @@ and it builds.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-12 (RetroArch, built with the base
+  cheats): works.
 - Ocarina sounds (`BANK_OCARINA`, such as Link's ocarina notes) are
   left as they are, since the ocarina's notes are set through its own
   channel and would be silent in another bank. Nothing is moved into the
