@@ -1,0 +1,15 @@
+diff --git a/src/code/z_actor.c b/src/code/z_actor.c
+index 243dc7fbb..42fd1ac58 100644
+--- a/src/code/z_actor.c
++++ b/src/code/z_actor.c
+@@ -2508,6 +2508,10 @@ void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
+                     if (actor->colorFilterTimer != 0) {
+                         actor->colorFilterTimer--;
+                     }
++                    // Turn slightly clockwise (seen from above) before the update, so an actor
++                    // that sets its facing itself overrides the turn.
++                    actor->world.rot.y -= 0x80;
++                    actor->shape.rot.y -= 0x80;
+                     actor->update(actor, play);
+                     DynaPoly_UnsetAllInteractFlags(play, &play->colCtx.dyna, actor);
+                 }

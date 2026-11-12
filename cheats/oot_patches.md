@@ -2360,3 +2360,60 @@ builds.
   changed. Any other actor in `ACTORCAT_ENEMY` (parts or shots an enemy
   spawns in that category) drifts too.
 - To change the speed, change the two `2.0f` in the diff.
+
+## Every actor slowly turns clockwise
+
+**Source diff:** `patches/actors-turn-slowly-clockwise.diff`
+**Changes:** built on the Mac. Changes `code` (`z_actor.c`).
+**Recorded:** 2026-11-12 01:11:02
+
+**Mechanism:** `Actor_UpdateAll` (`src/code/z_actor.c`) runs each actor's
+update with `actor->update(actor, play);`. Just before that call, the
+patch turns every actor (all categories) a little clockwise as seen from
+above:
+
+```c
+actor->world.rot.y -= 0x80;
+actor->shape.rot.y -= 0x80;
+```
+
+0x80 is about 0.7 degrees, so a full turn takes 512 frames (about 26
+seconds at 20 frames per second). Because the turn comes before the
+update, an actor that sets its facing itself (for example
+`shape.rot.y = this->actor.yawTowardsPlayer`) replaces the turn, and is
+not changed. An actor that only steps its rotation from the current value
+(`Math_SmoothStepToS`, `+=`) keeps the turn, and one that does not touch
+its rotation turns steadily.
+
+**Evidence:** yaw goes counter-clockwise as seen from above: x is
+`Math_SinS(yaw)` and z is `Math_CosS(yaw)`, so yaw 0 points to +z and
+0x4000 to +x. Subtracting turns clockwise. Both `world.rot.y` (the
+direction an actor moves) and `shape.rot.y` (the direction it is drawn
+facing) are turned, because many actors copy one into the other each
+frame (`shape.rot.y = world.rot.y`), which would undo a turn of only one
+of them. It runs only when the actor really updates (not frozen, inside
+the culling volume, `freezeTimer` at 0). `git apply --check` passes, also
+together with "Every enemy slowly drifts forward the way it faces" and
+"Every enemy sets the rotation of the enemy before it instead of its
+own", and it builds.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Every category is changed, not only enemies and NPCs. Moving platforms,
+  doors, blocks and other `ACTORCAT_BG` actors have collision that
+  follows `shape.rot` (`DynaPoly` in `z_bgcheck.c`), so a platform that
+  doesn't set its own rotation turns with its floor and walls. Some may
+  push Link or block paths.
+- Link (`z_player.c`) keeps his own `yaw` and copies it into
+  `shape.rot.y` in many states, so whether he turns depends on what he is
+  doing. He may turn slowly when standing still.
+- Thrown or flying things (arrows, bombs, boomerang) whose path uses
+  `world.rot` may curve to the right.
+- Actors that use `world.rot.y` or `shape.rot.y` for something other
+  than facing (as a timer or a mode, or `home.rot` copied back) may act
+  oddly.
+- To change the speed, change the two `0x80` in the diff (bigger is
+  faster; use `+=` to turn counter-clockwise).
