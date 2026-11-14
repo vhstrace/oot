@@ -2771,7 +2771,8 @@ with the base cheats.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-14 (RetroArch, built with the base
+  cheats): works.
 - The Kokiri Sword does 1 damage to most enemies, so its hits do 0 and 1
   in turn. A 0-damage hit can still make an enemy flinch, but takes no
   health. Enemies with 1 health (Keese, for example) take 2 hits about
