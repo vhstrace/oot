@@ -2695,6 +2695,8 @@ base cheats.
 **Changes:** built on the Mac. Changes `code` (`z_parameter.c`).
 **Recorded:** 2026-11-14 14:14:16
 
+Tags: `curated` `demo-ready` `video-ready` `play-start`
+
 **Mechanism:** `Interface_Update` (`src/code/z_parameter.c`) runs once
 per frame in `Play_Update`. It already has an empty check for the
 environment timer with the usual "is play running" conditions
