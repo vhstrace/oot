@@ -2784,3 +2784,36 @@ with the base cheats.
   out hits themselves. They are not changed. Not checked which ones.
 - Reflected magic and other things that use sword flags without being
   Link's sword (if any) are halved too. Not checked.
+
+## The low health alarm is silent
+
+**Source diff:** `patches/low-health-alarm-is-silent.diff`
+**Changes:** built on the Mac. Changes `code` (`z_lifemeter.c`).
+**Recorded:** 2026-11-14 16:02:06
+
+**Mechanism:** `Health_UpdateBeatingHeart` (`src/code/z_lifemeter.c`)
+moves the beating heart's timer each frame. Each time the beat ends it
+did `if (!Player_InCsMode(play) && !IS_PAUSED(&play->pauseCtx) &&
+Health_IsCritical() && !Play_InCsMode(play)) {
+Sfx_PlaySfxCentered(NA_SE_SY_HITPOINT_ALARM); }`. The patch removes
+that check and call, so the alarm never plays. The heart still beats.
+This is the same as the "Low HP" sound set to "None" in the OoT
+Randomizer's sound options.
+
+**Evidence:** This is the only use of `NA_SE_SY_HITPOINT_ALARM` in
+`src/` and `include/` (besides its sound table entry).
+`Health_IsCritical` (1 heart or less with up to 5 heart containers, up
+to 2 3/4 hearts with 16 or more) is still used in `z_player.c` for
+Link's tired idle animation, which is not changed. `git apply --check`
+passes, and it builds, alone and with the base cheats.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- Made to go with "Link loses a quarter heart every 20 seconds, down to
+  1 heart", which keeps Link at 1 heart, where the alarm would beep all
+  the time. Different files, so they can be combined.
+- Link still pants in his idle animation at low health, so low health
+  can still be seen.
