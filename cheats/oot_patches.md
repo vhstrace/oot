@@ -2723,7 +2723,8 @@ cheats.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-14 (RetroArch, alone and together with
+  "The low health alarm is silent"): works.
 - The drain never kills Link. It stops at 1 heart. Enemies and hazards
   still do their usual damage, so they can still kill him.
 - It does not stop in boss rooms (user's choice).
@@ -2814,7 +2815,8 @@ passes, and it builds, alone and with the base cheats.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user on 2026-11-14 (RetroArch, together with "Link
+  loses a quarter heart every 20 seconds, down to 1 heart"): works.
 - Made to go with "Link loses a quarter heart every 20 seconds, down to
   1 heart", which keeps Link at 1 heart, where the alarm would beep all
   the time. Different files, so they can be combined.
