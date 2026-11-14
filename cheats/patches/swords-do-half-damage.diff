@@ -1,0 +1,30 @@
+diff --git a/src/code/z_collision_check.c b/src/code/z_collision_check.c
+index 2567c3b86..c461983ec 100644
+--- a/src/code/z_collision_check.c
++++ b/src/code/z_collision_check.c
+@@ -3069,6 +3069,8 @@ void CollisionCheck_SetInfoGetDamageTable(CollisionCheckInfo* info, s32 index, C
+     CollisionCheck_SetInfo2(info, DamageTable_Get(index), init);
+ }
+ 
++static s32 sSwordHalfDamageCarry = 0;
++
+ /**
+  * Apply AC damage effect
+  */
+@@ -3104,6 +3106,16 @@ void CollisionCheck_ApplyDamage(UNUSED PlayState* play, UNUSED CollisionCheckCon
+         damage = tbl->table[i] & 0xF;
+         col->actor->colChkInfo.damageReaction = tbl->table[i] >> 4 & 0xF;
+     }
++    // Swords do half damage. An odd amount rounds down and up in turn, so on average it is exactly half.
++    if (elem->acHitElem->atDmgInfo.dmgFlags & DMG_SWORD) {
++        s32 whole = (s32)damage;
++
++        if (whole & 1) {
++            whole += sSwordHalfDamageCarry;
++            sSwordHalfDamageCarry ^= 1;
++        }
++        damage = whole >> 1;
++    }
+     if (!(col->acFlags & AC_HARD)) {
+         col->actor->colChkInfo.damage += damage;
+     }

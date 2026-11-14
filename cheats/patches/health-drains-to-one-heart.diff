@@ -1,0 +1,38 @@
+diff --git a/src/code/z_parameter.c b/src/code/z_parameter.c
+index 1641b2e68..66aa9c5c0 100644
+--- a/src/code/z_parameter.c
++++ b/src/code/z_parameter.c
+@@ -4025,6 +4025,8 @@ void Interface_Draw(PlayState* play) {
+     CLOSE_DISPS(play->state.gfxCtx, "../z_parameter.c", 4269);
+ }
+ 
++static s32 sHealthDrainTimer = 0;
++
+ void Interface_Update(PlayState* play) {
+     static u8 D_80125B60 = false;
+     static s16 sPrevTimeSpeed = 0;
+@@ -4209,6 +4211,24 @@ void Interface_Update(PlayState* play) {
+         (play->transitionTrigger == TRANS_TRIGGER_OFF) && (play->transitionMode == TRANS_MODE_OFF) &&
+         !Play_InCsMode(play)) {}
+ 
++    // Health drain: lose 1/4 heart every 20 seconds of play, but never go below 1 heart.
++    // The timer counts in 1/60 s units (R_UPDATE_RATE is the number of 1/60 s per frame).
++    if ((gSaveContext.gameMode == GAMEMODE_NORMAL) && !IS_PAUSED(&play->pauseCtx) &&
++        (msgCtx->msgMode == MSGMODE_NONE) && (play->transitionTrigger == TRANS_TRIGGER_OFF) &&
++        (play->transitionMode == TRANS_MODE_OFF) && !Play_InCsMode(play) &&
++        (play->gameOverCtx.state == GAMEOVER_INACTIVE)) {
++        sHealthDrainTimer += R_UPDATE_RATE;
++        if (sHealthDrainTimer >= 20 * 60) {
++            sHealthDrainTimer = 0;
++            if (gSaveContext.save.info.playerData.health > 0x10) {
++                gSaveContext.save.info.playerData.health -= 4;
++                if (gSaveContext.save.info.playerData.health < 0x10) {
++                    gSaveContext.save.info.playerData.health = 0x10;
++                }
++            }
++        }
++    }
++
+     if (gSaveContext.rupeeAccumulator != 0) {
+         if (gSaveContext.rupeeAccumulator > 0) {
+             if (gSaveContext.save.info.playerData.rupees < CUR_CAPACITY(UPG_WALLET)) {

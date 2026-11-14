@@ -2688,3 +2688,97 @@ base cheats.
   except Link and Epona turns clockwise" (different files).
 - This entry was "The moon turns clockwise in the sky" (moon only) until
   the sun was added on 2026-11-12.
+
+## Link loses a quarter heart every 20 seconds, down to 1 heart
+
+**Source diff:** `patches/health-drains-to-one-heart.diff`
+**Changes:** built on the Mac. Changes `code` (`z_parameter.c`).
+**Recorded:** 2026-11-14 14:14:16
+
+**Mechanism:** `Interface_Update` (`src/code/z_parameter.c`) runs once
+per frame in `Play_Update`. It already has an empty check for the
+environment timer with the usual "is play running" conditions
+(`!IS_PAUSED(&play->pauseCtx) && (msgCtx->msgMode == MSGMODE_NONE) &&
+... && !Play_InCsMode(play)) {}`). After it, the patch adds a new
+file-level timer, `sHealthDrainTimer`. On each frame where the game is
+in normal play (`gSaveContext.gameMode == GAMEMODE_NORMAL`), not
+paused, with no text box, no scene transition, no cutscene and no game
+over, the timer goes up by `R_UPDATE_RATE` (the number of 1/60 s per
+frame, 3 at the usual 20 frames per second). At `20 * 60` (20 seconds)
+it goes back to 0, and if `health` is more than `0x10` (1 heart), it
+goes down by 4 (1/4 heart), but not below `0x10`.
+
+**Evidence:** Health is in 1/16 heart units (`0x10` per heart; the
+low-health code in `z_en_item00.c` checks `health <= 0x10` for "1 heart
+or less"). The patch writes `health` directly instead of calling
+`Health_ChangeBy`, because `Health_ChangeBy` halves damage with Double
+Defense (`amount >>= 1`), which would make the drain 1/8 heart. Counting
+in `R_UPDATE_RATE` keeps 20 real seconds when the frame rate changes.
+`git apply --check` passes, and it builds, alone and with the base
+cheats.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The drain never kills Link. It stops at 1 heart. Enemies and hazards
+  still do their usual damage, so they can still kill him.
+- It does not stop in boss rooms (user's choice).
+- It stops while the game is paused, during text boxes (including shops
+  and talking), cutscenes, scene transitions and game over. The timer
+  keeps its count, so the next 1/4 heart comes when 20 seconds of play
+  have passed in total.
+- It keeps running during minigames, horse riding, ocarina playing
+  outside a text box, and underwater or in hot rooms (on top of those
+  hazards).
+- There is no sound when a quarter heart is lost. The heart meter just
+  goes down.
+- At 5 hearts or less, most pots and grass drop a recovery heart, and at
+  1 heart or less they make a healing fairy (`z_en_item00.c`, flexible
+  drops). With the drain, Link will often be in that range, so these
+  drops become more common.
+
+## Swords do half damage
+
+**Source diff:** `patches/swords-do-half-damage.diff`
+**Changes:** built on the Mac. Changes `code` (`z_collision_check.c`).
+**Recorded:** 2026-11-14 14:14:17
+
+**Mechanism:** `CollisionCheck_ApplyDamage` (`src/code/z_collision_check.c`)
+works out the damage of each hit: from the target's damage table
+(`damage = tbl->table[i] & 0xF;`) or, with no table, from the attacker's
+`atDmgInfo.damage` minus the target's defense. Then it adds it to
+`col->actor->colChkInfo.damage`. The patch halves the damage when the
+attacker's `atDmgInfo.dmgFlags` has any of `DMG_SWORD` (slash, spin
+attack and jump attack, for the Kokiri Sword, Master Sword and the
+Giant's Knife / Biggoron's Sword). An odd amount is rounded down and up
+in turn, using a file-level flag `sSwordHalfDamageCarry`, so on average
+it is exactly half.
+
+**Evidence:** Link's sword sets these flags in `z_player.c`
+(`{ DMG_SLASH_MASTER, DMG_JUMP_MASTER }, { DMG_SLASH_KOKIRI,
+DMG_JUMP_KOKIRI }, { DMG_SLASH_GIANT, DMG_JUMP_GIANT }`).
+`DMG_SWORD` is `DMG_SLASH | DMG_SPIN_ATTACK | DMG_JUMP_SLASH`
+(`include/collision_check.h`). Deku Sticks (`DMG_DEKU_STICK`), the
+Megaton Hammer (`DMG_HAMMER`), arrows, bombs and magic are not in it and
+do full damage. `git apply --check` passes, and it builds, alone and
+with the base cheats.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The Kokiri Sword does 1 damage to most enemies, so its hits do 0 and 1
+  in turn. A 0-damage hit can still make an enemy flinch, but takes no
+  health. Enemies with 1 health (Keese, for example) take 2 hits about
+  half the time.
+- The round-down/round-up flag is shared by all enemies, not kept per
+  enemy. Hitting two enemies in turn with 1-damage hits can give one of
+  them all the 0s. A hit that touches more than one part of an enemy in
+  the same frame also counts once per part.
+- Some actors don't use `colChkInfo.damage` for their health and work
+  out hits themselves. They are not changed. Not checked which ones.
+- Reflected magic and other things that use sword flags without being
+  Link's sword (if any) are halved too. Not checked.
