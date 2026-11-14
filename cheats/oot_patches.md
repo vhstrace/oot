@@ -2791,6 +2791,8 @@ with the base cheats.
 **Changes:** built on the Mac. Changes `code` (`z_lifemeter.c`).
 **Recorded:** 2026-11-14 16:02:06
 
+Tags: `demo-ready` `play-start` `curated`
+
 **Mechanism:** `Health_UpdateBeatingHeart` (`src/code/z_lifemeter.c`)
 moves the beating heart's timer each frame. Each time the beat ends it
 did `if (!Player_InCsMode(play) && !IS_PAUSED(&play->pauseCtx) &&
@@ -2817,3 +2819,5 @@ passes, and it builds, alone and with the base cheats.
   the time. Different files, so they can be combined.
 - Link still pants in his idle animation at low health, so low health
   can still be seen.
+- One of the base cheats since 2026-11-14, so every built ROM with the
+  base cheats has it.
