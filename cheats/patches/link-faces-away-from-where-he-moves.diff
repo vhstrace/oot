@@ -1,18 +1,29 @@
 diff --git a/src/overlays/actors/ovl_player_actor/z_player.c b/src/overlays/actors/ovl_player_actor/z_player.c
-index b8c908ad2..23506bbbc 100644
+index b8c908ad2..c6d3984da 100644
 --- a/src/overlays/actors/ovl_player_actor/z_player.c
 +++ b/src/overlays/actors/ovl_player_actor/z_player.c
-@@ -12262,6 +12262,14 @@ void Player_Draw(Actor* thisx, PlayState* play2) {
+@@ -12251,6 +12251,9 @@ void Player_DrawGameplay(PlayState* play, Player* this, s32 lod, Gfx* cullDList,
+     CLOSE_DISPS(play->state.gfxCtx, "../z_player.c", 19328);
+ }
+ 
++// Model turn from shape.rot.y; starts as half a turn (facing backward).
++static s16 sLinkFaceAwayYawOffset = 0x8000;
++
+ void Player_Draw(Actor* thisx, PlayState* play2) {
+     PlayState* play = play2;
+     Player* this = (Player*)thisx;
+@@ -12262,6 +12265,15 @@ void Player_Draw(Actor* thisx, PlayState* play2) {
          s32 lod;
          STACK_PAD(s32);
  
++        // Turn the model to face away from the way Link moves. While he moves, remember the turn
++        // (relative to shape.rot.y); when he stops, keep using it, so he still faces away from the
++        // way he last moved. Speed < 0 means he moves opposite to world.rot.y.
 +        if (this->actor.speed != 0.0f) {
-+            // Turn the model to face away from the way Link moves.
-+            // Speed < 0 means he moves opposite to world.rot.y.
-+            s16 faceYaw = this->actor.world.rot.y + ((this->actor.speed > 0.0f) ? 0x8000 : 0);
-+
-+            Matrix_RotateY(BINANG_TO_RAD((s16)(faceYaw - this->actor.shape.rot.y)), MTXMODE_APPLY);
++            sLinkFaceAwayYawOffset = this->actor.world.rot.y + ((this->actor.speed > 0.0f) ? 0x8000 : 0) -
++                                     this->actor.shape.rot.y;
 +        }
++        Matrix_RotateY(BINANG_TO_RAD(sLinkFaceAwayYawOffset), MTXMODE_APPLY);
 +
          if ((this->csAction != PLAYER_CSACTION_NONE) || (Player_CheckHostileLockOn(this) && 0) ||
              (this->actor.projectedPos.z < 160.0f)) {

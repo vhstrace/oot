@@ -2501,37 +2501,60 @@ builds.
 **Mechanism:** Link moves along `actor.world.rot.y` at `actor.speed`
 (`Actor_UpdateVelocityXZGravity`), and his model is drawn turned to
 `actor.shape.rot.y`. `Actor_Draw` builds the model matrix from
-`shape.rot` before it calls `Player_Draw`. The patch adds this at the
-start of `Player_Draw`: when `actor.speed` is not 0, it works out the
-way Link moves (`world.rot.y`, plus `0x8000` when the speed is
-negative, as in a backflip or knockback), adds `0x8000` to get the
-opposite, and calls `Matrix_RotateY` by the difference from
-`shape.rot.y`. So whenever Link moves sideways along the ground or in
-the air, his model faces straight away from the way he moves. Standing
-still, he faces as usual. `shape.rot.y` itself is not changed, so
+`shape.rot` before it calls `Player_Draw`. The patch adds a static
+`sLinkFaceAwayYawOffset` (starts at `0x8000`) and this at the start of
+`Player_Draw`: when `actor.speed` is not 0, it works out the way Link
+moves (`world.rot.y`, plus `0x8000` when the speed is negative, as in a
+backflip or knockback), adds `0x8000` to get the opposite, and stores
+the difference from `shape.rot.y` in `sLinkFaceAwayYawOffset`. Then,
+moving or not, it calls `Matrix_RotateY` by `sLinkFaceAwayYawOffset`.
+So while Link moves along the ground or in the air, his model faces
+straight away from the way he moves. When he stops, he keeps the last
+turn, so he still faces away from the way he was moving (after a run,
+he stands facing backward; after a backflip, he faces forward; after a
+side hop, he faces sideways). `shape.rot.y` itself is not changed, so
 steering, targeting and the camera work as before. This is like
 "Link, Ganondorf and their horses face backwards", which turns models
 only while they are drawn.
 
+Until 2026-11-14, the turn was only used while `actor.speed` was not 0,
+so he snapped back to facing forward when he stopped. The user asked
+for him to keep facing away after he stops.
+
 **Evidence:** `Player_Update` sets `world.rot.y` from `this->yaw` and
 `actor.speed` from `this->speedXZ` (or steps them on ice and hover
 boots). The skeleton (`Player_DrawImpl`), mask and held items are all
-drawn with the turned matrix, so they turn with him. `BINANG_TO_RAD` is
-in `include/z_math.h`. `git apply --check` passes, and it builds.
+drawn with the turned matrix, so they turn with him. The turn is stored
+relative to `shape.rot.y`, so when the game turns Link while he stands
+(to talk, to face a target, in cutscenes), his model turns with it and
+keeps the same offset. The overlay's data is loaded fresh from ROM with
+the overlay, so the turn starts at `0x8000` again when the overlay is
+loaded again (on a scene change). `BINANG_TO_RAD` is in
+`include/z_math.h`. `git apply --check` passes, and it builds, alone and
+with the base cheats.
 
 **Revisions:** US NTSC 1.0 only. Others not checked.
 
 **Caveats:**
 
-- Not tested.
+- Not tested since the 2026-11-14 change.
+- The user allows all side effects of this cheat (2026-11-14).
+- Since the turn now stays on while he stands still, Link faces away
+  from people when he talks to them, from chests when he opens them, and
+  from the camera or other actors in cutscenes. In first-person view
+  (C-up, the bow, the slingshot) his model is mostly hidden, but the
+  turn still applies.
 - Body part positions are taken while the model is drawn
-  (`Player_PostLimbDrawGameplay`). So while he moves, his sword hits,
-  shield and head (camera focus) are on the turned side too. A jump
-  attack or a slash while moving hits behind Link.
-- He snaps around at once when he starts or stops moving. There is no
-  turning animation.
+  (`Player_PostLimbDrawGameplay`). So his sword hits, shield and head
+  (camera focus) are on the turned side too, now also while he stands.
+  After a run, a slash from standing hits behind Link, and the shield
+  covers his back.
+- He snaps around at once when he starts moving in a new direction.
+  There is no turning animation.
 - It also turns him while rolling, jumping, swimming, being knocked back
   and on ice, since all of these have a speed.
+- A short knockback or sword lunge also sets the turn, so he may keep
+  that facing when he stops.
 - In one special state (`PLAYER_STATE2_26`), `Player_Draw` also draws a
   mirrored copy of Link under the floor. That copy builds its own matrix,
   so it is not turned.
