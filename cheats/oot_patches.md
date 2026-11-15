@@ -2916,3 +2916,73 @@ and it builds, alone and with the base cheats.
 - The title screen comes up about 4 seconds sooner (the logo fades in
   for 85 frames, stays 60, and fades out for 85). Nothing else on the
   title screen or file select changes.
+
+## Every enemy near Link shoots glowing balls at him
+
+**Source diff:** `patches/enemies-shoot-glowing-balls.diff`
+**Changes:** built on the Mac. Changes `code` (`z_actor.c`) and the
+`ovl_En_Nutsball` overlay.
+**Recorded:** 2026-11-14 23:49:32
+
+**Mechanism:** This is the OoT version of the ALTTP cheat "Fireballs
+shot by most enemy types". That one hooks a routine all enemies call
+each frame and spawns a fireball every 64 frames, with the sprite slot
+added to the frame counter so enemies don't all fire at once.
+
+OoT has a shared place too: `Actor_UpdateAll` (`src/code/z_actor.c`)
+calls `actor->update(actor, play)` for each actor in each category
+list. The patch adds, right after that call:
+
+```c
+if ((i == ACTORCAT_ENEMY) && (actor->update != NULL) && (actor->xzDistToPlayer < 500.0f) &&
+    !(player->stateFlags1 &
+      (PLAYER_STATE1_TALKING | PLAYER_STATE1_DEAD | PLAYER_STATE1_28 | PLAYER_STATE1_29)) &&
+    ((((uintptr_t)actor >> 4) + play->gameplayFrames) & 0x3F) == 0) {
+    Actor_Spawn(&play->actorCtx, play, ACTOR_EN_NUTSBALL, actor->focus.pos.x,
+                actor->focus.pos.y, actor->focus.pos.z, 0, actor->yawTowardsPlayer, 0,
+                EN_NUTSBALL_TYPE_ANY_ENEMY);
+}
+```
+
+So each enemy within 500 units of Link shoots once every 64 frames
+(about 3 seconds at the game's 20 frames per second). The actor's
+address takes the place of ALTTP's slot number, so enemies fire on
+different frames.
+
+The projectile is the Deku Scrub's nut (`EnNutsball`). It flies
+straight ahead at speed 10 for 30 frames, then falls, and breaks on
+walls, the floor or Link. A Deku Shield (or an adult Hylian Shield)
+sends it back. The nut normally needs the scrub's object for its model,
+so the patch adds a new type 5 (`EN_NUTSBALL_TYPE_ANY_ENEMY`):
+
+- `EnNutsball_Init` uses the actor's own object slot (`gameplay_keep`,
+  always loaded) and turns off its OC collider
+  (`ocFlags1 = OC1_NONE`), so it doesn't break at once on the enemy
+  that shoots it.
+- `EnNutsball_Draw` draws `gEffSparklesDL` from `gameplay_keep` in
+  orange, the same way `EnArrow_Draw` draws the slingshot seed's
+  sparkle (scale 80 here, 50 for the seed).
+
+**Evidence:** `EnNutsball` is `ACTORCAT_PROP`, so the new balls don't
+shoot balls. Its AT collider is `AT_TYPE_ENEMY` and enemies' AC
+colliders take `AC_TYPE_PLAYER`, so the balls don't hit the enemy that
+shoots them or other enemies. Types 0 to 4 work as before (the new code
+runs only for type 5). Bosses are in `ACTORCAT_BOSS` and don't shoot.
+Actors spawned during `Actor_UpdateAll` go to the head of their list,
+as when an enemy spawns its own projectile. `git apply --check`
+passes, and it builds, alone and with the base cheats.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The ball starts at the enemy's focus point (usually its head). Enemies
+  hidden under the ground or water (Leevers, Octoroks between shots)
+  may shoot balls that break at once on the floor.
+- Every enemy shoots, also ones that are not hostile in the usual way,
+  like Skulltulas hanging still and Gold Skulltulas.
+- A rough room with many enemies spawns many balls. They break in about
+  a second, so the actor count should stay low.
+- The ball does the nut's damage (half a heart) and makes the Octorok
+  rock sound when it breaks.

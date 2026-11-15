@@ -1,0 +1,99 @@
+diff --git a/src/code/z_actor.c b/src/code/z_actor.c
+index 243dc7fbb..466c995eb 100644
+--- a/src/code/z_actor.c
++++ b/src/code/z_actor.c
+@@ -32,6 +32,7 @@
+ 
+ #include "src/overlays/actors/ovl_Arms_Hook/z_arms_hook.h"
+ #include "src/overlays/actors/ovl_En_Part/z_en_part.h"
++#include "src/overlays/actors/ovl_En_Nutsball/z_en_nutsball.h"
+ 
+ #include "assets/objects/gameplay_keep/shadow_circle.h"
+ #include "assets/objects/gameplay_keep/shadow_horse.h"
+@@ -2510,6 +2511,16 @@ void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
+                     }
+                     actor->update(actor, play);
+                     DynaPoly_UnsetAllInteractFlags(play, &play->colCtx.dyna, actor);
++
++                    // Every enemy near Link shoots a glowing ball at him about once a second.
++                    if ((i == ACTORCAT_ENEMY) && (actor->update != NULL) && (actor->xzDistToPlayer < 500.0f) &&
++                        !(player->stateFlags1 &
++                          (PLAYER_STATE1_TALKING | PLAYER_STATE1_DEAD | PLAYER_STATE1_28 | PLAYER_STATE1_29)) &&
++                        ((((uintptr_t)actor >> 4) + play->gameplayFrames) & 0x3F) == 0) {
++                        Actor_Spawn(&play->actorCtx, play, ACTOR_EN_NUTSBALL, actor->focus.pos.x,
++                                    actor->focus.pos.y, actor->focus.pos.z, 0, actor->yawTowardsPlayer, 0,
++                                    EN_NUTSBALL_TYPE_ANY_ENEMY);
++                    }
+                 }
+ 
+                 CollisionCheck_ResetDamage(&actor->colChkInfo);
+diff --git a/src/overlays/actors/ovl_En_Nutsball/z_en_nutsball.c b/src/overlays/actors/ovl_En_Nutsball/z_en_nutsball.c
+index 9124b849d..734ac7c95 100644
+--- a/src/overlays/actors/ovl_En_Nutsball/z_en_nutsball.c
++++ b/src/overlays/actors/ovl_En_Nutsball/z_en_nutsball.c
+@@ -22,6 +22,7 @@
+ #include "assets/objects/object_shopnuts/object_shopnuts.h"
+ #include "assets/objects/object_dns/object_dns.h"
+ #include "assets/objects/object_dnk/object_dnk.h"
++#include "assets/objects/gameplay_keep/eff_sparkles.h"
+ 
+ #define FLAGS ACTOR_FLAG_UPDATE_CULLING_DISABLED
+ 
+@@ -80,7 +81,13 @@ void EnNutsball_Init(Actor* thisx, PlayState* play) {
+     ActorShape_Init(&this->actor.shape, 400.0f, ActorShadow_DrawCircle, 13.0f);
+     Collider_InitCylinder(play, &this->collider);
+     Collider_SetCylinder(play, &this->collider, &this->actor, &sCylinderInit);
+-    this->requiredObjectSlot = Object_GetSlot(&play->objectCtx, sObjectIds[NUTSBALL_GET_TYPE(&this->actor)]);
++    if (NUTSBALL_GET_TYPE(&this->actor) == EN_NUTSBALL_TYPE_ANY_ENEMY) {
++        // Always loaded. No OC, so it doesn't break on the enemy that shoots it.
++        this->requiredObjectSlot = this->actor.objectSlot;
++        this->collider.base.ocFlags1 = OC1_NONE;
++    } else {
++        this->requiredObjectSlot = Object_GetSlot(&play->objectCtx, sObjectIds[NUTSBALL_GET_TYPE(&this->actor)]);
++    }
+ 
+     if (this->requiredObjectSlot < 0) {
+         Actor_Kill(&this->actor);
+@@ -180,11 +187,23 @@ void EnNutsball_Draw(Actor* thisx, PlayState* play) {
+ 
+     OPEN_DISPS(play->state.gfxCtx, "../z_en_nutsball.c", 327);
+ 
+-    Gfx_SetupDL_25Opa(play->state.gfxCtx);
+-    Matrix_Mult(&play->billboardMtxF, MTXMODE_APPLY);
+-    Matrix_RotateZ(this->actor.home.rot.z * 9.58738e-05f, MTXMODE_APPLY);
+-    MATRIX_FINALIZE_AND_LOAD(POLY_OPA_DISP++, play->state.gfxCtx, "../z_en_nutsball.c", 333);
+-    gSPDisplayList(POLY_OPA_DISP++, sDLists[NUTSBALL_GET_TYPE(&this->actor)]);
++    if (NUTSBALL_GET_TYPE(&this->actor) == EN_NUTSBALL_TYPE_ANY_ENEMY) {
++        // An orange glowing ball, drawn like the slingshot seed's sparkle.
++        Gfx_SetupDL_25Xlu2(play->state.gfxCtx);
++        gDPSetPrimColor(POLY_XLU_DISP++, 0, 0, 255, 255, 170, 255);
++        gDPSetEnvColor(POLY_XLU_DISP++, 255, 100, 0, 255);
++        Matrix_Mult(&play->billboardMtxF, MTXMODE_APPLY);
++        Matrix_RotateZ(this->actor.home.rot.z * 9.58738e-05f, MTXMODE_APPLY);
++        Matrix_Scale(80.0f, 80.0f, 80.0f, MTXMODE_APPLY);
++        MATRIX_FINALIZE_AND_LOAD(POLY_XLU_DISP++, play->state.gfxCtx, "../z_en_nutsball.c", 333);
++        gSPDisplayList(POLY_XLU_DISP++, gEffSparklesDL);
++    } else {
++        Gfx_SetupDL_25Opa(play->state.gfxCtx);
++        Matrix_Mult(&play->billboardMtxF, MTXMODE_APPLY);
++        Matrix_RotateZ(this->actor.home.rot.z * 9.58738e-05f, MTXMODE_APPLY);
++        MATRIX_FINALIZE_AND_LOAD(POLY_OPA_DISP++, play->state.gfxCtx, "../z_en_nutsball.c", 333);
++        gSPDisplayList(POLY_OPA_DISP++, sDLists[NUTSBALL_GET_TYPE(&this->actor)]);
++    }
+ 
+     CLOSE_DISPS(play->state.gfxCtx, "../z_en_nutsball.c", 337);
+ }
+diff --git a/src/overlays/actors/ovl_En_Nutsball/z_en_nutsball.h b/src/overlays/actors/ovl_En_Nutsball/z_en_nutsball.h
+index 9af4b042d..ca0541ee9 100644
+--- a/src/overlays/actors/ovl_En_Nutsball/z_en_nutsball.h
++++ b/src/overlays/actors/ovl_En_Nutsball/z_en_nutsball.h
+@@ -11,7 +11,8 @@ typedef enum EnNutsballType {
+     /*  1 */ EN_NUTSBALL_TYPE_HINTNUTS,
+     /*  2 */ EN_NUTSBALL_TYPE_SHOPNUTS,
+     /*  3 */ EN_NUTSBALL_TYPE_DNS,
+-    /*  4 */ EN_NUTSBALL_TYPE_DNK
++    /*  4 */ EN_NUTSBALL_TYPE_DNK,
++    /*  5 */ EN_NUTSBALL_TYPE_ANY_ENEMY // shot by every enemy, drawn with gameplay_keep
+ } EnNutsballType;
+ 
+ struct EnNutsball;
