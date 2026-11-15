@@ -2913,5 +2913,6 @@ and it builds, alone and with the base cheats.
 - Not tested.
 - The 64DD check in `ConsoleLogo_Init` still runs, so nothing changes
   when a 64DD is attached.
-- The title screen comes up about 3 seconds sooner. Nothing else on the
+- The title screen comes up about 4 seconds sooner (the logo fades in
+  for 85 frames, stays 60, and fades out for 85). Nothing else on the
   title screen or file select changes.
