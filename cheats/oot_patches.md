@@ -2876,3 +2876,42 @@ passes, and it builds, alone and with the base cheats.
   can still be seen.
 - One of the base cheats since 2026-11-14, so every built ROM with the
   base cheats has it.
+
+## Skip the N64 logo screen
+
+**Source diff:** `patches/skip-the-n64-logo-screen.diff`
+**Changes:** built on the Mac. Changes the `ovl_title` overlay
+(`z_title.c`).
+**Recorded:** 2026-11-14 23:46:14
+
+**Mechanism:** At power on, `Setup_InitImpl` goes to the console logo
+state (`ovl_title/z_title.c`). `ConsoleLogo_Main` fades the spinning N64
+logo in and out, and when `ConsoleLogo_Calc` sets `this->exit` it goes
+on to the title screen. The iQue version already skips the logo with
+
+```c
+#if PLATFORM_IQUE
+    this->exit = true;
+#endif
+```
+
+The patch removes the `#if`, so `this->exit` is set on the first frame
+on N64 too, and the title screen loads at once.
+
+**Evidence:** The state is not skipped as a whole, because
+`ConsoleLogo_Init` and `ConsoleLogo_Destroy` still have to run:
+`Sram_Alloc` and `Sram_InitSram` read the save file, and
+`CIC6105_EnableAudio` turns on the sound. With this patch they still
+run (init, one frame, destroy), as on iQue. The first frame is drawn
+fully black (`coverAlpha` starts at 255). `git apply --check` passes,
+and it builds, alone and with the base cheats.
+
+**Revisions:** US NTSC 1.0 only. Others not checked.
+
+**Caveats:**
+
+- Not tested.
+- The 64DD check in `ConsoleLogo_Init` still runs, so nothing changes
+  when a 64DD is attached.
+- The title screen comes up about 3 seconds sooner. Nothing else on the
+  title screen or file select changes.

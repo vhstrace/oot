@@ -1,0 +1,15 @@
+diff --git a/src/overlays/gamestates/ovl_title/z_title.c b/src/overlays/gamestates/ovl_title/z_title.c
+index 7432fb0a3..7969a01b3 100644
+--- a/src/overlays/gamestates/ovl_title/z_title.c
++++ b/src/overlays/gamestates/ovl_title/z_title.c
+@@ -183,9 +183,8 @@ void ConsoleLogo_Main(GameState* thisx) {
+     }
+ #endif
+ 
+-#if PLATFORM_IQUE
++    // Skip the N64 logo: leave on the first frame, as the iQue version does.
+     this->exit = true;
+-#endif
+ 
+     if (this->exit) {
+         gSaveContext.seqId = (u8)NA_BGM_DISABLED;
