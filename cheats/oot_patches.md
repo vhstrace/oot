@@ -2984,5 +2984,5 @@ passes, and it builds, alone and with the base cheats.
   like Skulltulas hanging still and Gold Skulltulas.
 - A rough room with many enemies spawns many balls. They break in about
   a second, so the actor count should stay low.
-- The ball does the nut's damage (half a heart) and makes the Octorok
-  rock sound when it breaks.
+- The ball does the same damage as a Deku Scrub's nut (its collider's
+  damage value is 8) and makes the Octorok rock sound when it breaks.
