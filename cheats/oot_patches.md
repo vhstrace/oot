@@ -2498,6 +2498,8 @@ builds.
 (`z_player.c`).
 **Recorded:** 2026-11-12 02:17:55
 
+Tags: `curated` `demo-ready` `video-ready` `play-start`
+
 **Mechanism:** Link moves along `actor.world.rot.y` at `actor.speed`
 (`Actor_UpdateVelocityXZGravity`), and his model is drawn turned to
 `actor.shape.rot.y`. `Actor_Draw` builds the model matrix from
