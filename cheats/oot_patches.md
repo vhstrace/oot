@@ -2446,6 +2446,8 @@ own", and it builds.
 `z_collision_check.c`).
 **Recorded:** 2026-11-12 01:36:17
 
+Tags: `curated` `demo-ready` `video-ready`
+
 **Mechanism:** `Actor_UpdateAll` (`src/code/z_actor.c`) already skips
 the update of actors that the game freezes (for example while Link
 talks): it only calls `CollisionCheck_ResetDamage(&actor->colChkInfo);`
