@@ -2442,7 +2442,8 @@ own", and it builds.
 ## Freeze time for enemies by holding L
 
 **Source diff:** `patches/hold-l-freezes-enemies.diff`
-**Changes:** built on the Mac. Changes `code` (`z_actor.c`).
+**Changes:** built on the Mac. Changes `code` (`z_actor.c`,
+`z_collision_check.c`).
 **Recorded:** 2026-11-12 01:36:17
 
 **Mechanism:** `Actor_UpdateAll` (`src/code/z_actor.c`) already skips
@@ -2457,6 +2458,26 @@ are. Let go of L and they go on from where they were. Link and all other
 actors keep running. Enemies whose `update` is `NULL` (killed) are not
 skipped, so they are still deleted as usual. Adds
 `#include "controller.h"` for the button macros.
+
+**Frozen enemies can be hurt** (added 2026-11-14): Each frame, the
+game first checks attacks against the AC (hurt) colliders that actors
+set in their last update (`CollisionCheck_AT` in `Play_Update`), then
+`CollisionCheck_ClearContext` empties the lists, then `Actor_UpdateAll`
+runs the updates, which react to hits and set their colliders again. A
+frozen enemy doesn't run its update, so before this change its colliders
+were gone after one frame. Now, while L is held,
+`CollisionCheck_ClearContext` (`src/code/z_collision_check.c`) keeps
+the AC colliders of `ACTORCAT_ENEMY` actors (whose `update` is not
+`NULL`) instead of clearing them. In `Actor_UpdateAll`, the freeze
+branch first calls a new `Actor_RemoveKeptACColliders(play, actor,
+true)`: if one of the enemy's kept colliders has `AC_HIT`, it takes the
+enemy's colliders off the list and the enemy is not frozen this frame.
+It runs one normal update, which takes the damage the game's own way
+(health, flinch, death, hit sound), and sets its colliders again. The
+next frame it is frozen again. `Actor_Delete` also calls
+`Actor_RemoveKeptACColliders(play, actor, false)`, so a kept collider
+never points to a deleted actor (for example when a room change deletes
+actors, then calls `CollisionCheck_ClearContext`).
 
 **Evidence:** In the US N64 retail build, L does only two things during
 play: pressing it turns the minimap on or off (`z_map_exp.c`, two
@@ -2478,11 +2499,15 @@ builds.
   original game.
 - Don't hold L while playing a song on the ocarina: L restarts the song
   input.
-- A frozen enemy doesn't set up its colliders (that happens in its
-  update), so while L is held Link's sword and arrows pass through
-  enemies, and enemies can't hurt Link by touch. Hits that land before
-  the freeze are dropped (`CollisionCheck_ResetDamage`), like the game's
-  own freeze.
+- Frozen enemies can be hit and hurt (since 2026-11-14). Each hit gives
+  the enemy one frame of movement: it starts its flinch or death, then
+  freezes in that pose until L is let go. An enemy whose health runs
+  out stays frozen in its death animation until L is let go, then
+  finishes dying. That change is not tested.
+- Only the AC (hurt) colliders are kept. Frozen enemies still can't hurt
+  Link by touch (AT), and Link still walks through them (OC).
+- An enemy whose hurt collider is set up by a part in another category
+  (not `ACTORCAT_ENEMY`) can't be hit while frozen.
 - Bosses (`ACTORCAT_BOSS`) are not frozen. Enemy shots and parts in
   other categories keep moving; ones in `ACTORCAT_ENEMY` freeze too.
 - Don't combine with "Frame advance on controller 1 (L pauses, R steps

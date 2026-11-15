@@ -1,5 +1,5 @@
 diff --git a/src/code/z_actor.c b/src/code/z_actor.c
-index 243dc7fbb..2e000718b 100644
+index 243dc7fbb..6d57e0613 100644
 --- a/src/code/z_actor.c
 +++ b/src/code/z_actor.c
 @@ -2,6 +2,7 @@
@@ -10,15 +10,115 @@ index 243dc7fbb..2e000718b 100644
  #include "fault.h"
  #include "gfx.h"
  #include "gfx_setupdl.h"
-@@ -2476,6 +2477,11 @@ void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
+@@ -2395,6 +2396,36 @@ u32 sCategoryFreezeMasks[ACTORCAT_MAX] = {
+     PLAYER_STATE1_TALKING | PLAYER_STATE1_DEAD | PLAYER_STATE1_28,
+ };
+ 
++/**
++ * Removes the actor's colliders from the AC list. With onlyIfHit, does this only if one of them was hit, and
++ * returns whether one was. CollisionCheck_ClearContext keeps frozen enemies' AC colliders while L is held.
++ */
++s32 Actor_RemoveKeptACColliders(PlayState* play, Actor* actor, s32 onlyIfHit) {
++    CollisionCheckContext* colChkCtx = &play->colChkCtx;
++    s32 hit = false;
++    s32 count = 0;
++    s32 i;
++
++    for (i = 0; i < colChkCtx->colACCount; i++) {
++        if ((colChkCtx->colAC[i]->actor == actor) && (colChkCtx->colAC[i]->acFlags & AC_HIT)) {
++            hit = true;
++        }
++    }
++    if (onlyIfHit && !hit) {
++        return false;
++    }
++    for (i = 0; i < colChkCtx->colACCount; i++) {
++        if (colChkCtx->colAC[i]->actor != actor) {
++            colChkCtx->colAC[count++] = colChkCtx->colAC[i];
++        }
++    }
++    for (i = count; i < colChkCtx->colACCount; i++) {
++        colChkCtx->colAC[i] = NULL;
++    }
++    colChkCtx->colACCount = count;
++    return hit;
++}
++
+ void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
+     s32 i;
+     Actor* actor;
+@@ -2476,6 +2507,13 @@ void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
                            (actor->parent == &player->actor)))) {
                  CollisionCheck_ResetDamage(&actor->colChkInfo);
                  actor = actor->next;
 +            } else if ((actor->category == ACTORCAT_ENEMY) && (actor->update != NULL) &&
-+                       CHECK_BTN_ALL(play->state.input[0].cur.button, BTN_L)) {
++                       CHECK_BTN_ALL(play->state.input[0].cur.button, BTN_L) &&
++                       !Actor_RemoveKeptACColliders(play, actor, true)) {
 +                // Holding L on controller 1 freezes enemies, like the game's own freeze above.
++                // A frozen enemy that was hit gets one normal update, so it takes the hit.
 +                CollisionCheck_ResetDamage(&actor->colChkInfo);
 +                actor = actor->next;
              } else if (actor->update == NULL) {
                  if (!actor->isDrawn) {
                      actor = Actor_Delete(&play->actorCtx, actor, play);
+@@ -3408,6 +3446,8 @@ Actor* Actor_Delete(ActorContext* actorCtx, Actor* actor, PlayState* play) {
+     }
+ 
+     Audio_StopSfxByPos(&actor->projectedPos);
++    // A deleted actor's AC colliders must not stay in the list (see Actor_RemoveKeptACColliders).
++    Actor_RemoveKeptACColliders(play2, actor, false);
+     Actor_Destroy(actor, play2);
+ 
+     newHead = Actor_RemoveFromCategory(play2, actorCtx, actor);
+diff --git a/src/code/z_collision_check.c b/src/code/z_collision_check.c
+index 2567c3b86..0ebf3643c 100644
+--- a/src/code/z_collision_check.c
++++ b/src/code/z_collision_check.c
+@@ -1,5 +1,6 @@
+ #include "gfx.h"
+ #include "attributes.h"
++#include "controller.h"
+ #include "printf.h"
+ #include "regs.h"
+ #include "sfx.h"
+@@ -1045,20 +1046,37 @@ void CollisionCheck_DestroyContext(UNUSED PlayState* play, UNUSED CollisionCheck
+ /**
+  * Clears all collider lists in CollisionCheckContext when not in SAC mode.
+  */
+-void CollisionCheck_ClearContext(UNUSED PlayState* play, CollisionCheckContext* colChkCtx) {
++void CollisionCheck_ClearContext(PlayState* play, CollisionCheckContext* colChkCtx) {
+     Collider** colP;
+     OcLine** lineP;
+ 
+     if (!(colChkCtx->sacFlags & SAC_ENABLE)) {
++        s32 keepCount = 0;
++
++        // While L is held on controller 1, enemies are frozen (Actor_UpdateAll) and don't set their AC
++        // colliders again. Keep the ones from before, so frozen enemies can still be hit.
++        if (CHECK_BTN_ALL(play->state.input[0].cur.button, BTN_L)) {
++            s32 i;
++
++            for (i = 0; i < colChkCtx->colACCount; i++) {
++                Collider* col = colChkCtx->colAC[i];
++
++                if ((col->actor != NULL) && (col->actor->category == ACTORCAT_ENEMY) &&
++                    (col->actor->update != NULL)) {
++                    colChkCtx->colAC[keepCount++] = col;
++                }
++            }
++        }
++
+         colChkCtx->colATCount = 0;
+-        colChkCtx->colACCount = 0;
++        colChkCtx->colACCount = keepCount;
+         colChkCtx->colOCCount = 0;
+         colChkCtx->colLineCount = 0;
+         for (colP = colChkCtx->colAT; colP < colChkCtx->colAT + COLLISION_CHECK_AT_MAX; colP++) {
+             *colP = NULL;
+         }
+ 
+-        for (colP = colChkCtx->colAC; colP < colChkCtx->colAC + COLLISION_CHECK_AC_MAX; colP++) {
++        for (colP = colChkCtx->colAC + keepCount; colP < colChkCtx->colAC + COLLISION_CHECK_AC_MAX; colP++) {
+             *colP = NULL;
+         }
+ 
