@@ -2884,6 +2884,8 @@ passes, and it builds, alone and with the base cheats.
 (`z_title.c`).
 **Recorded:** 2026-11-14 23:46:14
 
+Tags: `curated` `play-start` `utility`
+
 **Mechanism:** At power on, `Setup_InitImpl` goes to the console logo
 state (`ovl_title/z_title.c`). `ConsoleLogo_Main` fades the spinning N64
 logo in and out, and when `ConsoleLogo_Calc` sets `this->exit` it goes
@@ -2910,7 +2912,8 @@ and it builds, alone and with the base cheats.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in RetroArch: works.
+- It is one of the base cheats (2026-11-15), so every built ROM has it.
 - The 64DD check in `ConsoleLogo_Init` still runs, so nothing changes
   when a 64DD is attached.
 - The title screen comes up about 4 seconds sooner (the logo fades in
