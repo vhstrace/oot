@@ -2927,6 +2927,8 @@ and it builds, alone and with the base cheats.
 `ovl_En_Nutsball` overlay.
 **Recorded:** 2026-11-14 23:49:32
 
+Tags: `demo-ready` `video-ready` `challenge` `curated`
+
 **Mechanism:** This is the OoT version of the ALTTP cheat "Fireballs
 shot by most enemy types". That one hooks a routine all enemies call
 each frame and spawns a fireball every 64 frames, with the sprite slot
@@ -2979,7 +2981,7 @@ passes, and it builds, alone and with the base cheats.
 
 **Caveats:**
 
-- Not tested.
+- Tested by the user in RetroArch: works.
 - The ball starts at the enemy's focus point (usually its head). Enemies
   hidden under the ground or water (Leevers, Octoroks between shots)
   may shoot balls that break at once on the floor.
