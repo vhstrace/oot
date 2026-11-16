@@ -15,7 +15,7 @@ index 243dc7fbb..466c995eb 100644
                      actor->update(actor, play);
                      DynaPoly_UnsetAllInteractFlags(play, &play->colCtx.dyna, actor);
 +
-+                    // Every enemy near Link shoots a glowing ball at him about once a second.
++                    // Every enemy near Link shoots a glowing ball at him about every 3 seconds.
 +                    if ((i == ACTORCAT_ENEMY) && (actor->update != NULL) && (actor->xzDistToPlayer < 500.0f) &&
 +                        !(player->stateFlags1 &
 +                          (PLAYER_STATE1_TALKING | PLAYER_STATE1_DEAD | PLAYER_STATE1_28 | PLAYER_STATE1_29)) &&
